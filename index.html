@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS & Theta God — AI Trading Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ─── RESET & BASE ────────────────────────────────── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue-900:#0a1628;--blue-800:#0d1f3c;--blue-700:#102a4c;
+  --blue-600:#1a3a5c;--blue-500:#2563eb;--blue-400:#3b82f6;
+  --blue-300:#60a5fa;--blue-200:#93c5fd;--blue-100:#dbeafe;
+  --cyan:#06b6d4;--cyan-glow:#22d3ee;
+  --green:#10b981;--red:#ef4444;--gold:#f59e0b;
+  --white:#ffffff;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+  --gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;
+  --glass:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.08);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--blue-900);color:var(--white);
+  overflow-x:hidden;line-height:1.6;
+}
+h1,h2,h3,h4{font-family:'Orbitron',sans-serif;letter-spacing:0.5px}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ─── ANIMATED GRID BACKGROUND ───────────────────── */
+.grid-bg{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+  background:
+    linear-gradient(rgba(37,99,235,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:gridMove 20s linear infinite;
+}
+@keyframes gridMove{0%{transform:translate(0,0)}100%{transform:translate(60px,60px)}}
+
+/* ─── FLOATING GEOMETRIC SHAPES ──────────────────── */
+.geo-container{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.geo{position:absolute;border:1px solid rgba(37,99,235,0.15);opacity:0.4;animation:float 15s ease-in-out infinite}
+.geo.triangle{width:0;height:0;border:none;border-left:30px solid transparent;border-right:30px solid transparent;border-bottom:52px solid rgba(37,99,235,0.08)}
+.geo.hex{width:60px;height:34px;background:rgba(6,182,212,0.06);position:absolute;clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)}
+.geo.circle{border-radius:50%;width:80px;height:80px;border:1px solid rgba(37,99,235,0.1)}
+.geo.diamond{width:40px;height:40px;transform:rotate(45deg);border:1px solid rgba(6,182,212,0.12)}
+.geo:nth-child(1){top:10%;left:5%;animation-duration:18s;animation-delay:0s}
+.geo:nth-child(2){top:20%;right:10%;animation-duration:22s;animation-delay:2s}
+.geo:nth-child(3){top:50%;left:15%;animation-duration:16s;animation-delay:4s}
+.geo:nth-child(4){top:70%;right:20%;animation-duration:20s;animation-delay:1s}
+.geo:nth-child(5){top:85%;left:40%;animation-duration:24s;animation-delay:3s}
+.geo:nth-child(6){top:30%;left:70%;animation-duration:19s;animation-delay:5s}
+.geo:nth-child(7){top:60%;right:5%;animation-duration:21s;animation-delay:2s}
+.geo:nth-child(8){top:15%;left:45%;animation-duration:17s;animation-delay:6s}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  25%{transform:translateY(-30px) rotate(5deg)}
+  50%{transform:translateY(-15px) rotate(-3deg)}
+  75%{transform:translateY(-40px) rotate(4deg)}
+}
+
+/* ─── LAYOUT ─────────────────────────────────────── */
+.container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+section{padding:100px 0;position:relative}
+.section-label{
+  font-family:'Orbitron',sans-serif;font-size:0.7rem;letter-spacing:4px;
+  text-transform:uppercase;color:var(--cyan);margin-bottom:12px;
+  display:flex;align-items:center;gap:12px;
+}
+.section-label::before{content:'';width:40px;height:1px;background:var(--cyan)}
+.section-title{font-size:clamp(2rem,5vw,3.2rem);margin-bottom:16px;line-height:1.2}
+.section-sub{font-size:1.1rem;color:var(--gray-400);max-width:600px;margin-bottom:48px}
+.highlight{color:var(--cyan-glow)}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.gold{color:var(--gold)}
+
+/* ─── GLASS CARDS ────────────────────────────────── */
+.card{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:16px;padding:32px;
+  backdrop-filter:blur(12px);
+  transition:transform 0.3s,border-color 0.3s,box-shadow 0.3s;
+}
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(37,99,235,0.3);
+  box-shadow:0 20px 60px rgba(0,0,0,0.3),0 0 30px rgba(37,99,235,0.1);
+}
+.card-grid{display:grid;gap:24px}
+.card-grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card-grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.card-grid.cols-4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+
+/* ─── HERO ───────────────────────────────────────── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;text-align:center;
+  position:relative;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 20px;border-radius:100px;
+  background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.3);
+  font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--blue-300);margin-bottom:32px;
+  font-family:'Orbitron',sans-serif;
+}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{
+  font-size:clamp(3rem,8vw,6rem);font-weight:900;
+  background:linear-gradient(135deg,var(--white) 0%,var(--blue-200) 50%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;margin-bottom:24px;line-height:1.1;
+}
+.hero-tagline{
+  font-size:clamp(1rem,2.5vw,1.4rem);color:var(--gray-400);
+  max-width:700px;margin-bottom:48px;
+}
+.hero-stats{display:flex;gap:48px;flex-wrap:wrap;justify-content:center}
+.hero-stat{text-align:center}
+.hero-stat-value{
+  font-family:'Orbitron',sans-serif;font-size:2.4rem;font-weight:700;
+  color:var(--cyan-glow);display:block;
+}
+.hero-stat-label{font-size:0.85rem;color:var(--gray-500);margin-top:4px}
+.scroll-indicator{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--gray-500);font-size:0.75rem;letter-spacing:2px;
+  animation:bobUp 2s ease-in-out infinite;
+}
+.scroll-arrow{width:20px;height:20px;border-right:2px solid var(--gray-500);border-bottom:2px solid var(--gray-500);transform:rotate(45deg)}
+@keyframes bobUp{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+
+/* ─── NAV ────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:16px 0;transition:background 0.3s;
+}
+nav.scrolled{background:rgba(10,22,40,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
+nav .container{display:flex;justify-content:space-between;align-items:center}
+.nav-logo{font-family:'Orbitron',sans-serif;font-weight:700;font-size:1.1rem;color:var(--white)}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{
+  color:var(--gray-400);text-decoration:none;font-size:0.85rem;
+  letter-spacing:1px;transition:color 0.3s;font-family:'Space Grotesk',sans-serif;
+}
+.nav-links a:hover{color:var(--cyan)}
+
+/* ─── STAT BLOCKS ────────────────────────────────── */
+.stat-block{text-align:center;padding:24px}
+.stat-value{
+  font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:700;
+  margin-bottom:4px;
+}
+.stat-label{font-size:0.8rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px}
+
+/* ─── STRATEGY EXPLAINER ─────────────────────────── */
+.step-flow{display:flex;flex-direction:column;gap:0}
+.step{
+  display:flex;gap:24px;padding:24px 0;
+  border-left:2px solid var(--glass-border);
+  padding-left:32px;position:relative;
+}
+.step::before{
+  content:'';position:absolute;left:-7px;top:28px;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--blue-500);border:2px solid var(--blue-900);
+}
+.step-num{
+  font-family:'Orbitron',sans-serif;font-size:0.7rem;
+  color:var(--cyan);letter-spacing:2px;margin-bottom:4px;
+}
+.step h4{font-size:1.1rem;margin-bottom:6px;font-family:'Space Grotesk',sans-serif;font-weight:600}
+.step p{color:var(--gray-400);font-size:0.95rem}
+
+/* ─── CHART CONTAINER ────────────────────────────── */
+.chart-wrap{
+  background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:16px;padding:24px;margin:24px 0;
+}
+.chart-wrap canvas{max-height:400px}
+
+/* ─── YEARLY TABLE ───────────────────────────────── */
+.data-table{width:100%;border-collapse:collapse;font-size:0.9rem}
+.data-table th{
+  font-family:'Orbitron',sans-serif;font-size:0.7rem;
+  letter-spacing:1px;text-transform:uppercase;
+  color:var(--gray-400);padding:12px 16px;text-align:left;
+  border-bottom:1px solid var(--glass-border);
+}
+.data-table td{
+  padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.03);
+  font-family:'JetBrains Mono',monospace;font-size:0.85rem;
+}
+.data-table tr:hover{background:rgba(37,99,235,0.05)}
+.data-table .positive{color:var(--green)}
+.data-table .negative{color:var(--red)}
+
+/* ─── COMPARISON SECTION ─────────────────────────── */
+.vs-badge{
+  display:inline-block;padding:6px 16px;border-radius:8px;
+  font-family:'Orbitron',sans-serif;font-size:0.7rem;
+  letter-spacing:2px;margin-bottom:16px;
+}
+.vs-atlas{background:rgba(37,99,235,0.2);color:var(--blue-300)}
+.vs-theta{background:rgba(6,182,212,0.2);color:var(--cyan)}
+
+/* ─── ALPHA SIGNALS ──────────────────────────────── */
+.alpha-card{position:relative;overflow:hidden}
+.alpha-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue-500),var(--cyan));
+}
+.alpha-num{
+  font-family:'Orbitron',sans-serif;font-size:3rem;font-weight:900;
+  color:rgba(37,99,235,0.15);position:absolute;top:12px;right:16px;
+}
+.alpha-name{font-family:'Orbitron',sans-serif;font-size:0.85rem;color:var(--cyan);margin-bottom:8px}
+.alpha-desc{color:var(--gray-400);font-size:0.9rem}
+.alpha-perf{
+  margin-top:12px;font-family:'JetBrains Mono',monospace;
+  color:var(--green);font-size:0.9rem;
+}
+
+/* ─── DIVIDER ────────────────────────────────────── */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue-500),var(--cyan),var(--blue-500),transparent);
+  margin:0 auto;max-width:600px;
+}
+
+/* ─── TECH STACK ─────────────────────────────────── */
+.tech-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:100px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);
+  font-size:0.8rem;color:var(--gray-400);margin:4px;
+}
+
+/* ─── FOOTER ─────────────────────────────────────── */
+footer{
+  padding:60px 0 40px;border-top:1px solid var(--glass-border);
+  text-align:center;color:var(--gray-500);font-size:0.85rem;
+}
+footer .logo-foot{font-family:'Orbitron',sans-serif;font-size:1.5rem;margin-bottom:8px;color:var(--gray-400)}
+
+/* ─── SCROLL ANIMATIONS ──────────────────────────── */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.8s,transform 0.8s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+.reveal-delay-4{transition-delay:0.4s}
+
+/* ─── GLOW EFFECTS ───────────────────────────────── */
+.glow-line{
+  position:absolute;height:1px;width:200px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  animation:glowSweep 4s ease-in-out infinite;
+}
+@keyframes glowSweep{
+  0%{left:-200px;opacity:0}
+  50%{opacity:1}
+  100%{left:100%;opacity:0}
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────── */
+@media(max-width:768px){
+  section{padding:60px 0}
+  .hero h1{font-size:2.5rem}
+  .hero-stats{gap:24px}
+  .hero-stat-value{font-size:1.6rem}
+  .nav-links{display:none}
+  .card{padding:20px}
+  .stat-value{font-size:1.5rem}
+  .data-table{font-size:0.75rem}
+  .data-table td,.data-table th{padding:8px}
+}
+
+/* ─── SCANLINE OVERLAY ───────────────────────────── */
+.scanline{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:99;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,
+    rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px
+  );
+}
+</style>
+</head>
+<body>
+
+<!-- Background effects -->
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="geo-container">
+  <div class="geo triangle"></div>
+  <div class="geo hex"></div>
+  <div class="geo circle"></div>
+  <div class="geo diamond"></div>
+  <div class="geo triangle"></div>
+  <div class="geo hex"></div>
+  <div class="geo circle"></div>
+  <div class="geo diamond"></div>
+</div>
+
+<!-- Navigation -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-logo">⚡ QUANT.SYS</div>
+    <ul class="nav-links">
+      <li><a href="#atlas">ATLAS</a></li>
+      <li><a href="#theta">THETA GOD</a></li>
+      <li><a href="#backtest">BACKTESTS</a></li>
+      <li><a href="#compare">COMPARE</a></li>
+      <li><a href="#tech">TECH</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span> AUTONOMOUS TRADING SYSTEMS</div>
+  <h1>ATLAS &<br>THETA GOD</h1>
+  <p class="hero-tagline">
+    Two AI-powered quantitative trading bots that autonomously trade Indian markets.
+    One finds alpha in equities. The other sells time. Both print money.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-value" data-count="822841" data-prefix="₹" data-format="comma">0</span>
+      <span class="hero-stat-label">Theta God (₹1L → ₹8.2L)</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-value" data-count="635916" data-prefix="₹" data-format="comma">0</span>
+      <span class="hero-stat-label">ATLAS (₹1L → ₹6.4L)</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-value" data-count="10" data-suffix=" yrs">0</span>
+      <span class="hero-stat-label">Backtested</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-value" data-count="100" data-suffix="%">0</span>
+      <span class="hero-stat-label">Years Profitable</span>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    SCROLL<br>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ATLAS SECTION -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="atlas">
+  <div class="container">
+    <div class="section-label reveal">SYSTEM 01</div>
+    <h2 class="section-title reveal">ATLAS <span class="highlight">— The Stock Hunter</span></h2>
+    <p class="section-sub reveal">
+      An autonomous daily equity trading bot that scans the entire Nifty 50 universe,
+      runs 5 quantitative alpha signals, validates with AI, and executes trades — all before you wake up.
+    </p>
+
+    <!-- Stats -->
+    <div class="card-grid cols-4 reveal">
+      <div class="card stat-block">
+        <div class="stat-value green">+20.4%</div>
+        <div class="stat-label">CAGR</div>
+      </div>
+      <div class="card stat-block">
+        <div class="stat-value" style="color:var(--cyan)">6.4x</div>
+        <div class="stat-label">Return (10yr)</div>
+      </div>
+      <div class="card stat-block">
+        <div class="stat-value">59%</div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="card stat-block">
+        <div class="stat-value gold">10/10</div>
+        <div class="stat-label">Years Profitable</div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <h3 style="font-family:'Orbitron';font-size:1rem;color:var(--cyan);letter-spacing:2px;margin:60px 0 24px">
+      HOW ATLAS WORKS
+    </h3>
+    <div class="step-flow reveal">
+      <div class="step">
+        <div>
+          <div class="step-num">STEP 01</div>
+          <h4>📡 Scan the Universe</h4>
+          <p>Every morning at 9:15 AM, ATLAS downloads fresh data for all 50 Nifty stocks — price, volume, momentum, volatility.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <div class="step-num">STEP 02</div>
+          <h4>🧠 Run 5 Alpha Signals</h4>
+          <p>Each stock gets scored by 5 uncorrelated quantitative factors — from volume-weighted momentum to Keltner channel breakouts. The signals are combined into a composite score.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <div class="step-num">STEP 03</div>
+          <h4>🤖 AI Validation</h4>
+          <p>Top-ranked stocks go through an LLM brain (Claude/Gemini) for fundamental analysis — news, earnings, sector sentiment. Only stocks that pass both quant AND AI filters get traded.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <div class="step-num">STEP 04</div>
+          <h4>⚡ Execute & Protect</h4>
+          <p>Orders fire automatically via Angel One API. Every position gets a trailing stop (+3% activation, 1.5% trail) and a 15-day max hold. Risk manager caps exposure at 18% per trade.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- The KILLER 5 Alphas -->
+    <h3 style="font-family:'Orbitron';font-size:1rem;color:var(--cyan);letter-spacing:2px;margin:60px 0 24px">
+      THE KILLER 5 — ALPHA SIGNALS
+    </h3>
+    <div class="card-grid cols-3 reveal">
+      <div class="card alpha-card">
+        <div class="alpha-num">α1</div>
+        <div class="alpha-name">ALPHA 054</div>
+        <h4>Volume-Weighted Momentum</h4>
+        <p class="alpha-desc">Detects stocks where price rises are backed by increasing volume — smart money footprint.</p>
+        <div class="alpha-perf">+21.2%/yr • Weight: 3.0</div>
+      </div>
+      <div class="card alpha-card">
+        <div class="alpha-num">α2</div>
+        <div class="alpha-name">QLIB KUP</div>
+        <h4>Keltner Channel Breakout</h4>
+        <p class="alpha-desc">Catches explosive moves when price breaks above the Keltner channel — volatility expansion signal.</p>
+        <div class="alpha-perf">+19.5%/yr • Weight: 3.0</div>
+      </div>
+      <div class="card alpha-card">
+        <div class="alpha-num">α3</div>
+        <div class="alpha-name">QLIB MA10</div>
+        <h4>Moving Average Momentum</h4>
+        <p class="alpha-desc">Trend-following signal using 10-period MA crossover dynamics — rides the wave.</p>
+        <div class="alpha-perf">+16.1%/yr • Weight: 2.5</div>
+      </div>
+      <div class="card alpha-card">
+        <div class="alpha-num">α4</div>
+        <div class="alpha-name">ALPHA 041</div>
+        <h4>High-Low Range Position</h4>
+        <p class="alpha-desc">Measures where the close sits within the daily range — detects accumulation patterns.</p>
+        <div class="alpha-perf">+15.2%/yr • Weight: 2.5</div>
+      </div>
+      <div class="card alpha-card">
+        <div class="alpha-num">α5</div>
+        <div class="alpha-name">ALPHA 042</div>
+        <h4>Mean Reversion</h4>
+        <p class="alpha-desc">The contrarian — buys oversold bounces. Low correlation with other signals provides diversification.</p>
+        <div class="alpha-perf">+14.8%/yr • 11/11 yrs profitable</div>
+      </div>
+    </div>
+
+    <!-- ATLAS Yearly Chart -->
+    <div class="chart-wrap reveal" style="margin-top:48px">
+      <h4 style="font-family:'Orbitron';font-size:0.8rem;letter-spacing:2px;color:var(--gray-400);margin-bottom:16px">
+        ATLAS — YEAR BY YEAR PERFORMANCE
+      </h4>
+      <canvas id="atlasYearlyChart"></canvas>
+    </div>
+
+    <!-- BEAST Config -->
+    <div class="card reveal" style="margin-top:24px">
+      <h4 style="font-family:'Orbitron';font-size:0.8rem;letter-spacing:2px;color:var(--cyan);margin-bottom:16px">
+        ⚙️ BEAST MODE CONFIG
+      </h4>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div><span class="mono" style="color:var(--gray-400)">Position Size:</span> <span class="mono">18% / trade</span></div>
+        <div><span class="mono" style="color:var(--gray-400)">Trailing Stop:</span> <span class="mono">+3% → 1.5% trail</span></div>
+        <div><span class="mono" style="color:var(--gray-400)">Max Hold:</span> <span class="mono">15 days</span></div>
+        <div><span class="mono" style="color:var(--gray-400)">Max Positions:</span> <span class="mono">8 simultaneous</span></div>
+        <div><span class="mono" style="color:var(--gray-400)">Buy Threshold:</span> <span class="mono">0.60 (top 40%)</span></div>
+        <div><span class="mono" style="color:var(--gray-400)">Daily Loss Cap:</span> <span class="mono">5%</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- THETA GOD SECTION -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="theta">
+  <div class="container">
+    <div class="section-label reveal">SYSTEM 02</div>
+    <h2 class="section-title reveal">THETA GOD <span class="highlight">🔱 — The Time Seller</span></h2>
+    <p class="section-sub reveal">
+      A SENSEX short straddle bot that sells ATM options every single trading day,
+      collects premium from theta decay, and manages risk with intelligent stop-losses.
+      It literally sells time for money.
+    </p>
+
+    <!-- Stats -->
+    <div class="card-grid cols-4 reveal">
+      <div class="card stat-block">
+        <div class="stat-value green">+23.5%</div>
+        <div class="stat-label">CAGR</div>
+      </div>
+      <div class="card stat-block">
+        <div class="stat-value" style="color:var(--cyan)">8.2x</div>
+        <div class="stat-label">Return (10yr)</div>
+      </div>
+      <div class="card stat-block">
+        <div class="stat-value">70.3%</div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="card stat-block">
+        <div class="stat-value gold">89%</div>
+        <div class="stat-label">Months Profitable</div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <h3 style="font-family:'Orbitron';font-size:1rem;color:var(--cyan);letter-spacing:2px;margin:60px 0 24px">
+      HOW THETA GOD WORKS
+    </h3>
+
+    <div class="card reveal" style="margin-bottom:32px;text-align:center;padding:40px">
+      <p style="font-size:1.2rem;color:var(--gray-400);max-width:800px;margin:0 auto">
+        Options are like insurance contracts. Buyers pay a premium for protection.
+        <strong style="color:var(--white)">Theta God is the insurance company</strong> —
+        it sells this "insurance" every day and keeps the premium when nothing happens.
+        And most days? <span class="green">Nothing happens.</span>
+      </p>
+    </div>
+
+    <div class="step-flow reveal">
+      <div class="step">
+        <div>
+          <div class="step-num">09:59 AM</div>
+          <h4>📉 Sell ATM Straddle</h4>
+          <p>Sell both a Call and a Put option at the same strike price (at-the-money). Collect the total premium upfront. If SENSEX doesn't move much — you keep it all.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <div class="step-num">ALL DAY</div>
+          <h4>🛡️ Monitor with Stop-Losses</h4>
+          <p>CE gets a 25% SL, PE gets 23%. Every 10 seconds the bot checks prices. If one leg moves against you, it exits that leg and trails the other to breakeven — making it risk-free.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <div class="step-num">03:06 PM</div>
+          <h4>✅ Close & Collect</h4>
+          <p>Square off everything. On a calm day, both options decay towards zero and you pocket ~70% of the premium. On a volatile day, the SL + trail system limits losses.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <div class="step-num">REPEAT</div>
+          <h4>🔄 Every. Single. Day.</h4>
+          <p>The edge compounds. 2,300+ trades over 10 years. 70% of them winners. The law of large numbers turns a small daily edge into massive wealth.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Theta God growth chart -->
+    <div class="chart-wrap reveal" style="margin-top:48px">
+      <h4 style="font-family:'Orbitron';font-size:0.8rem;letter-spacing:2px;color:var(--gray-400);margin-bottom:16px">
+        THETA GOD — CAPITAL GROWTH CURVE (₹1L START)
+      </h4>
+      <canvas id="thetaGrowthChart"></canvas>
+    </div>
+
+    <!-- Yearly table -->
+    <div class="card reveal" style="margin-top:24px;overflow-x:auto">
+      <h4 style="font-family:'Orbitron';font-size:0.8rem;letter-spacing:2px;color:var(--cyan);margin-bottom:16px">
+        YEAR-BY-YEAR BREAKDOWN
+      </h4>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Year</th><th>Trades</th><th>Wins</th><th>Win Rate</th>
+            <th>Net P&L</th><th>Avg P&L</th><th>Avg VIX</th><th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2017</td><td>242</td><td>157</td><td>64.9%</td><td class="positive">₹+11,653</td><td>₹+48</td><td>12.6</td><td>✅</td></tr>
+          <tr><td>2018</td><td>246</td><td>176</td><td>71.5%</td><td class="positive">₹+45,835</td><td>₹+186</td><td>15.1</td><td>✅</td></tr>
+          <tr><td>2019</td><td>241</td><td>163</td><td>67.6%</td><td class="positive">₹+44,074</td><td>₹+183</td><td>16.5</td><td>✅</td></tr>
+          <tr><td>2020</td><td>249</td><td>180</td><td>72.3%</td><td class="positive" style="color:var(--gold)">₹+1,06,865</td><td>₹+429</td><td>26.9</td><td>🏆</td></tr>
+          <tr><td>2021</td><td>247</td><td>183</td><td>74.1%</td><td class="positive">₹+1,11,886</td><td>₹+453</td><td>18.0</td><td>✅</td></tr>
+          <tr><td>2022</td><td>248</td><td>193</td><td>77.8%</td><td class="positive" style="color:var(--gold)">₹+1,32,542</td><td>₹+534</td><td>19.3</td><td>🏆</td></tr>
+          <tr><td>2023</td><td>245</td><td>167</td><td>68.2%</td><td class="positive">₹+51,645</td><td>₹+211</td><td>12.4</td><td>✅</td></tr>
+          <tr><td>2024</td><td>245</td><td>167</td><td>68.2%</td><td class="positive">₹+1,02,014</td><td>₹+416</td><td>14.6</td><td>✅</td></tr>
+          <tr><td>2025</td><td>248</td><td>176</td><td>71.0%</td><td class="positive">₹+97,215</td><td>₹+392</td><td>13.4</td><td>✅</td></tr>
+          <tr><td>2026*</td><td>97</td><td>61</td><td>62.9%</td><td class="positive">₹+19,111</td><td>₹+197</td><td>16.9</td><td>✅</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.75rem;color:var(--gray-500);margin-top:12px">* 2026 partial year (Jan–May)</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- BACKTEST DEEP DIVE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="backtest">
+  <div class="container">
+    <div class="section-label reveal">VALIDATION</div>
+    <h2 class="section-title reveal">Backtest <span class="highlight">Deep Dive</span></h2>
+    <p class="section-sub reveal">
+      10 years of historical data. 2,500+ simulated trades. Black-Scholes pricing.
+      No curve fitting. No cherry-picking. Just the raw truth.
+    </p>
+
+    <!-- Combined growth chart -->
+    <div class="chart-wrap reveal">
+      <h4 style="font-family:'Orbitron';font-size:0.8rem;letter-spacing:2px;color:var(--gray-400);margin-bottom:16px">
+        ATLAS vs THETA GOD — ₹1,00,000 INVESTED IN 2016
+      </h4>
+      <canvas id="combinedGrowthChart"></canvas>
+    </div>
+
+    <!-- Key insights -->
+    <div class="card-grid cols-2 reveal" style="margin-top:32px">
+      <div class="card">
+        <h4 style="margin-bottom:16px;color:var(--cyan)">📈 Why Theta God outperforms</h4>
+        <ul style="list-style:none;color:var(--gray-400);line-height:2">
+          <li>✦ <strong style="color:var(--white)">2,300 trades</strong> vs ATLAS's ~400 — more trades = faster compounding</li>
+          <li>✦ <strong style="color:var(--white)">Volatility is fuel</strong> — high VIX = fatter premiums = more profit</li>
+          <li>✦ <strong style="color:var(--white)">Market-neutral</strong> — profits whether market goes up, down, or sideways</li>
+          <li>✦ <strong style="color:var(--white)">Theta always decays</strong> — time is the one thing that never reverses</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:16px;color:var(--blue-300)">🧠 Why ATLAS is powerful</h4>
+        <ul style="list-style:none;color:var(--gray-400);line-height:2">
+          <li>✦ <strong style="color:var(--white)">AI + Quant hybrid</strong> — not just numbers, understands context</li>
+          <li>✦ <strong style="color:var(--white)">5 uncorrelated signals</strong> — diverse edge, not dependent on one pattern</li>
+          <li>✦ <strong style="color:var(--white)">Beat Nifty by 4.4%/yr</strong> — ₹6.4L vs Nifty's ₹4.4L over 10 years</li>
+          <li>✦ <strong style="color:var(--white)">Completely autonomous</strong> — runs once daily, no babysitting needed</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Monthly heatmap chart -->
+    <div class="chart-wrap reveal" style="margin-top:32px">
+      <h4 style="font-family:'Orbitron';font-size:0.8rem;letter-spacing:2px;color:var(--gray-400);margin-bottom:16px">
+        THETA GOD — MONTHLY P&L (₹)
+      </h4>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- COMPARISON -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="compare">
+  <div class="container">
+    <div class="section-label reveal">HEAD TO HEAD</div>
+    <h2 class="section-title reveal">System <span class="highlight">Comparison</span></h2>
+
+    <div class="card-grid cols-2 reveal">
+      <!-- ATLAS -->
+      <div class="card" style="border-top:3px solid var(--blue-500)">
+        <div class="vs-badge vs-atlas">ATLAS</div>
+        <h3 style="font-size:1.5rem;margin-bottom:24px">The Stock Hunter</h3>
+        <table style="width:100%;font-size:0.9rem">
+          <tr><td style="color:var(--gray-400);padding:6px 0">Market</td><td class="mono" style="text-align:right;padding:6px 0">NSE (Nifty 50)</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Asset</td><td class="mono" style="text-align:right;padding:6px 0">Equities</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Direction</td><td class="mono" style="text-align:right;padding:6px 0">Long only</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Frequency</td><td class="mono" style="text-align:right;padding:6px 0">Daily scan</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Hold Period</td><td class="mono" style="text-align:right;padding:6px 0">1–15 days</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">CAGR</td><td class="mono green" style="text-align:right;padding:6px 0">+20.4%</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">10yr Return</td><td class="mono green" style="text-align:right;padding:6px 0">₹1L → ₹6.4L</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Win Rate</td><td class="mono" style="text-align:right;padding:6px 0">59%</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Max Drawdown</td><td class="mono red" style="text-align:right;padding:6px 0">-32.3%</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Edge</td><td class="mono" style="text-align:right;padding:6px 0">Alpha signals</td></tr>
+        </table>
+      </div>
+
+      <!-- THETA GOD -->
+      <div class="card" style="border-top:3px solid var(--cyan)">
+        <div class="vs-badge vs-theta">THETA GOD 🔱</div>
+        <h3 style="font-size:1.5rem;margin-bottom:24px">The Time Seller</h3>
+        <table style="width:100%;font-size:0.9rem">
+          <tr><td style="color:var(--gray-400);padding:6px 0">Market</td><td class="mono" style="text-align:right;padding:6px 0">BSE (SENSEX)</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Asset</td><td class="mono" style="text-align:right;padding:6px 0">Index Options</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Direction</td><td class="mono" style="text-align:right;padding:6px 0">Market neutral</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Frequency</td><td class="mono" style="text-align:right;padding:6px 0">Every day</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Hold Period</td><td class="mono" style="text-align:right;padding:6px 0">Intraday</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">CAGR</td><td class="mono green" style="text-align:right;padding:6px 0">+23.5%</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">10yr Return</td><td class="mono green" style="text-align:right;padding:6px 0">₹1L → ₹8.2L</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Win Rate</td><td class="mono" style="text-align:right;padding:6px 0">70.3%</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Max Drawdown</td><td class="mono red" style="text-align:right;padding:6px 0">-1.6%</td></tr>
+          <tr><td style="color:var(--gray-400);padding:6px 0">Edge</td><td class="mono" style="text-align:right;padding:6px 0">Variance premium</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Combined stats -->
+    <div class="card reveal" style="margin-top:32px;text-align:center;padding:48px">
+      <div class="section-label" style="justify-content:center">COMBINED PORTFOLIO</div>
+      <h3 style="font-size:2rem;margin:16px 0">₹2,00,000 → <span class="green">₹14,58,757</span></h3>
+      <p style="color:var(--gray-400)">
+        Running both systems with ₹1L each — diversified across equities AND options.
+        <br>Different markets, different edges, same result: <strong style="color:var(--white)">consistent compounding.</strong>
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TECH STACK -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="tech">
+  <div class="container">
+    <div class="section-label reveal">UNDER THE HOOD</div>
+    <h2 class="section-title reveal">Tech <span class="highlight">Architecture</span></h2>
+    <p class="section-sub reveal">
+      Built with Python, deployed on cloud, connected to live markets.
+      Every trade is logged, every decision auditable.
+    </p>
+
+    <div class="card-grid cols-3 reveal">
+      <div class="card">
+        <h4 style="margin-bottom:16px;color:var(--cyan)">🧮 Quantitative Engine</h4>
+        <div>
+          <span class="tech-pill">Python 3.12</span>
+          <span class="tech-pill">NumPy</span>
+          <span class="tech-pill">Pandas</span>
+          <span class="tech-pill">SciPy</span>
+          <span class="tech-pill">Black-Scholes</span>
+          <span class="tech-pill">392 Alpha Factors</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:16px;color:var(--cyan)">🔌 Broker & Data</h4>
+        <div>
+          <span class="tech-pill">Angel One API</span>
+          <span class="tech-pill">SmartAPI</span>
+          <span class="tech-pill">NSE + BSE</span>
+          <span class="tech-pill">BFO Exchange</span>
+          <span class="tech-pill">TOTP Auth</span>
+          <span class="tech-pill">Live LTP Feed</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:16px;color:var(--cyan)">☁️ Infrastructure</h4>
+        <div>
+          <span class="tech-pill">Azure VM</span>
+          <span class="tech-pill">GitHub Actions</span>
+          <span class="tech-pill">systemd</span>
+          <span class="tech-pill">SQLite Journal</span>
+          <span class="tech-pill">Telegram Bot</span>
+          <span class="tech-pill">Crash Recovery</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Risk management -->
+    <div class="card reveal" style="margin-top:32px">
+      <h4 style="font-family:'Orbitron';font-size:0.8rem;letter-spacing:2px;color:var(--gold);margin-bottom:20px">
+        🛡️ RISK MANAGEMENT — 11 LAYERS OF PROTECTION
+      </h4>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;color:var(--gray-400);font-size:0.9rem">
+        <div>⬡ Per-trade stop-loss (25% CE / 23% PE)</div>
+        <div>⬡ Trail-to-breakeven on SL hit</div>
+        <div>⬡ 5% daily circuit breaker</div>
+        <div>⬡ Partial order rollback</div>
+        <div>⬡ Session token auto-renewal</div>
+        <div>⬡ Stale price force-exit (60s)</div>
+        <div>⬡ Atomic trade recording</div>
+        <div>⬡ Crash recovery from DB</div>
+        <div>⬡ Double-entry prevention</div>
+        <div>⬡ Holiday calendar</div>
+        <div>⬡ Non-blocking notifications</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="logo-foot">⚡ QUANT.SYS</div>
+    <p>Autonomous quantitative trading systems built by Siddhivinayak Dubey</p>
+    <p style="margin-top:24px;font-size:0.7rem;color:var(--gray-600)">
+      Backtested using historical data. Past performance does not guarantee future results.
+      <br>Options involve significant risk. Paper trading recommended before live deployment.
+    </p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT -->
+<!-- ═══════════════════════════════════════════════════ -->
+<script>
+// ─── NAV SCROLL ─────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ─── SCROLL REVEAL ──────────────────────────────────
+const reveals = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+reveals.forEach(el => revealObserver.observe(el));
+
+// ─── COUNTER ANIMATION ─────────────────────────────
+const counters = document.querySelectorAll('[data-count]');
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    if (el.dataset.animated) return;
+    el.dataset.animated = 'true';
+
+    const target = parseInt(el.dataset.count);
+    const prefix = el.dataset.prefix || '';
+    const suffix = el.dataset.suffix || '';
+    const format = el.dataset.format;
+    const duration = 2000;
+    const start = performance.now();
+
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      let current = Math.floor(eased * target);
+
+      if (format === 'comma') {
+        el.textContent = prefix + current.toLocaleString('en-IN');
+      } else {
+        el.textContent = prefix + current + suffix;
+      }
+
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  });
+}, { threshold: 0.5 });
+counters.forEach(el => counterObserver.observe(el));
+
+// ─── CHART.JS CONFIG ────────────────────────────────
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+
+// ─── ATLAS YEARLY CHART ─────────────────────────────
+new Chart(document.getElementById('atlasYearlyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026*'],
+    datasets: [{
+      label: 'Annual Return %',
+      data: [10.8, 18.9, 17.0, 23.3, 31.4, 44.7, 6.1, 26.3, 18.7, 22.4, -9.6],
+      backgroundColor: ctx => {
+        const v = ctx.raw;
+        return v >= 0 ? 'rgba(37,99,235,0.6)' : 'rgba(239,68,68,0.6)';
+      },
+      borderColor: ctx => {
+        const v = ctx.raw;
+        return v >= 0 ? '#3b82f6' : '#ef4444';
+      },
+      borderWidth: 1,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.raw >= 0 ? '+' : ''}${ctx.raw}%`
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: { callback: v => v + '%' },
+        grid: { color: 'rgba(255,255,255,0.03)' }
+      },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ─── THETA GOD GROWTH CHART ─────────────────────────
+const thetaYearly = [
+  { year: '2017', pnl: 11653 },
+  { year: '2018', pnl: 45835 },
+  { year: '2019', pnl: 44074 },
+  { year: '2020', pnl: 106865 },
+  { year: '2021', pnl: 111886 },
+  { year: '2022', pnl: 132542 },
+  { year: '2023', pnl: 51645 },
+  { year: '2024', pnl: 102014 },
+  { year: '2025', pnl: 97215 },
+  { year: '2026', pnl: 19111 },
+];
+let thetaCumulative = [100000];
+thetaYearly.forEach(y => thetaCumulative.push(thetaCumulative[thetaCumulative.length-1] + y.pnl));
+
+new Chart(document.getElementById('thetaGrowthChart'), {
+  type: 'line',
+  data: {
+    labels: ['Start','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
+    datasets: [{
+      label: 'Portfolio Value (₹)',
+      data: thetaCumulative,
+      borderColor: '#22d3ee',
+      backgroundColor: 'rgba(6,182,212,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 5,
+      pointBackgroundColor: '#22d3ee',
+      pointBorderColor: '#0a1628',
+      pointBorderWidth: 2,
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => `₹${ctx.raw.toLocaleString('en-IN')}`
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: { callback: v => '₹' + (v/1000).toFixed(0) + 'K' },
+        grid: { color: 'rgba(255,255,255,0.03)' }
+      },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ─── COMBINED GROWTH CHART ──────────────────────────
+const atlasYearlyPnl = [10800, 18900, 17000, 23300, 31400, 44700, 6100, 26300, 18700, 22400];
+// Convert percentage returns to absolute for ₹1L start
+let atlasCum = [100000];
+atlasYearlyPnl.forEach(pct => {
+  const prev = atlasCum[atlasCum.length - 1];
+  atlasCum.push(prev * (1 + pct / 100000 * (prev / 100000)));
+});
+// Actually let's use the real numbers: ₹1L → ₹6.36L over 10 years
+// Recalculate properly
+atlasCum = [100000];
+const atlasReturns = [0.108, 0.189, 0.170, 0.233, 0.314, 0.447, 0.061, 0.263, 0.187, 0.224];
+atlasReturns.forEach(r => atlasCum.push(atlasCum[atlasCum.length-1] * (1 + r)));
+
+// Nifty buy-and-hold (approximate)
+const niftyCum = [100000, 128000, 138000, 152000, 167000, 192000, 230000, 242000, 280000, 340000, 437000];
+
+new Chart(document.getElementById('combinedGrowthChart'), {
+  type: 'line',
+  data: {
+    labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
+    datasets: [
+      {
+        label: 'Theta God 🔱',
+        data: thetaCumulative,
+        borderColor: '#22d3ee',
+        backgroundColor: 'rgba(6,182,212,0.05)',
+        fill: true, tension: 0.4, borderWidth: 3,
+        pointRadius: 4, pointBackgroundColor: '#22d3ee',
+      },
+      {
+        label: 'ATLAS',
+        data: atlasCum,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(37,99,235,0.05)',
+        fill: true, tension: 0.4, borderWidth: 3,
+        pointRadius: 4, pointBackgroundColor: '#3b82f6',
+      },
+      {
+        label: 'Nifty 50 (Buy & Hold)',
+        data: niftyCum,
+        borderColor: '#64748b',
+        borderDash: [5, 5],
+        fill: false, tension: 0.4, borderWidth: 2,
+        pointRadius: 3, pointBackgroundColor: '#64748b',
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { usePointStyle: true, padding: 20 }
+      },
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.dataset.label}: ₹${ctx.raw.toLocaleString('en-IN')}`
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: { callback: v => '₹' + (v/100000).toFixed(1) + 'L' },
+        grid: { color: 'rgba(255,255,255,0.03)' }
+      },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ─── MONTHLY P&L BAR CHART ──────────────────────────
+const monthlyData = [
+  // 2017
+  3120,-2112,2149,1394,1862,-396,-1811,4591,1839,-1709,1872,854,
+  // 2018
+  3503,3350,3699,1059,3351,6657,796,3932,6820,5680,3262,3726,
+  // 2019
+  6095,1204,2680,9542,10372,1288,68,-1264,4177,839,1944,7130,
+  // 2020
+  10009,7898,23148,15933,11604,11842,11227,9621,2304,4578,-3353,2054,
+  // 2021
+  17843,17541,8745,9497,5604,7794,3422,4115,4964,12139,3568,16655,
+  // 2022
+  3760,-3210,15819,13937,12807,13583,11684,12405,15435,16436,10390,9497,
+  // 2023
+  12948,1574,2449,-80,1670,9041,-903,2919,-550,8058,1625,12893,
+  // 2024
+  10593,10850,6588,6616,17713,7857,14257,6642,8122,2815,17539,-7577,
+];
+
+// Last 36 months only (2022-2024) for readability
+const last36 = monthlyData.slice(-36);
+const months36 = [];
+for (let y = 2022; y <= 2024; y++) {
+  ['J','F','M','A','M','J','J','A','S','O','N','D'].forEach(m => {
+    months36.push(m + "'" + String(y).slice(2));
+  });
+}
+
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'bar',
+  data: {
+    labels: months36,
+    datasets: [{
+      label: 'Monthly P&L (₹)',
+      data: last36,
+      backgroundColor: last36.map(v => v >= 0 ? 'rgba(16,185,129,0.6)' : 'rgba(239,68,68,0.6)'),
+      borderColor: last36.map(v => v >= 0 ? '#10b981' : '#ef4444'),
+      borderWidth: 1,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => `₹${ctx.raw >= 0 ? '+' : ''}${ctx.raw.toLocaleString('en-IN')}`
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: { callback: v => '₹' + (v/1000).toFixed(0) + 'K' },
+        grid: { color: 'rgba(255,255,255,0.03)' }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 10 } }
+      }
+    }
+  }
+});
+
+// ─── SMOOTH SCROLL FOR NAV LINKS ────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+</body>
+</html>

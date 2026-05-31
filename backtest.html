@@ -283,8 +283,10 @@ DATA.forEach(d => dataMap[d.d] = d);
 
 // ═══════════════════════════════════════════════════════
 //  BLACK-SCHOLES ENGINE
+//  ATM IV is typically 1.4× VIX (VIX measures OTM IV)
 // ═══════════════════════════════════════════════════════
 const R = 0.065; // risk-free rate
+const ATM_IV_MULT = 1.4; // ATM IV is ~40% higher than VIX
 
 function normCdf(x) {
   const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
@@ -329,7 +331,8 @@ function simulateDay(day, lots) {
   const close = day.c;
   const vix = day.v;
   const strike = getATM(spot);
-  const sigma = vix / 100;
+  // ATM IV is higher than VIX (which measures OTM 30-day IV)
+  const sigma = (vix / 100) * ATM_IV_MULT;
 
   // DTE: assume weekly option, ~3 days to expiry on average
   const dte = 3;
@@ -343,10 +346,6 @@ function simulateDay(day, lots) {
   const ceSL = ceEntry * 1.25;  // 25% SL
   const peSL = peEntry * 1.23;  // 23% SL
 
-  // Trail-to-BE thresholds
-  const ceTrailThresh = ceEntry * 0.50; // 50% decay
-  const peTrailThresh = peEntry * 0.50;
-
   // === Simulate intraday price path ===
   // We use High and Low to determine what happened
   // Conservative approach: check adverse moves first
@@ -355,10 +354,7 @@ function simulateDay(day, lots) {
   let ceSlHit = false, peSlHit = false;
 
   // For CE (call we sold): price goes UP = bad for us
-  // CE premium increases when spot goes up
-  // Estimate CE premium at day's high (worst case for CE seller)
-  const ceAtHigh = bsCall(high, strike, T * 0.8, R, sigma); // slightly less T (midday)
-  // Estimate CE premium at day's low (best case for CE)
+  const ceAtHigh = bsCall(high, strike, T * 0.8, R, sigma);
   const ceAtLow = bsCall(low, strike, T * 0.8, R, sigma);
 
   // For PE (put we sold): price goes DOWN = bad for us
@@ -380,28 +376,55 @@ function simulateDay(day, lots) {
   }
 
   // EOD exit for non-SL legs
-  // Premium at close (3:15 PM) with reduced time
-  const T_close = Math.max(T - 1/365, 0.5/365); // 1 day less
+  // Premium at close (3:06 PM) with reduced time
+  const T_close = Math.max(T - 1/365, 0.5/365);
+
+  // KEY LOGIC: When one leg hits SL, trail the OTHER leg's SL to breakeven
+  // This is exactly what Theta God does in production
 
   if (!ceSlHit) {
     ceExit = bsCall(close, strike, T_close, R, sigma);
-    // Trail-to-BE check: if premium dropped to 50%, SL moved to entry
-    // If it then bounced back above entry, it would have been stopped at entry
-    if (ceAtLow <= ceTrailThresh && ceExit > ceEntry) {
-      ceExit = ceEntry; // Trailed to breakeven, stopped there
-      ceExitType = 'TRAIL-BE';
+
+    if (peSlHit) {
+      // PE got stopped → CE SL now trails to entry (breakeven)
+      // If CE bounced above entry at any point after, it exits at entry
+      if (ceExit > ceEntry) {
+        ceExit = ceEntry;
+        ceExitType = 'TRAIL-BE';
+      } else {
+        ceExitType = 'EOD'; // CE decayed below entry = pure profit
+      }
     } else {
-      ceExitType = 'EOD';
+      // Independent trail-to-BE: if CE decayed to 50%, SL moved to entry
+      const ceTrailThresh = ceEntry * 0.50;
+      if (ceAtLow <= ceTrailThresh && ceExit > ceEntry) {
+        ceExit = ceEntry;
+        ceExitType = 'TRAIL-BE';
+      } else {
+        ceExitType = 'EOD';
+      }
     }
   }
 
   if (!peSlHit) {
     peExit = bsPut(close, strike, T_close, R, sigma);
-    if (peAtHigh <= peTrailThresh && peExit > peEntry) {
-      peExit = peEntry;
-      peExitType = 'TRAIL-BE';
+
+    if (ceSlHit) {
+      // CE got stopped → PE SL now trails to entry (breakeven)
+      if (peExit > peEntry) {
+        peExit = peEntry;
+        peExitType = 'TRAIL-BE';
+      } else {
+        peExitType = 'EOD';
+      }
     } else {
-      peExitType = 'EOD';
+      const peTrailThresh = peEntry * 0.50;
+      if (peAtHigh <= peTrailThresh && peExit > peEntry) {
+        peExit = peEntry;
+        peExitType = 'TRAIL-BE';
+      } else {
+        peExitType = 'EOD';
+      }
     }
   }
 

@@ -618,6 +618,15 @@ function displayResults(results, startingCapital) {
       ? '<span class="badge badge-win">WIN</span>'
       : '<span class="badge badge-loss">LOSS</span>';
 
+    // Show exit types for both legs
+    const exitInfo = [];
+    if (r.ceExitType === 'SL') exitInfo.push('<span class="badge badge-sl">CE SL</span>');
+    if (r.peExitType === 'SL') exitInfo.push('<span class="badge badge-sl">PE SL</span>');
+    if (r.ceExitType === 'TRAIL-BE') exitInfo.push('<span class="badge badge-eod">CE T-BE</span>');
+    if (r.peExitType === 'TRAIL-BE') exitInfo.push('<span class="badge badge-eod">PE T-BE</span>');
+    if (!exitInfo.length) exitInfo.push('<span class="badge badge-eod">EOD</span>');
+    const exitBadges = exitInfo.join(' ') + ' ' + resultBadge;
+
     const tr = document.createElement('tr');
     tr.className = rowClass;
     tr.style.cursor = 'pointer';
@@ -634,7 +643,7 @@ function displayResults(results, startingCapital) {
       <td class="${r.cePnL >= 0 ? 'pnl-pos' : 'pnl-neg'}">${fmtINR(r.cePnL)}</td>
       <td class="${r.pePnL >= 0 ? 'pnl-pos' : 'pnl-neg'}">${fmtINR(r.pePnL)}</td>
       <td class="${pnlClass}" style="font-weight:600">${fmtINR(r.netPnL)}</td>
-      <td>${resultBadge}</td>
+      <td>${exitBadges}</td>
     `;
 
     // Click to expand details

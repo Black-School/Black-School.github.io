@@ -235,6 +235,10 @@ tr.holiday td{color:var(--text-muted);font-style:italic}
   <!-- Results -->
   <section class="results-section" id="resultsSection" style="display:none">
     <h3>Trade-by-Trade Breakdown</h3>
+    <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:0.5rem">
+      <span style="color:#00ff88">●</span> Real market data (SmartAPI)&nbsp;&nbsp;
+      <span style="color:#ff8800">○</span> Estimated (Black-Scholes)
+    </div>
     <div class="table-wrap">
       <table id="resultsTable">
         <thead>
@@ -280,6 +284,14 @@ const DATA = [{"d":"2024-01-02","o":72332.9,"h":72332.9,"l":71613.7,"c":71892.5,
 // Build lookup
 const dataMap = {};
 DATA.forEach(d => dataMap[d.d] = d);
+
+// ═══════════════════════════════════════════════════════
+//  REAL TRADE DATA (from actual SmartAPI option premiums)
+//  These override BS estimates for dates where we have real data
+// ═══════════════════════════════════════════════════════
+const REAL_TRADES = [{"d":"2026-05-15","spot":75750.9,"strike":75800,"ceEntry":1242.85,"peEntry":1141.6,"ceSL":1553.56,"peSL":1404.17,"ceExit":1186.6,"peExit":1165.65,"ceExitType":"EOD","peExitType":"EOD","cePnL":562.5,"pePnL":-240.5,"brokerage":138.93,"netPnL":183.07,"real":true},{"d":"2026-05-18","spot":74365.1,"strike":74400,"ceEntry":1364.75,"peEntry":1181.3,"ceSL":1705.94,"peSL":1453.0,"ceExit":1705.94,"peExit":1181.3,"ceExitType":"SL","peExitType":"SL","cePnL":-3411.88,"pePnL":0.0,"brokerage":144.29,"netPnL":-3556.17,"real":true},{"d":"2026-05-19","spot":75684.7,"strike":75700,"ceEntry":1226.55,"peEntry":1144.95,"ceSL":1533.19,"peSL":1408.29,"ceExit":1058.25,"peExit":1277.55,"ceExitType":"EOD","peExitType":"EOD","cePnL":1683.0,"pePnL":-1326.0,"brokerage":138.66,"netPnL":218.34,"real":true},{"d":"2026-05-20","spot":74892.6,"strike":74900,"ceEntry":1165.65,"peEntry":1162.65,"ceSL":1457.06,"peSL":1430.06,"ceExit":1284.0,"peExit":763.55,"ceExitType":"EOD","peExitType":"EOD","cePnL":-1183.5,"pePnL":3991.0,"brokerage":136.32,"netPnL":2671.18,"real":true},{"d":"2026-05-21","spot":75667.0,"strike":75700,"ceEntry":980.0,"peEntry":963.7,"ceSL":1225.0,"peSL":1185.35,"ceExit":783.95,"peExit":1085.65,"ceExitType":"EOD","peExitType":"EOD","cePnL":1960.5,"pePnL":-1219.5,"brokerage":130.4,"netPnL":610.6,"real":true},{"d":"2026-05-22","spot":75568.2,"strike":75600,"ceEntry":990.0,"peEntry":900.0,"ceSL":1237.5,"peSL":1107.0,"ceExit":952.95,"peExit":831.35,"ceExitType":"EOD","peExitType":"EOD","cePnL":370.5,"pePnL":686.5,"brokerage":129.19,"netPnL":927.81,"real":true},{"d":"2026-05-25","spot":76200.6,"strike":76200,"ceEntry":875.15,"peEntry":740.0,"ceSL":1093.94,"peSL":910.2,"ceExit":1093.94,"peExit":500.0,"ceExitType":"SL","peExitType":"EOD","cePnL":-2187.88,"pePnL":2400.0,"brokerage":124.56,"netPnL":87.56,"real":true},{"d":"2026-05-26","spot":76571.0,"strike":76600,"ceEntry":766.05,"peEntry":701.9,"ceSL":957.56,"peSL":863.34,"ceExit":515.0,"peExit":863.34,"ceExitType":"EOD","peExitType":"SL","cePnL":2510.5,"pePnL":-1614.37,"brokerage":121.38,"netPnL":774.75,"real":true},{"d":"2026-05-27","spot":75970.3,"strike":76000,"ceEntry":705.0,"peEntry":599.65,"ceSL":881.25,"peSL":737.57,"ceExit":679.0,"peExit":535.0,"ceExitType":"EOD","peExitType":"EOD","cePnL":260.0,"pePnL":646.5,"brokerage":118.31,"netPnL":788.19,"real":true},{"d":"2026-05-29","spot":75930.3,"strike":75900,"ceEntry":675.0,"peEntry":488.2,"ceSL":843.75,"peSL":600.49,"ceExit":360.8,"peExit":600.5,"ceExitType":"EOD","peExitType":"SL","cePnL":3142.0,"pePnL":-1123.0,"brokerage":114.96,"netPnL":1904.04,"real":true}];
+const realTradeMap = {};
+REAL_TRADES.forEach(t => realTradeMap[t.d] = t);
 
 // ═══════════════════════════════════════════════════════
 //  BLACK-SCHOLES ENGINE
@@ -546,7 +558,38 @@ function runBacktest() {
 
     const day = dataMap[date];
     const lots = Math.max(1, Math.floor(runningCapital / marginPerLot));
-    const trade = simulateDay(day, lots);
+
+    let trade;
+    // Use REAL trade data if available (from SmartAPI option premiums)
+    if (realTradeMap[date]) {
+      const rt = realTradeMap[date];
+      // Scale P&L by lots (real data is for 1 lot = 10 qty)
+      trade = {
+        date: rt.d,
+        spot: rt.spot,
+        high: day ? day.h : rt.spot,
+        low: day ? day.l : rt.spot,
+        close: day ? day.c : rt.spot,
+        vix: day ? day.v : 15,
+        strike: rt.strike,
+        ceEntry: rt.ceEntry,
+        peEntry: rt.peEntry,
+        ceSL: rt.ceSL,
+        peSL: rt.peSL,
+        ceExit: rt.ceExit,
+        peExit: rt.peExit,
+        ceExitType: rt.ceExitType,
+        peExitType: rt.peExitType,
+        cePnL: rt.cePnL * lots,
+        pePnL: rt.pePnL * lots,
+        brokerage: rt.brokerage * lots,
+        netPnL: rt.netPnL * lots,
+        real: true
+      };
+    } else {
+      trade = simulateDay(day, lots);
+      trade.real = false;
+    }
     trade.lotsUsed = lots;
     trade.capitalBefore = runningCapital;
     runningCapital += trade.netPnL;
@@ -655,7 +698,7 @@ function displayResults(results, startingCapital) {
     tr.style.cursor = 'pointer';
     tr.innerHTML = `
       <td>${tradeNum}</td>
-      <td style="font-family:var(--sans);font-size:0.75rem">${fmtDate(r.date)}</td>
+      <td style="font-family:var(--sans);font-size:0.75rem">${fmtDate(r.date)}${r.real ? ' <span title="Real market data from SmartAPI" style="color:#00ff88;font-size:0.6rem;vertical-align:super">●</span>' : ' <span title="Estimated via Black-Scholes" style="color:#ff8800;font-size:0.6rem;vertical-align:super">○</span>'}</td>
       <td style="font-family:var(--mono);color:var(--gold)">${r.lotsUsed}</td>
       <td>${r.spot.toFixed(0)}</td>
       <td>${r.strike}</td>

@@ -406,13 +406,15 @@ function simulateDay(day, lots) {
   }
 
   // P&L: we SOLD, so profit when exit < entry
-  const cePnL = (ceEntry - ceExit) * lots;
-  const pePnL = (peEntry - peExit) * lots;
+  // SENSEX lot size = 10, so qty = lots × 10
+  const qty = lots * 10;
+  const cePnL = (ceEntry - ceExit) * qty;
+  const pePnL = (peEntry - peExit) * qty;
 
   // Brokerage: ~₹20/order × 4 orders + STT + charges
-  const turnover = (ceEntry + peEntry + ceExit + peExit) * lots;
+  const turnover = (ceEntry + peEntry + ceExit + peExit) * qty;
   const brokerFee = 80; // 4 × ₹20
-  const stt = ceEntry * lots * 0.000625 + peEntry * lots * 0.000625; // sell side STT
+  const stt = ceEntry * qty * 0.000625 + peEntry * qty * 0.000625; // sell side STT
   const exchangeCharges = turnover * 0.00053;
   const gst = (brokerFee + exchangeCharges) * 0.18;
   const totalBrokerage = brokerFee + stt + exchangeCharges + gst;

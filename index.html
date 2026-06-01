@@ -113,7 +113,7 @@ nav .container{display:flex;justify-content:space-between;align-items:center}
   letter-spacing:2px;text-transform:uppercase;
   transition:color 0.3s;font-family:var(--sans);font-weight:500;
 }
-.nav-links a:hover{color:var(--gold)}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
 
 /* ─── SECTION LABELS ─────────────────────────────── */
 .section-label{
@@ -356,7 +356,8 @@ footer p{color:var(--text-dim);font-size:0.8rem;line-height:1.8}
   .hero-stats{flex-direction:column;border:none}
   .hero-stat{border-right:none;border-bottom:1px solid var(--border);padding:20px 32px}
   .hero-stat:last-child{border-bottom:none}
-  .nav-links{display:none}
+  nav .container{flex-direction:column;align-items:flex-start;gap:14px}
+  .nav-links{display:flex;gap:12px;flex-wrap:wrap}
   .card{padding:24px}
   .card-grid.cols-2{grid-template-columns:1fr}
   .stat-value{font-size:1.8rem}
@@ -388,12 +389,10 @@ footer p{color:var(--text-dim);font-size:0.8rem;line-height:1.8}
   <div class="container">
     <div class="nav-logo">Black <span>School</span></div>
     <ul class="nav-links">
-      <li><a href="#atlas">Atlas</a></li>
-      <li><a href="#theta">Theta God</a></li>
-      <li><a href="#backtest">Backtests</a></li>
-      <li><a href="#compare">Compare</a></li>
-      <li><a href="#tech">Architecture</a></li>
-      <li><a href="backtest.html" style="color:var(--gold)">🔱 Live Backtest</a></li>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="theta-god.html">Theta God</a></li>
+      <li><a href="backtest.html">ATLAS</a></li>
+      <li><a href="backtest.html">Backtest Runner</a></li>
     </ul>
   </div>
 </nav>

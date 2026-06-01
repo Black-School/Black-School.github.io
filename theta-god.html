@@ -341,12 +341,15 @@ body::before{
 </footer>
 
 <script>
-// Fallback data (used if fetch fails)
+// Fallback data (used if fetch fails — e.g. local file:// access)
 const FALLBACK_DATA = {
   initial_capital: 100000, current_capital: 103311.11, mode: "paper",
   instrument: "SENSEX", lot_size: 10, last_updated: "2026-06-01 15:30 IST",
   strategy: { entry_time: "09:59", exit_time: "15:06", ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: "12:30" },
-  trades: []
+  trades: [
+    { id:1, date:"2026-05-29", time_entry:"09:59:07", time_exit:"15:06:01", instrument:"SENSEX", spot:75930.27, ce_strike:75900, pe_strike:75900, ce_sell:675.0, pe_sell:488.2, ce_exit:356.8, pe_exit:600.49, ce_sl_hit:false, pe_sl_hit:true, qty:10, gross_pnl:2059.10, brokerage:108.94, net_pnl:1950.16, capital_before:100000, capital_after:101950.16, notes:"SCHEDULED_EXIT" },
+    { id:2, date:"2026-06-01", time_entry:"09:59:05", time_exit:"15:06:02", instrument:"SENSEX", spot:74877.9, ce_strike:74900, pe_strike:74900, ce_sell:555.15, pe_sell:456.65, ce_exit:303.3, pe_exit:561.7, ce_sl_hit:false, pe_sl_hit:true, qty:10, gross_pnl:1468.0, brokerage:107.05, net_pnl:1360.95, capital_before:101950.16, capital_after:103311.11, notes:"SCHEDULED_EXIT" },
+  ]
 };
 
 let THETA_GOD_DATA = FALLBACK_DATA;

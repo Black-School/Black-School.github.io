@@ -91,29 +91,16 @@ h4{font-family:var(--sans);font-weight:500;color:var(--white);font-size:0.95rem}
 section{padding:120px 0;position:relative}
 
 /* ─── NAV ────────────────────────────────────────── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:20px 0;transition:all 0.4s ease;
+.top-nav{position:sticky;top:0;z-index:100;background:rgba(5,5,5,0.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.top-nav .container{display:flex;justify-content:space-between;align-items:center;padding:16px 0;gap:18px}
+.brand{font-family:var(--serif);font-size:1.25rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--white);text-decoration:none}
+.brand span{color:var(--gold)}
+.nav-links{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;list-style:none}
+.nav-link{
+  padding:9px 14px;border:1px solid var(--border);border-radius:999px;color:var(--text-dim);
+  font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;transition:all 0.25s ease;text-decoration:none;
 }
-nav.scrolled{
-  background:rgba(5,5,5,0.92);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-  padding:14px 0;
-}
-nav .container{display:flex;justify-content:space-between;align-items:center}
-.nav-logo{
-  font-family:var(--serif);font-weight:400;font-size:1.15rem;
-  color:var(--white);letter-spacing:0.15em;text-transform:uppercase;
-}
-.nav-logo span{color:var(--gold)}
-.nav-links{display:flex;gap:36px;list-style:none}
-.nav-links a{
-  color:var(--text-dim);text-decoration:none;font-size:0.75rem;
-  letter-spacing:2px;text-transform:uppercase;
-  transition:color 0.3s;font-family:var(--sans);font-weight:500;
-}
-.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+.nav-link:hover,.nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.28);background:var(--gold-dim)}
 
 /* ─── SECTION LABELS ─────────────────────────────── */
 .section-label{
@@ -385,15 +372,15 @@ footer p{color:var(--text-dim);font-size:0.8rem;line-height:1.8}
 <div class="grain"></div>
 
 <!-- Navigation -->
-<nav id="nav">
+<nav class="top-nav" id="nav">
   <div class="container">
-    <div class="nav-logo">Black <span>School</span></div>
-    <ul class="nav-links">
-      <li><a href="index.html" class="active">Home</a></li>
-      <li><a href="theta-god.html">Theta God</a></li>
-      <li><a href="backtest.html">ATLAS</a></li>
-      <li><a href="backtest.html">Backtest Runner</a></li>
-    </ul>
+    <a href="index.html" class="brand">Black <span>School</span></a>
+    <div class="nav-links">
+      <a class="nav-link active" href="index.html">Home</a>
+      <a class="nav-link" href="theta-god.html">Theta God</a>
+      <a class="nav-link" href="backtest.html">ATLAS</a>
+      <a class="nav-link" href="backtest.html">Backtest Runner</a>
+    </div>
   </div>
 </nav>
 

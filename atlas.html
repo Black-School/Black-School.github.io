@@ -72,6 +72,9 @@ body::before{
 .live-stat .label{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
 .live-stat .value{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--white);line-height:1}
 .live-stat .sub{margin-top:10px;font-size:0.82rem;color:var(--text-dim)}
+.dashboard-banner{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:4px 0 24px;padding:18px 22px;border-radius:20px;border:1px solid rgba(201,168,76,0.18);background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(255,255,255,0.04));box-shadow:0 20px 50px rgba(0,0,0,0.24)}
+.dashboard-banner__title{font-size:0.95rem;font-weight:600;color:var(--white)}
+.dashboard-banner__note{font-size:0.84rem;color:var(--text-dim)}
 .tab-shell{padding:8px 0 4px}
 .tab-nav{display:inline-flex;flex-wrap:wrap;gap:12px;padding:8px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.02);margin-bottom:8px}
 .tab-btn{padding:12px 20px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text-dim);font-size:0.82rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;transition:all 0.25s ease}
@@ -112,6 +115,7 @@ body::before{
 @media(max-width:1080px){
   .hero-grid,.dashboard-grid,.two-col{grid-template-columns:1fr}
   .last-updated{justify-self:start;text-align:left}
+  .dashboard-banner{flex-direction:column;align-items:flex-start}
   .live-stats,.about-stats-grid,.steps-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:760px){
@@ -150,7 +154,7 @@ body::before{
     <div class="card hero-shell fade-up">
       <div class="hero-grid">
         <div>
-          <div class="hero-kicker">Autonomous equity system</div>
+          <div class="hero-kicker">Ten-year backtest profile</div>
           <h1>ATLAS ⚡</h1>
           <p class="hero-subtitle">Nifty 50 multi-signal engine • backtested before live deployment</p>
           <div class="hero-meta">
@@ -188,7 +192,7 @@ body::before{
         </div>
         <div class="live-stat">
           <div class="label">Profitable Years</div>
-          <div class="value">10 / 10</div>
+          <div class="value">10/10</div>
           <div class="sub">No losing calendar year</div>
         </div>
       </div>
@@ -198,12 +202,16 @@ body::before{
 <main class="container">
   <div class="tab-shell fade-up">
     <div class="tab-nav" role="tablist" aria-label="ATLAS views">
-      <button class="tab-btn active" id="atlas-dashboard-btn" type="button" role="tab" aria-selected="true" aria-controls="atlas-dashboard-tab" data-tab-target="atlas-dashboard-tab">Dashboard</button>
-      <button class="tab-btn" id="atlas-about-btn" type="button" role="tab" aria-selected="false" aria-controls="atlas-about-tab" data-tab-target="atlas-about-tab">About</button>
+      <button class="tab-btn active" id="atlas-about-btn" type="button" role="tab" aria-selected="true" aria-controls="atlas-about-tab" data-tab-target="atlas-about-tab">About</button>
+      <button class="tab-btn" id="atlas-dashboard-btn" type="button" role="tab" aria-selected="false" aria-controls="atlas-dashboard-tab" data-tab-target="atlas-dashboard-tab">Dashboard</button>
     </div>
   </div>
 
-  <div class="tab-content active" id="atlas-dashboard-tab" role="tabpanel" aria-labelledby="atlas-dashboard-btn">
+  <div class="tab-content" id="atlas-dashboard-tab" role="tabpanel" aria-labelledby="atlas-dashboard-btn" hidden>
+    <div class="dashboard-banner fade-up">
+      <div class="dashboard-banner__title">📊 Backtest Results — Not yet live trading</div>
+      <div class="dashboard-banner__note">All charts, stats, and summaries below are historical simulation outputs and not live deployment metrics.</div>
+    </div>
     <section class="dashboard-grid section">
       <div class="card about-card fade-up">
         <div class="section-kicker">Dashboard</div>
@@ -230,7 +238,7 @@ body::before{
           </div>
           <div class="about-stat">
             <div class="label">Profitable Years</div>
-            <div class="value">10 / 10</div>
+            <div class="value">10/10</div>
             <div class="detail">All tested years closed green</div>
           </div>
         </div>
@@ -304,7 +312,7 @@ body::before{
     </section>
   </div>
 
-  <div class="tab-content" id="atlas-about-tab" role="tabpanel" aria-labelledby="atlas-about-btn" hidden>
+  <div class="tab-content active" id="atlas-about-tab" role="tabpanel" aria-labelledby="atlas-about-btn">
     <section class="section">
       <div class="card about-card">
         <div class="section-label">System I</div>
@@ -328,7 +336,7 @@ body::before{
           </div>
           <div class="about-stat">
             <div class="label">Profitable Years</div>
-            <div class="value">10 / 10</div>
+            <div class="value">10/10</div>
             <div class="detail">Every tested year finished positive</div>
           </div>
         </div>

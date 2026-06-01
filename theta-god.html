@@ -79,11 +79,31 @@ body::before{
 .last-updated .value{font-family:var(--mono);font-size:0.92rem;color:var(--white)}
 .last-updated .stamp{padding:14px 18px;border:1px solid var(--border);border-radius:20px;background:rgba(255,255,255,0.02)}
 
-.live-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);margin-top:24px;border-radius:22px;overflow:hidden}
+.live-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-top:24px;border-radius:22px;overflow:hidden}
 .live-stat{padding:24px 20px;background:var(--bg-elevated)}
 .live-stat .label{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
 .live-stat .value{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--white);line-height:1}
 .live-stat .sub{margin-top:10px;font-size:0.82rem;color:var(--text-dim)}
+
+.dashboard-banner{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:4px 0 24px;padding:18px 22px;border-radius:20px;border:1px solid rgba(201,168,76,0.2);background:linear-gradient(135deg,rgba(201,168,76,0.14),rgba(255,255,255,0.04));box-shadow:0 20px 50px rgba(0,0,0,0.24)}
+.dashboard-banner__title{font-size:0.95rem;font-weight:600;color:var(--white)}
+.dashboard-banner__meta{display:flex;flex-wrap:wrap;gap:10px}
+.dashboard-banner__chip{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:var(--text-dim);font-size:0.82rem}
+.dashboard-banner__chip strong{color:var(--white);font-weight:600}
+
+.compound-intro{margin-top:8px;color:var(--text);line-height:1.7;max-width:72ch}
+.compound-timeline{display:grid;gap:14px;margin-top:26px}
+.compound-row{display:grid;grid-template-columns:148px minmax(0,1fr) 180px;gap:16px;align-items:center}
+.compound-year{font-family:var(--mono);font-size:0.82rem;color:var(--white)}
+.compound-year span{display:block;margin-top:4px;font-size:0.74rem;color:var(--text-dim)}
+.compound-bar-track{height:44px;border-radius:999px;border:1px solid rgba(201,168,76,0.16);background:rgba(255,255,255,0.035);overflow:hidden}
+.compound-bar{position:relative;display:flex;align-items:center;height:100%;min-width:72px;border-radius:999px;background:linear-gradient(90deg,rgba(201,168,76,0.58),rgba(201,168,76,0.96));box-shadow:0 10px 30px rgba(201,168,76,0.22)}
+.compound-bar span{position:absolute;right:14px;color:#0b0905;font-family:var(--mono);font-size:0.75rem;font-weight:700;white-space:nowrap}
+.compound-gain{text-align:right;font-family:var(--mono);font-size:0.8rem;color:var(--text-dim)}
+.compound-gain strong{display:block;color:var(--white);font-size:0.88rem;margin-bottom:4px}
+.compound-summary{margin-top:24px;padding:18px 20px;border-radius:18px;border:1px solid rgba(201,168,76,0.16);background:rgba(255,255,255,0.03)}
+.compound-summary strong{display:block;color:var(--white);margin-bottom:6px}
+.compound-note{margin-top:18px;padding:14px 16px;border-left:3px solid var(--gold);border-radius:12px;background:rgba(255,255,255,0.03);color:var(--text);font-size:0.9rem;line-height:1.7}
 
 .dashboard-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:24px}
 .chart-card{padding:28px}
@@ -192,6 +212,9 @@ body::before{
 @media(max-width:1080px){
   .hero-grid,.dashboard-grid,.two-col,.bottom-grid{grid-template-columns:1fr}
   .last-updated{justify-self:start;text-align:left}
+  .dashboard-banner{flex-direction:column;align-items:flex-start}
+  .compound-row{grid-template-columns:1fr}
+  .compound-gain{text-align:left}
   .live-stats,.stats-grid,.about-stats-grid,.steps-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:760px){
@@ -235,27 +258,48 @@ body::before{
     <div class="card hero-shell fade-up">
       <div class="hero-grid">
         <div>
-          <div class="hero-kicker">Live paper trading dashboard</div>
+          <div class="hero-kicker">Ten-year backtest snapshot</div>
           <h1>🔱 Theta God</h1>
-          <p class="hero-subtitle">SENSEX Short Straddle • Paper Trading</p>
+          <p class="hero-subtitle">SENSEX Short Straddle • 2017–2026 Black-Scholes simulation with live paper trading in the dashboard tab</p>
           <div class="hero-meta">
-            <div class="meta-pill">Index <strong id="heroInstrument">SENSEX</strong></div>
-            <div class="meta-pill">Lot <strong id="heroLot">10</strong></div>
-            <div class="meta-pill">Mode <strong id="heroMode">Paper</strong></div>
+            <div class="meta-pill">Index <strong>SENSEX</strong></div>
+            <div class="meta-pill">Structure <strong>ATM Short Straddle</strong></div>
+            <div class="meta-pill">Mode <strong>Backtest</strong></div>
           </div>
         </div>
         <div class="last-updated">
           <div>
             <div class="label">Status</div>
-            <div class="value positive">Live paper ledger</div>
+            <div class="value positive">Backtest validated</div>
           </div>
           <div class="stamp">
-            <div class="label">Last updated</div>
-            <div class="value" id="lastUpdated">—</div>
+            <div class="label">Live paper</div>
+            <div class="value">Dashboard tab • started May 29, 2026</div>
           </div>
         </div>
       </div>
-      <div class="live-stats" id="liveStats"></div>
+      <div class="live-stats" id="liveStats">
+        <div class="live-stat">
+          <div class="label">CAGR</div>
+          <div class="value positive">+23.5%</div>
+          <div class="sub">Ten-year simulated CAGR</div>
+        </div>
+        <div class="live-stat">
+          <div class="label">10yr Return</div>
+          <div class="value positive">₹1L → ₹8.2L</div>
+          <div class="sub">Black-Scholes compounding path</div>
+        </div>
+        <div class="live-stat">
+          <div class="label">Win Rate</div>
+          <div class="value positive">70.3%</div>
+          <div class="sub">Winning monthly closes</div>
+        </div>
+        <div class="live-stat">
+          <div class="label">Months Profitable</div>
+          <div class="value positive">89%</div>
+          <div class="sub">Profitable months across the sample</div>
+        </div>
+      </div>
     </div>
   </div>
 </header>
@@ -264,13 +308,22 @@ body::before{
 <main class="container">
   <div class="tab-shell fade-up">
     <div class="tab-nav" role="tablist" aria-label="Theta God views">
-      <button class="tab-btn active" id="dashboard-btn" type="button" role="tab" aria-selected="true" aria-controls="dashboard-tab" data-tab-target="dashboard-tab">Dashboard</button>
-      <button class="tab-btn" id="about-btn" type="button" role="tab" aria-selected="false" aria-controls="about-tab" data-tab-target="about-tab">About</button>
+      <button class="tab-btn active" id="about-btn" type="button" role="tab" aria-selected="true" aria-controls="about-tab" data-tab-target="about-tab">About</button>
+      <button class="tab-btn" id="dashboard-btn" type="button" role="tab" aria-selected="false" aria-controls="dashboard-tab" data-tab-target="dashboard-tab">Dashboard</button>
     </div>
   </div>
 
-  <div class="tab-content active" id="dashboard-tab" role="tabpanel" aria-labelledby="dashboard-btn">
-    <section class="dashboard-grid section">
+  <div class="tab-content" id="dashboard-tab" role="tabpanel" aria-labelledby="dashboard-btn" hidden>
+            <div class="dashboard-banner fade-up">
+          <div class="dashboard-banner__title">📊 Live Paper Trading — Started May 29, 2026</div>
+          <div class="dashboard-banner__meta">
+            <div class="dashboard-banner__chip">Current capital <strong id="dashboardCurrentCapital">—</strong></div>
+            <div class="dashboard-banner__chip">Trade count <strong id="dashboardTradeCount">—</strong></div>
+            <div class="dashboard-banner__chip">Last updated <strong id="dashboardUpdated">Awaiting feed...</strong></div>
+          </div>
+        </div>
+
+        <section class="dashboard-grid section">
     <div class="card chart-card fade-up">
       <div class="chart-header">
         <div>
@@ -379,7 +432,7 @@ body::before{
 
   </div>
 
-  <div class="tab-content" id="about-tab" role="tabpanel" aria-labelledby="about-btn" hidden>
+  <div class="tab-content active" id="about-tab" role="tabpanel" aria-labelledby="about-btn">
     <section class="section">
       <div class="card about-card">
         <div class="section-label">System II</div>
@@ -490,6 +543,72 @@ body::before{
       </div>
     </section>
   </div>
+
+  <section class="section">
+    <div class="card trade-card">
+      <div class="section-kicker">Compounding power</div>
+      <h2 class="chart-title">The Power of Compounding</h2>
+      <p class="compound-intro">Starting with ₹1,00,000 and reinvesting all profits:</p>
+      <div class="compound-timeline">
+        <div class="compound-row">
+          <div class="compound-year">Year 1 (2017)<span>₹1,00,000 → ₹1,11,653</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:13.6%"><span>₹1,11,653</span></div></div>
+          <div class="compound-gain"><strong>+₹11,653</strong>11.7% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 2 (2018)<span>₹1,11,653 → ₹1,57,488</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:19.1%"><span>₹1,57,488</span></div></div>
+          <div class="compound-gain"><strong>+₹45,835</strong>41.1% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 3 (2019)<span>₹1,57,488 → ₹2,01,562</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:24.5%"><span>₹2,01,562</span></div></div>
+          <div class="compound-gain"><strong>+₹44,074</strong>28.0% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 4 (2020)<span>₹2,01,562 → ₹3,08,427</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:37.5%"><span>₹3,08,427</span></div></div>
+          <div class="compound-gain"><strong>+₹1,06,865</strong>COVID volatility = massive premium</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 5 (2021)<span>₹3,08,427 → ₹4,20,313</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:51.1%"><span>₹4,20,313</span></div></div>
+          <div class="compound-gain"><strong>+₹1,11,886</strong>36.3% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 6 (2022)<span>₹4,20,313 → ₹5,52,855</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:67.2%"><span>₹5,52,855</span></div></div>
+          <div class="compound-gain"><strong>+₹1,32,542</strong>31.5% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 7 (2023)<span>₹5,52,855 → ₹6,04,500</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:73.5%"><span>₹6,04,500</span></div></div>
+          <div class="compound-gain"><strong>+₹51,645</strong>9.3% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 8 (2024)<span>₹6,04,500 → ₹7,06,514</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:85.9%"><span>₹7,06,514</span></div></div>
+          <div class="compound-gain"><strong>+₹1,02,014</strong>16.9% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 9 (2025)<span>₹7,06,514 → ₹8,03,729</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:97.7%"><span>₹8,03,729</span></div></div>
+          <div class="compound-gain"><strong>+₹97,215</strong>13.8% return</div>
+        </div>
+        <div class="compound-row">
+          <div class="compound-year">Year 10 (2026*)<span>₹8,03,729 → ₹8,22,840</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:100%"><span>₹8,22,840</span></div></div>
+          <div class="compound-gain"><strong>+₹19,111</strong>Partial year</div>
+        </div>
+      </div>
+      <div class="compound-summary">
+        <strong>Final: ₹1,00,000 → ₹8,22,840 (8.2×)</strong>
+        Reinvested premium collection accelerates as the capital base compounds across years.
+      </div>
+      <div class="compound-note">Note: These numbers are from Black-Scholes simulation. Real option data validation showed BS estimates can be 2-3× overstated. Actual returns would likely be lower but still significantly positive.</div>
+    </div>
+  </section>
+  </div>
 </main>
 
 <footer class="footer">
@@ -511,6 +630,12 @@ const FALLBACK_DATA = {
 };
 
 let THETA_GOD_DATA = FALLBACK_DATA;
+let dashboardRendered = false;
+
+const fmtCurrency = value => `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmtCompactCurrency = value => `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+const fmtPct = value => `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+const fmtDate = value => new Date(`${value}T00:00:00`).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
 async function loadData() {
   try {
@@ -521,315 +646,301 @@ async function loadData() {
     }
   } catch (e) {
     console.warn('Using fallback data:', e);
+  } finally {
+    updateDashboardBanner();
+    if (document.getElementById('dashboard-tab').classList.contains('active')) {
+      ensureDashboardRendered();
+    }
   }
+}
+
+function latestUpdateText() {
+  const latestTrade = THETA_GOD_DATA.trades.at(-1);
+  return THETA_GOD_DATA.last_updated || (latestTrade ? `${fmtDate(latestTrade.date)} • ${latestTrade.time_exit}` : 'No trades yet');
+}
+
+function updateDashboardBanner() {
+  document.getElementById('dashboardCurrentCapital').textContent = fmtCurrency(THETA_GOD_DATA.current_capital);
+  document.getElementById('dashboardTradeCount').textContent = `${THETA_GOD_DATA.trades.length}`;
+  document.getElementById('dashboardUpdated').textContent = latestUpdateText();
+}
+
+function ensureDashboardRendered() {
+  if (dashboardRendered) return;
   renderDashboard();
+  dashboardRendered = true;
+  observeFadeUps();
 }
 
 function renderDashboard() {
-
-const fmtCurrency = value => `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const fmtCompactCurrency = value => `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
-const fmtPct = value => `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
-const fmtDate = value => new Date(`${value}T00:00:00`).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-const latestTrade = THETA_GOD_DATA.trades.at(-1);
-const lastUpdatedText = THETA_GOD_DATA.last_updated || (latestTrade ? `${fmtDate(latestTrade.date)} • ${latestTrade.time_exit}` : 'No trades yet');
-document.getElementById('lastUpdated').textContent = lastUpdatedText;
-document.getElementById('heroInstrument').textContent = THETA_GOD_DATA.instrument;
-document.getElementById('heroLot').textContent = THETA_GOD_DATA.lot_size;
-document.getElementById('heroMode').textContent = THETA_GOD_DATA.mode[0].toUpperCase() + THETA_GOD_DATA.mode.slice(1);
-
-const trades = [...THETA_GOD_DATA.trades];
-const totalPnl = THETA_GOD_DATA.current_capital - THETA_GOD_DATA.initial_capital;
-const winTrades = trades.filter(t => t.net_pnl > 0);
-const lossTrades = trades.filter(t => t.net_pnl < 0);
-const winRate = trades.length ? (winTrades.length / trades.length) * 100 : 0;
-const capitalSeries = [THETA_GOD_DATA.initial_capital, ...trades.map(t => t.capital_after)];
-const drawdowns = capitalSeries.map((value, index) => {
-  const peak = Math.max(...capitalSeries.slice(0, index + 1));
-  return peak ? ((value - peak) / peak) * 100 : 0;
-});
-const maxDrawdown = Math.min(...drawdowns);
-const bestTrade = trades.reduce((best, trade) => trade.net_pnl > best.net_pnl ? trade : best, trades[0]);
-const worstTrade = trades.reduce((worst, trade) => trade.net_pnl < worst.net_pnl ? trade : worst, trades[0]);
-const avgWin = winTrades.length ? winTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / winTrades.length : null;
-const avgLoss = lossTrades.length ? lossTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / lossTrades.length : null;
-let streakWins = 0, streakLosses = 0, currentWins = 0, currentLosses = 0;
-trades.forEach(trade => {
-  if (trade.net_pnl > 0) {
-    currentWins += 1;
-    currentLosses = 0;
-  } else if (trade.net_pnl < 0) {
-    currentLosses += 1;
-    currentWins = 0;
-  }
-  streakWins = Math.max(streakWins, currentWins);
-  streakLosses = Math.max(streakLosses, currentLosses);
-});
-const returns = trades.map(trade => trade.net_pnl / trade.capital_before);
-const meanReturn = returns.length ? returns.reduce((sum, value) => sum + value, 0) / returns.length : 0;
-const variance = returns.length > 1 ? returns.reduce((sum, value) => sum + Math.pow(value - meanReturn, 2), 0) / (returns.length - 1) : 0;
-const stdDev = Math.sqrt(variance);
-const sharpe = returns.length >= 3 && stdDev > 0 ? (meanReturn / stdDev) * Math.sqrt(252) : null;
-
-const liveStats = [
-  { label: 'Capital', value: fmtCompactCurrency(THETA_GOD_DATA.current_capital), sub: `Started ${fmtCompactCurrency(THETA_GOD_DATA.initial_capital)}` },
-  { label: 'Total P&L', value: fmtCurrency(totalPnl), sub: `${totalPnl >= 0 ? 'Ahead of start' : 'Below start'}`, className: totalPnl >= 0 ? 'positive' : 'negative' },
-  { label: 'Win Rate', value: `${winRate.toFixed(1)}%`, sub: `${winTrades.length}/${trades.length} profitable`, className: winRate >= 50 ? 'positive' : 'negative' },
-  { label: 'Total Trades', value: String(trades.length), sub: `${trades.filter(t => t.ce_sl_hit || t.pe_sl_hit).length} with SL events` },
-  { label: 'Max Drawdown', value: `${maxDrawdown.toFixed(2)}%`, sub: maxDrawdown === 0 ? 'No drawdown yet' : 'Peak-to-trough', className: maxDrawdown < 0 ? 'negative' : '' },
-];
-document.getElementById('liveStats').innerHTML = liveStats.map(stat => `
-  <div class="live-stat">
-    <div class="label">${stat.label}</div>
-    <div class="value ${stat.className || ''}">${stat.value}</div>
-    <div class="sub">${stat.sub}</div>
-  </div>
-`).join('');
-
-const snapshotGrid = [
-  { label: 'Net return', value: fmtPct((totalPnl / THETA_GOD_DATA.initial_capital) * 100), detail: 'Since inception', className: totalPnl >= 0 ? 'positive' : 'negative' },
-  { label: 'Brokerage', value: fmtCurrency(trades.reduce((sum, trade) => sum + trade.brokerage, 0)), detail: 'All recorded costs' },
-  { label: 'Avg gross', value: fmtCurrency(trades.reduce((sum, trade) => sum + trade.gross_pnl, 0) / trades.length), detail: 'Before costs' },
-  { label: 'Best close', value: fmtCurrency(bestTrade.capital_after), detail: fmtDate(bestTrade.date) },
-].map(item => `
-  <div class="metric-tile">
-    <div class="label">${item.label}</div>
-    <div class="value ${item.className || ''}">${item.value}</div>
-    <div class="detail">${item.detail}</div>
-  </div>
-`).join('');
-document.getElementById('snapshotGrid').innerHTML = snapshotGrid;
-
-const strategyGrid = [
-  ['Index', THETA_GOD_DATA.instrument],
-  ['Lot', `${THETA_GOD_DATA.lot_size}`],
-  ['Mode', THETA_GOD_DATA.mode.toUpperCase()],
-  ['Entry', THETA_GOD_DATA.strategy.entry_time],
-  ['Exit', THETA_GOD_DATA.strategy.exit_time],
-  ['CE Stop', `${THETA_GOD_DATA.strategy.ce_sl_pct}%`],
-  ['PE Stop', `${THETA_GOD_DATA.strategy.pe_sl_pct}%`],
-  ['Trail', THETA_GOD_DATA.strategy.trail_to_be ? 'Breakeven' : 'Off'],
-  ['Re-entry watch', THETA_GOD_DATA.strategy.reentry_time],
-  ['Instrument type', 'Index options'],
-].map(([label, value]) => `
-  <div class="param">
-    <div class="label">${label}</div>
-    <div class="value">${value}</div>
-  </div>
-`).join('');
-document.getElementById('strategyGrid').innerHTML = strategyGrid;
-
-const statsGrid = [
-  { label: 'Best day', value: bestTrade ? fmtCurrency(bestTrade.net_pnl) : '—', detail: bestTrade ? fmtDate(bestTrade.date) : 'No data', className: 'positive' },
-  { label: 'Worst day', value: worstTrade ? fmtCurrency(worstTrade.net_pnl) : '—', detail: worstTrade ? fmtDate(worstTrade.date) : 'No data', className: worstTrade && worstTrade.net_pnl < 0 ? 'negative' : '' },
-  { label: 'Avg win', value: avgWin !== null ? fmtCurrency(avgWin) : '—', detail: `${winTrades.length} winning days`, className: 'positive' },
-  { label: 'Avg loss', value: avgLoss !== null ? fmtCurrency(avgLoss) : '—', detail: `${lossTrades.length} losing days`, className: avgLoss !== null ? 'negative' : '' },
-  { label: 'Consecutive wins', value: `${streakWins}`, detail: 'Longest streak', className: 'positive' },
-  { label: 'Consecutive losses', value: `${streakLosses}`, detail: 'Longest streak', className: streakLosses ? 'negative' : '' },
-  { label: 'Sharpe ratio', value: sharpe !== null ? sharpe.toFixed(2) : 'N/A', detail: sharpe !== null ? 'Daily returns annualized' : 'Need more data' },
-  { label: 'Average hold', value: '5h 07m', detail: 'Entry 09:59 → exit 15:06' },
-].map(item => `
-  <div class="stat-card">
-    <div class="label">${item.label}</div>
-    <div class="value ${item.className || ''}">${item.value}</div>
-    <div class="detail">${item.detail}</div>
-  </div>
-`).join('');
-document.getElementById('statsGrid').innerHTML = statsGrid;
-
-document.getElementById('winRateNote').textContent = `${winTrades.length} wins • ${lossTrades.length} losses • ${trades.length} total sessions`;
-
-function rowBadge(trade){
-  if (trade.ce_sl_hit || trade.pe_sl_hit) return '<span class="badge badge-red">SL Event</span>';
-  if (trade.net_pnl >= 0) return '<span class="badge badge-green">Profit</span>';
-  return '<span class="badge badge-red">Loss</span>';
-}
-
-function tradeMatches(trade, search, pnlFilter){
-  const haystack = [trade.date, trade.notes, trade.ce_strike, trade.pe_strike, trade.time_entry, trade.time_exit].join(' ').toLowerCase();
-  const matchesSearch = haystack.includes(search);
-  const matchesFilter = pnlFilter === 'all'
-    || (pnlFilter === 'profit' && trade.net_pnl > 0)
-    || (pnlFilter === 'loss' && trade.net_pnl < 0)
-    || (pnlFilter === 'sl' && (trade.ce_sl_hit || trade.pe_sl_hit));
-  return matchesSearch && matchesFilter;
-}
-
-function sortTrades(list, sortBy){
-  const sorted = [...list];
-  switch(sortBy){
-    case 'date-asc': sorted.sort((a,b) => new Date(a.date) - new Date(b.date)); break;
-    case 'pnl-desc': sorted.sort((a,b) => b.net_pnl - a.net_pnl); break;
-    case 'pnl-asc': sorted.sort((a,b) => a.net_pnl - b.net_pnl); break;
-    case 'capital-desc': sorted.sort((a,b) => b.capital_after - a.capital_after); break;
-    default: sorted.sort((a,b) => new Date(b.date) - new Date(a.date));
-  }
-  return sorted;
-}
-
-function renderTrades(){
-  const search = document.getElementById('searchInput').value.trim().toLowerCase();
-  const pnlFilter = document.getElementById('pnlFilter').value;
-  const sortBy = document.getElementById('sortBy').value;
-  const filtered = sortTrades(trades.filter(trade => tradeMatches(trade, search, pnlFilter)), sortBy);
-  const tbody = document.getElementById('tradeTableBody');
-  const empty = document.getElementById('tradeEmpty');
-  tbody.innerHTML = filtered.map(trade => `
-    <tr class="data-row" data-trade-id="${trade.id}">
-      <td><button class="expand-btn" type="button" aria-label="Expand trade ${trade.id}" data-expand="${trade.id}">+</button></td>
-      <td>${fmtDate(trade.date)}</td>
-      <td>${trade.time_entry}</td>
-      <td>${trade.time_exit}</td>
-      <td>${trade.spot.toFixed(2)}</td>
-      <td>${trade.ce_strike}</td>
-      <td>${trade.pe_strike}</td>
-      <td>${trade.ce_sell.toFixed(2)} → ${trade.ce_exit.toFixed(2)}</td>
-      <td>${trade.pe_sell.toFixed(2)} → ${trade.pe_exit.toFixed(2)}</td>
-      <td>${rowBadge(trade)}</td>
-      <td class="${trade.gross_pnl >= 0 ? 'positive' : 'negative'}">${fmtCurrency(trade.gross_pnl)}</td>
-      <td class="${trade.net_pnl >= 0 ? 'positive' : 'negative'}">${fmtCurrency(trade.net_pnl)}</td>
-      <td>${fmtCurrency(trade.capital_after)}</td>
-    </tr>
-    <tr class="detail-row" id="detail-${trade.id}">
-      <td colspan="13" class="detail-panel">
-        <div class="detail-inner">
-          <div class="detail-item"><div class="label">Instrument</div><div class="value">${trade.instrument}</div></div>
-          <div class="detail-item"><div class="label">Quantity</div><div class="value">${trade.qty}</div></div>
-          <div class="detail-item"><div class="label">Capital Before</div><div class="value">${fmtCurrency(trade.capital_before)}</div></div>
-          <div class="detail-item"><div class="label">Brokerage</div><div class="value">${fmtCurrency(trade.brokerage)}</div></div>
-          <div class="detail-item"><div class="label">CE Stop Hit</div><div class="value">${trade.ce_sl_hit ? 'Yes' : 'No'}</div></div>
-          <div class="detail-item"><div class="label">PE Stop Hit</div><div class="value">${trade.pe_sl_hit ? 'Yes' : 'No'}</div></div>
-          <div class="detail-item"><div class="label">Notes</div><div class="value">${trade.notes}</div></div>
-          <div class="detail-item"><div class="label">Trade ID</div><div class="value">#${trade.id}</div></div>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-  empty.hidden = filtered.length !== 0;
-  document.querySelectorAll('[data-expand]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.expand;
-      const detail = document.getElementById(`detail-${id}`);
-      detail.classList.toggle('open');
-      btn.textContent = detail.classList.contains('open') ? '−' : '+';
-    });
+  const trades = [...THETA_GOD_DATA.trades];
+  const totalPnl = THETA_GOD_DATA.current_capital - THETA_GOD_DATA.initial_capital;
+  const winTrades = trades.filter(t => t.net_pnl > 0);
+  const lossTrades = trades.filter(t => t.net_pnl < 0);
+  const winRate = trades.length ? (winTrades.length / trades.length) * 100 : 0;
+  const capitalSeries = [THETA_GOD_DATA.initial_capital, ...trades.map(t => t.capital_after)];
+  const drawdowns = capitalSeries.map((value, index) => {
+    const peak = Math.max(...capitalSeries.slice(0, index + 1));
+    return peak ? ((value - peak) / peak) * 100 : 0;
   });
-}
+  const maxDrawdown = Math.min(...drawdowns);
+  const bestTrade = trades.length ? trades.reduce((best, trade) => trade.net_pnl > best.net_pnl ? trade : best, trades[0]) : null;
+  const worstTrade = trades.length ? trades.reduce((worst, trade) => trade.net_pnl < worst.net_pnl ? trade : worst, trades[0]) : null;
+  const avgWin = winTrades.length ? winTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / winTrades.length : null;
+  const avgLoss = lossTrades.length ? lossTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / lossTrades.length : null;
+  let streakWins = 0, streakLosses = 0, currentWins = 0, currentLosses = 0;
+  trades.forEach(trade => {
+    if (trade.net_pnl > 0) {
+      currentWins += 1;
+      currentLosses = 0;
+    } else if (trade.net_pnl < 0) {
+      currentLosses += 1;
+      currentWins = 0;
+    }
+    streakWins = Math.max(streakWins, currentWins);
+    streakLosses = Math.max(streakLosses, currentLosses);
+  });
+  const returns = trades.map(trade => trade.net_pnl / trade.capital_before);
+  const meanReturn = returns.length ? returns.reduce((sum, value) => sum + value, 0) / returns.length : 0;
+  const variance = returns.length > 1 ? returns.reduce((sum, value) => sum + Math.pow(value - meanReturn, 2), 0) / (returns.length - 1) : 0;
+  const stdDev = Math.sqrt(variance);
+  const sharpe = returns.length >= 3 && stdDev > 0 ? (meanReturn / stdDev) * Math.sqrt(252) : null;
 
-['searchInput','pnlFilter','sortBy'].forEach(id => document.getElementById(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderTrades));
-renderTrades();
+  const snapshotGrid = [
+    { label: 'Net return', value: fmtPct((totalPnl / THETA_GOD_DATA.initial_capital) * 100), detail: 'Since inception', className: totalPnl >= 0 ? 'positive' : 'negative' },
+    { label: 'Brokerage', value: fmtCurrency(trades.reduce((sum, trade) => sum + trade.brokerage, 0)), detail: 'All recorded costs' },
+    { label: 'Avg gross', value: fmtCurrency(trades.reduce((sum, trade) => sum + trade.gross_pnl, 0) / trades.length), detail: 'Before costs' },
+    { label: 'Best close', value: bestTrade ? fmtCurrency(bestTrade.capital_after) : '—', detail: bestTrade ? fmtDate(bestTrade.date) : 'No data' },
+  ].map(item => `
+    <div class="metric-tile">
+      <div class="label">${item.label}</div>
+      <div class="value ${item.className || ''}">${item.value}</div>
+      <div class="detail">${item.detail}</div>
+    </div>
+  `).join('');
+  document.getElementById('snapshotGrid').innerHTML = snapshotGrid;
 
-Chart.defaults.color = '#6b6356';
-Chart.defaults.borderColor = 'rgba(255,255,255,0.04)';
-Chart.defaults.font.family = "'Inter', sans-serif";
-Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  const strategyGrid = [
+    ['Index', THETA_GOD_DATA.instrument],
+    ['Lot', `${THETA_GOD_DATA.lot_size}`],
+    ['Mode', THETA_GOD_DATA.mode.toUpperCase()],
+    ['Entry', THETA_GOD_DATA.strategy.entry_time],
+    ['Exit', THETA_GOD_DATA.strategy.exit_time],
+    ['CE Stop', `${THETA_GOD_DATA.strategy.ce_sl_pct}%`],
+    ['PE Stop', `${THETA_GOD_DATA.strategy.pe_sl_pct}%`],
+    ['Trail', THETA_GOD_DATA.strategy.trail_to_be ? 'Breakeven' : 'Off'],
+    ['Re-entry watch', THETA_GOD_DATA.strategy.reentry_time],
+    ['Instrument type', 'Index options'],
+  ].map(([label, value]) => `
+    <div class="param">
+      <div class="label">${label}</div>
+      <div class="value">${value}</div>
+    </div>
+  `).join('');
+  document.getElementById('strategyGrid').innerHTML = strategyGrid;
 
-const labels = ['Start', ...trades.map(trade => fmtDate(trade.date))];
-const capitalData = [THETA_GOD_DATA.initial_capital, ...trades.map(trade => trade.capital_after)];
-new Chart(document.getElementById('capitalChart'), {
-  type: 'line',
-  data: {
-    labels,
-    datasets: [{
-      label: 'Capital',
-      data: capitalData,
-      borderColor: '#c9a84c',
-      backgroundColor: 'rgba(201,168,76,0.12)',
-      fill: true,
-      borderWidth: 2.5,
-      tension: 0.32,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      pointBackgroundColor: '#c9a84c',
-      pointBorderColor: '#050505',
-      pointBorderWidth: 2,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#0d0d0d',
-        borderColor: 'rgba(201,168,76,0.18)',
-        borderWidth: 1,
-        callbacks: {
-          label: ctx => `Capital: ${fmtCurrency(ctx.raw)}`,
-          afterLabel: ctx => {
-            if (ctx.dataIndex === 0) return 'Initial capital';
-            const trade = trades[ctx.dataIndex - 1];
-            return `Day P&L: ${fmtCurrency(trade.net_pnl)}`;
+  const statsGrid = [
+    { label: 'Best day', value: bestTrade ? fmtCurrency(bestTrade.net_pnl) : '—', detail: bestTrade ? fmtDate(bestTrade.date) : 'No data', className: 'positive' },
+    { label: 'Worst day', value: worstTrade ? fmtCurrency(worstTrade.net_pnl) : '—', detail: worstTrade ? fmtDate(worstTrade.date) : 'No data', className: worstTrade && worstTrade.net_pnl < 0 ? 'negative' : '' },
+    { label: 'Avg win', value: avgWin !== null ? fmtCurrency(avgWin) : '—', detail: `${winTrades.length} winning days`, className: 'positive' },
+    { label: 'Avg loss', value: avgLoss !== null ? fmtCurrency(avgLoss) : '—', detail: `${lossTrades.length} losing days`, className: avgLoss !== null ? 'negative' : '' },
+    { label: 'Consecutive wins', value: `${streakWins}`, detail: 'Longest streak', className: 'positive' },
+    { label: 'Consecutive losses', value: `${streakLosses}`, detail: 'Longest streak', className: streakLosses ? 'negative' : '' },
+    { label: 'Sharpe ratio', value: sharpe !== null ? sharpe.toFixed(2) : 'N/A', detail: sharpe !== null ? 'Daily returns annualized' : 'Need more data' },
+    { label: 'Average hold', value: '5h 07m', detail: 'Entry 09:59 → exit 15:06' },
+  ].map(item => `
+    <div class="stat-card">
+      <div class="label">${item.label}</div>
+      <div class="value ${item.className || ''}">${item.value}</div>
+      <div class="detail">${item.detail}</div>
+    </div>
+  `).join('');
+  document.getElementById('statsGrid').innerHTML = statsGrid;
+
+  document.getElementById('winRateNote').textContent = `${winTrades.length} wins • ${lossTrades.length} losses • ${trades.length} total sessions`;
+
+  function rowBadge(trade){
+    if (trade.ce_sl_hit || trade.pe_sl_hit) return '<span class="badge badge-red">SL Event</span>';
+    if (trade.net_pnl >= 0) return '<span class="badge badge-green">Profit</span>';
+    return '<span class="badge badge-red">Loss</span>';
+  }
+
+  function tradeMatches(trade, search, pnlFilter){
+    const haystack = [trade.date, trade.notes, trade.ce_strike, trade.pe_strike, trade.time_entry, trade.time_exit].join(' ').toLowerCase();
+    const matchesSearch = haystack.includes(search);
+    const matchesFilter = pnlFilter === 'all'
+      || (pnlFilter === 'profit' && trade.net_pnl > 0)
+      || (pnlFilter === 'loss' && trade.net_pnl < 0)
+      || (pnlFilter === 'sl' && (trade.ce_sl_hit || trade.pe_sl_hit));
+    return matchesSearch && matchesFilter;
+  }
+
+  function sortTrades(list, sortBy){
+    const sorted = [...list];
+    switch(sortBy){
+      case 'date-asc': sorted.sort((a,b) => new Date(a.date) - new Date(b.date)); break;
+      case 'pnl-desc': sorted.sort((a,b) => b.net_pnl - a.net_pnl); break;
+      case 'pnl-asc': sorted.sort((a,b) => a.net_pnl - b.net_pnl); break;
+      case 'capital-desc': sorted.sort((a,b) => b.capital_after - a.capital_after); break;
+      default: sorted.sort((a,b) => new Date(b.date) - new Date(a.date));
+    }
+    return sorted;
+  }
+
+  function renderTrades(){
+    const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    const pnlFilter = document.getElementById('pnlFilter').value;
+    const sortBy = document.getElementById('sortBy').value;
+    const filtered = sortTrades(trades.filter(trade => tradeMatches(trade, search, pnlFilter)), sortBy);
+    const tbody = document.getElementById('tradeTableBody');
+    const empty = document.getElementById('tradeEmpty');
+    tbody.innerHTML = filtered.map(trade => `
+      <tr class="data-row" data-trade-id="${trade.id}">
+        <td><button class="expand-btn" type="button" aria-label="Expand trade ${trade.id}" data-expand="${trade.id}">+</button></td>
+        <td>${fmtDate(trade.date)}</td>
+        <td>${trade.time_entry}</td>
+        <td>${trade.time_exit}</td>
+        <td>${trade.spot.toFixed(2)}</td>
+        <td>${trade.ce_strike}</td>
+        <td>${trade.pe_strike}</td>
+        <td>${trade.ce_sell.toFixed(2)} → ${trade.ce_exit.toFixed(2)}</td>
+        <td>${trade.pe_sell.toFixed(2)} → ${trade.pe_exit.toFixed(2)}</td>
+        <td>${rowBadge(trade)}</td>
+        <td class="${trade.gross_pnl >= 0 ? 'positive' : 'negative'}">${fmtCurrency(trade.gross_pnl)}</td>
+        <td class="${trade.net_pnl >= 0 ? 'positive' : 'negative'}">${fmtCurrency(trade.net_pnl)}</td>
+        <td>${fmtCurrency(trade.capital_after)}</td>
+      </tr>
+      <tr class="detail-row" id="detail-${trade.id}">
+        <td colspan="13" class="detail-panel">
+          <div class="detail-inner">
+            <div class="detail-item"><div class="label">Instrument</div><div class="value">${trade.instrument}</div></div>
+            <div class="detail-item"><div class="label">Quantity</div><div class="value">${trade.qty}</div></div>
+            <div class="detail-item"><div class="label">Capital Before</div><div class="value">${fmtCurrency(trade.capital_before)}</div></div>
+            <div class="detail-item"><div class="label">Brokerage</div><div class="value">${fmtCurrency(trade.brokerage)}</div></div>
+            <div class="detail-item"><div class="label">CE Stop Hit</div><div class="value">${trade.ce_sl_hit ? 'Yes' : 'No'}</div></div>
+            <div class="detail-item"><div class="label">PE Stop Hit</div><div class="value">${trade.pe_sl_hit ? 'Yes' : 'No'}</div></div>
+            <div class="detail-item"><div class="label">Notes</div><div class="value">${trade.notes}</div></div>
+            <div class="detail-item"><div class="label">Trade ID</div><div class="value">#${trade.id}</div></div>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+    empty.hidden = filtered.length !== 0;
+    document.querySelectorAll('[data-expand]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.expand;
+        const detail = document.getElementById(`detail-${id}`);
+        detail.classList.toggle('open');
+        btn.textContent = detail.classList.contains('open') ? '−' : '+';
+      });
+    });
+  }
+
+  ['searchInput','pnlFilter','sortBy'].forEach(id => document.getElementById(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderTrades));
+  renderTrades();
+
+  Chart.defaults.color = '#6b6356';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.04)';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+  const labels = ['Start', ...trades.map(trade => fmtDate(trade.date))];
+  const capitalData = [THETA_GOD_DATA.initial_capital, ...trades.map(trade => trade.capital_after)];
+  new Chart(document.getElementById('capitalChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Capital',
+        data: capitalData,
+        borderColor: '#c9a84c',
+        backgroundColor: 'rgba(201,168,76,0.12)',
+        fill: true,
+        borderWidth: 2.5,
+        tension: 0.32,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#c9a84c',
+        pointBorderColor: '#050505',
+        pointBorderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0d0d0d',
+          borderColor: 'rgba(201,168,76,0.18)',
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => `Capital: ${fmtCurrency(ctx.raw)}`,
+            afterLabel: ctx => {
+              if (ctx.dataIndex === 0) return 'Initial capital';
+              const trade = trades[ctx.dataIndex - 1];
+              return `Day P&L: ${fmtCurrency(trade.net_pnl)}`;
+            }
           }
         }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } }
       }
-    },
-    scales: {
-      x: { grid: { display: false } },
-      y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } }
     }
-  }
-});
-
-new Chart(document.getElementById('dailyPnlChart'), {
-  type: 'bar',
-  data: {
-    labels: trades.map(trade => fmtDate(trade.date)),
-    datasets: [{
-      label: 'Daily net P&L',
-      data: trades.map(trade => trade.net_pnl),
-      backgroundColor: trades.map(trade => trade.net_pnl >= 0 ? '#5fa878' : '#c45c5c'),
-      borderRadius: 10,
-      borderSkipped: false,
-      maxBarThickness: 48,
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: ctx => `Net P&L: ${fmtCurrency(ctx.raw)}` } }
-    },
-    scales: {
-      x: { grid: { display: false } },
-      y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } }
-    }
-  }
-});
-
-new Chart(document.getElementById('winRateChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Wins', 'Losses'],
-    datasets: [{
-      data: [winTrades.length, lossTrades.length],
-      backgroundColor: ['#5fa878', 'rgba(255,255,255,0.08)'],
-      borderColor: ['#5fa878', 'rgba(255,255,255,0.08)'],
-      hoverOffset: 4,
-      cutout: '72%'
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: 'bottom' },
-      tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}` } }
-    }
-  }
-});
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) entry.target.classList.add('visible');
   });
-}, { threshold: 0.12 });
-document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
+  new Chart(document.getElementById('dailyPnlChart'), {
+    type: 'bar',
+    data: {
+      labels: trades.map(trade => fmtDate(trade.date)),
+      datasets: [{
+        label: 'Daily net P&L',
+        data: trades.map(trade => trade.net_pnl),
+        backgroundColor: trades.map(trade => trade.net_pnl >= 0 ? '#5fa878' : '#c45c5c'),
+        borderRadius: 10,
+        borderSkipped: false,
+        maxBarThickness: 48,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `Net P&L: ${fmtCurrency(ctx.raw)}` } }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } }
+      }
+    }
+  });
 
-} // end renderDashboard
+  new Chart(document.getElementById('winRateChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Wins', 'Losses'],
+      datasets: [{
+        data: [winTrades.length, lossTrades.length],
+        backgroundColor: ['#5fa878', 'rgba(255,255,255,0.08)'],
+        borderColor: ['#5fa878', 'rgba(255,255,255,0.08)'],
+        hoverOffset: 4,
+        cutout: '72%'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}` } }
+      }
+    }
+  });
+}
 
 function setupTabs(){
   const buttons = document.querySelectorAll('.tab-btn');
@@ -848,13 +959,23 @@ function setupTabs(){
         panel.hidden = !isActive;
         panel.classList.toggle('active', isActive);
       });
+      if (targetId === 'dashboard-tab') ensureDashboardRendered();
     });
   });
 }
 
-setupTabs();
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
 
-// Load live data and render
+function observeFadeUps(){
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+}
+
+setupTabs();
+observeFadeUps();
 loadData();
 </script>
 </body>

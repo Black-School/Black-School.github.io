@@ -1,0 +1,447 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS — System Dashboard | Black School</title>
+<meta name="description" content="ATLAS system page for Black School — dashboard snapshot and full strategy overview.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#050505; --bg-elevated:#0a0a0a; --bg-card:#0d0d0d;
+  --border:rgba(255,255,255,0.06); --gold:#c9a84c; --gold-dim:rgba(201,168,76,0.15);
+  --white:#f5f0e8; --text:#b8b0a0; --text-dim:#6b6356;
+  --green:#5fa878; --red:#c45c5c;
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);background:radial-gradient(circle at top, rgba(201,168,76,0.08), transparent 32%),var(--bg);
+  color:var(--text);line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font:inherit}
+::selection{background:var(--gold-dim);color:var(--white)}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;opacity:0.35;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+}
+.formula-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.formula-bg span{position:absolute;font-family:var(--serif);font-style:italic;color:rgba(201,168,76,0.04);white-space:nowrap}
+.formula-bg span:nth-child(1){top:10%;left:6%;font-size:1.2rem}
+.formula-bg span:nth-child(2){top:20%;right:8%;font-size:1.45rem}
+.formula-bg span:nth-child(3){top:46%;left:8%;font-size:1rem}
+.formula-bg span:nth-child(4){top:72%;right:10%;font-size:1.1rem}
+.formula-bg span:nth-child(5){top:84%;left:48%;font-size:1.25rem}
+.container{width:min(1200px,calc(100% - 40px));margin:0 auto;position:relative;z-index:1}
+.section{padding:28px 0}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0)),var(--bg-card);border:1px solid var(--border);border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.32)}
+.section-kicker{font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px}
+.section-label{font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+.section-note{font-size:0.9rem;color:var(--text-dim)}
+.chart-title{font-family:var(--serif);font-size:1.5rem;color:var(--white);font-weight:300}
+.positive{color:var(--green)!important}
+.mono{font-family:var(--mono)}
+.top-nav{position:sticky;top:0;z-index:5;background:rgba(5,5,5,0.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+.top-nav .container{display:flex;justify-content:space-between;align-items:center;padding:16px 0;gap:18px}
+.brand{font-family:var(--serif);font-size:1.25rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--white)}
+.brand span{color:var(--gold)}
+.nav-links{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.nav-link{padding:9px 14px;border:1px solid var(--border);border-radius:999px;color:var(--text-dim);font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;transition:all 0.25s ease}
+.nav-link:hover,.nav-link.active{color:var(--gold);border-color:rgba(201,168,76,0.28);background:var(--gold-dim)}
+.hero{padding:44px 0 22px}
+.hero-shell{padding:34px;overflow:hidden;position:relative}
+.hero-shell::after{content:'';position:absolute;inset:auto -15% -35% auto;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle, rgba(201,168,76,0.16), transparent 62%);filter:blur(4px)}
+.hero-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:end}
+.hero-kicker{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid rgba(201,168,76,0.18);border-radius:999px;background:rgba(201,168,76,0.06);color:var(--gold);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:600}
+.hero h1{font-family:var(--serif);font-size:clamp(3rem,8vw,5.6rem);font-weight:300;color:var(--white);line-height:0.95;margin:18px 0 10px}
+.hero-subtitle{font-family:var(--serif);font-style:italic;font-size:clamp(1.1rem,2.2vw,1.5rem);color:var(--text);max-width:620px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.meta-pill{padding:10px 14px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.02);font-size:0.78rem;color:var(--text-dim)}
+.meta-pill strong{color:var(--white);font-weight:500}
+.last-updated{justify-self:end;text-align:right;display:grid;gap:10px}
+.last-updated .label{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dim)}
+.last-updated .value{font-family:var(--mono);font-size:0.92rem;color:var(--white)}
+.last-updated .stamp{padding:14px 18px;border:1px solid var(--border);border-radius:20px;background:rgba(255,255,255,0.02)}
+.live-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-top:24px;border-radius:22px;overflow:hidden}
+.live-stat{padding:24px 20px;background:var(--bg-elevated)}
+.live-stat .label{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
+.live-stat .value{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--white);line-height:1}
+.live-stat .sub{margin-top:10px;font-size:0.82rem;color:var(--text-dim)}
+.tab-shell{padding:8px 0 4px}
+.tab-nav{display:inline-flex;flex-wrap:wrap;gap:12px;padding:8px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.02);margin-bottom:8px}
+.tab-btn{padding:12px 20px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text-dim);font-size:0.82rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;transition:all 0.25s ease}
+.tab-btn:hover,.tab-btn.active{color:var(--gold);background:var(--gold-dim);border-color:rgba(201,168,76,0.28)}
+.tab-content{opacity:0;transform:translateY(12px)}
+.tab-content.active{opacity:1;transform:translateY(0);animation:tabFade 0.35s ease}
+.tab-content[hidden]{display:none}
+.dashboard-grid,.two-col{display:grid;grid-template-columns:1.25fr 1fr;gap:24px}
+.chart-card,.snapshot,.strategy-card,.stats-card,.about-card{padding:28px}
+.snapshot{display:grid;gap:16px;align-content:start}
+.snapshot-grid,.config-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.metric-tile,.config-item,.signal-card,.about-stat,.step-card,.status-card{padding:18px;border:1px solid var(--border);border-radius:18px;background:rgba(255,255,255,0.02)}
+.metric-tile .label,.config-item .label,.about-stat .label,.status-card .label{font-size:0.68rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
+.metric-tile .value,.config-item .value,.about-stat .value,.status-card .value{font-family:var(--serif);font-size:1.7rem;line-height:1;color:var(--white)}
+.metric-tile .detail,.config-item .detail,.about-stat .detail,.status-card .detail{font-size:0.8rem;color:var(--text-dim);margin-top:8px}
+.about-title{font-family:var(--serif);font-size:clamp(2.4rem,5vw,3.4rem);color:var(--white);font-weight:300;margin-bottom:16px}
+.about-copy{font-size:1.05rem;color:var(--text);max-width:720px;margin-bottom:36px;line-height:1.8}
+.about-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.about-stat .value{color:var(--gold)}
+.strategy-list{list-style:none;display:grid;gap:10px;margin-top:20px}
+.strategy-list li{padding-left:18px;position:relative}
+.strategy-list li::before{content:'';position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step-num{font-family:var(--mono);font-size:0.82rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.step-card h3,.signal-card h3{font-size:1.25rem;color:var(--white);margin-bottom:10px;font-family:var(--serif);font-weight:300}
+.step-card p,.signal-card p{font-size:0.9rem;color:var(--text);line-height:1.7}
+.signal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.signal-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:12px}
+.signal-metric{font-family:var(--mono);font-size:0.8rem;color:var(--gold)}
+.status-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 28px}
+.cta-link{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border:1px solid rgba(201,168,76,0.28);border-radius:999px;background:var(--gold-dim);color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;font-size:0.76rem}
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+.footer{padding:28px 0 44px;text-align:center;color:var(--text-dim)}
+.footer a{color:var(--gold)}
+@keyframes tabFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1080px){
+  .hero-grid,.dashboard-grid,.two-col{grid-template-columns:1fr}
+  .last-updated{justify-self:start;text-align:left}
+  .live-stats,.about-stats-grid,.steps-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .top-nav .container{align-items:flex-start;flex-direction:column}
+  .container{width:min(100% - 24px,1200px)}
+  .hero-shell,.chart-card,.snapshot,.strategy-card,.stats-card,.about-card{padding:22px}
+  .live-stats,.about-stats-grid,.snapshot-grid,.config-grid,.steps-grid,.signal-grid,.status-grid{grid-template-columns:1fr}
+  .hero{padding-top:26px}
+  .hero h1{font-size:3rem}
+  .nav-links,.tab-nav{width:100%}
+  .nav-link,.tab-btn{flex:1;text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="formula-bg" aria-hidden="true">
+  <span>Σ α<sub>i</sub> · w<sub>i</sub> → composite score</span>
+  <span>Momentum • Breakout • Mean Reversion</span>
+  <span>LLM validation → cleaner entries</span>
+  <span>Trailing stops • portfolio limits • daily loss cap</span>
+  <span>Nifty 50 scan at 09:15</span>
+</div>
+<nav class="top-nav">
+  <div class="container">
+    <a href="index.html" class="brand">Black <span>School</span></a>
+    <div class="nav-links">
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="theta-god.html">Theta God</a>
+      <a class="nav-link active" href="atlas.html">ATLAS</a>
+      <a class="nav-link" href="backtest.html">Backtest Runner</a>
+    </div>
+  </div>
+</nav>
+<header class="hero section">
+  <div class="container">
+    <div class="card hero-shell fade-up">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-kicker">Autonomous equity system</div>
+          <h1>ATLAS ⚡</h1>
+          <p class="hero-subtitle">Nifty 50 multi-signal engine • backtested before live deployment</p>
+          <div class="hero-meta">
+            <div class="meta-pill">Universe <strong>Nifty 50</strong></div>
+            <div class="meta-pill">Max Hold <strong>15 Days</strong></div>
+            <div class="meta-pill">Mode <strong>Backtest</strong></div>
+          </div>
+        </div>
+        <div class="last-updated">
+          <div>
+            <div class="label">Status</div>
+            <div class="value positive">Research complete</div>
+          </div>
+          <div class="stamp">
+            <div class="label">Deployment</div>
+            <div class="value">Backtest only • live pending</div>
+          </div>
+        </div>
+      </div>
+      <div class="live-stats">
+        <div class="live-stat">
+          <div class="label">CAGR</div>
+          <div class="value">+20.4%</div>
+          <div class="sub">Ten-year compounded growth</div>
+        </div>
+        <div class="live-stat">
+          <div class="label">10yr Return</div>
+          <div class="value">6.4×</div>
+          <div class="sub">₹1 lakh becomes ₹6.4 lakh</div>
+        </div>
+        <div class="live-stat">
+          <div class="label">Win Rate</div>
+          <div class="value">59%</div>
+          <div class="sub">Across all executed positions</div>
+        </div>
+        <div class="live-stat">
+          <div class="label">Profitable Years</div>
+          <div class="value">10 / 10</div>
+          <div class="sub">No losing calendar year</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<main class="container">
+  <div class="tab-shell fade-up">
+    <div class="tab-nav" role="tablist" aria-label="ATLAS views">
+      <button class="tab-btn active" id="atlas-dashboard-btn" type="button" role="tab" aria-selected="true" aria-controls="atlas-dashboard-tab" data-tab-target="atlas-dashboard-tab">Dashboard</button>
+      <button class="tab-btn" id="atlas-about-btn" type="button" role="tab" aria-selected="false" aria-controls="atlas-about-tab" data-tab-target="atlas-about-tab">About</button>
+    </div>
+  </div>
+
+  <div class="tab-content active" id="atlas-dashboard-tab" role="tabpanel" aria-labelledby="atlas-dashboard-btn">
+    <section class="dashboard-grid section">
+      <div class="card about-card fade-up">
+        <div class="section-kicker">Dashboard</div>
+        <h2 class="chart-title">Backtest Snapshot</h2>
+        <p class="about-copy" style="max-width:640px;margin-bottom:0">Backtest results • Not yet live trading. ATLAS is designed as a fully autonomous pre-market stock selection engine and is currently presented as a validated research system.</p>
+        <div class="cta-row">
+          <a class="cta-link" href="backtest.html">Open Full Backtest Runner</a>
+        </div>
+        <div class="about-stats-grid">
+          <div class="about-stat">
+            <div class="label">CAGR</div>
+            <div class="value">+20.4%</div>
+            <div class="detail">Compound annual growth rate</div>
+          </div>
+          <div class="about-stat">
+            <div class="label">10yr Return</div>
+            <div class="value">6.4×</div>
+            <div class="detail">Ten-year capital multiple</div>
+          </div>
+          <div class="about-stat">
+            <div class="label">Win Rate</div>
+            <div class="value">59%</div>
+            <div class="detail">Hit rate across all trades</div>
+          </div>
+          <div class="about-stat">
+            <div class="label">Profitable Years</div>
+            <div class="value">10 / 10</div>
+            <div class="detail">All tested years closed green</div>
+          </div>
+        </div>
+      </div>
+      <aside class="card snapshot fade-up">
+        <div class="section-kicker">Research capsule</div>
+        <h2 class="chart-title">Institutional Summary</h2>
+        <p class="section-note">Quant signals generate ideas, AI filters for context, and portfolio rules keep exposure disciplined.</p>
+        <div class="snapshot-grid">
+          <div class="metric-tile">
+            <div class="label">Universe</div>
+            <div class="value">50</div>
+            <div class="detail">Nifty constituents scanned daily</div>
+          </div>
+          <div class="metric-tile">
+            <div class="label">Signals</div>
+            <div class="value">5</div>
+            <div class="detail">Uncorrelated alpha factors</div>
+          </div>
+          <div class="metric-tile">
+            <div class="label">AI Layer</div>
+            <div class="value">LLM</div>
+            <div class="detail">Fundamental validation before execution</div>
+          </div>
+          <div class="metric-tile">
+            <div class="label">Daily Loss Cap</div>
+            <div class="value">5%</div>
+            <div class="detail">Portfolio circuit breaker</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="two-col section">
+      <div class="card strategy-card fade-up">
+        <div class="section-kicker">Portfolio blueprint</div>
+        <h2 class="chart-title">What the engine optimizes for</h2>
+        <ul class="strategy-list">
+          <li>Daily ranking of all Nifty 50 names before the market opens.</li>
+          <li>Five alpha signals with explicit weights to avoid single-factor dependence.</li>
+          <li>AI validation on top-ranked names before capital is committed.</li>
+          <li>Automatic execution, trailing protection, and strict portfolio limits.</li>
+        </ul>
+      </div>
+      <div class="card stats-card fade-up">
+        <div class="section-kicker">Deployment status</div>
+        <h2 class="chart-title">Current readiness</h2>
+        <div class="status-grid">
+          <div class="status-card">
+            <div class="label">Data Pipeline</div>
+            <div class="value">Ready</div>
+            <div class="detail">Daily universe scan at 9:15 AM</div>
+          </div>
+          <div class="status-card">
+            <div class="label">Signal Stack</div>
+            <div class="value">5 / 5</div>
+            <div class="detail">Fully specified alpha model</div>
+          </div>
+          <div class="status-card">
+            <div class="label">Execution</div>
+            <div class="value">API</div>
+            <div class="detail">Broker automation path defined</div>
+          </div>
+          <div class="status-card">
+            <div class="label">Live Trading</div>
+            <div class="value">Pending</div>
+            <div class="detail">Backtest verified, not yet live</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="tab-content" id="atlas-about-tab" role="tabpanel" aria-labelledby="atlas-about-btn" hidden>
+    <section class="section">
+      <div class="card about-card">
+        <div class="section-label">System I</div>
+        <h2 class="about-title">ATLAS</h2>
+        <p class="about-copy">An autonomous daily equity trading system that scans the Nifty 50 universe, scores stocks through five quantitative alpha signals, validates with AI, and executes — all before the market opens.</p>
+        <div class="about-stats-grid">
+          <div class="about-stat">
+            <div class="label">CAGR</div>
+            <div class="value">+20.4%</div>
+            <div class="detail">Decade-long compounded return</div>
+          </div>
+          <div class="about-stat">
+            <div class="label">10yr Return</div>
+            <div class="value">6.4×</div>
+            <div class="detail">Capital multiple over ten years</div>
+          </div>
+          <div class="about-stat">
+            <div class="label">Win Rate</div>
+            <div class="value">59%</div>
+            <div class="detail">Measured across the full test set</div>
+          </div>
+          <div class="about-stat">
+            <div class="label">Profitable Years</div>
+            <div class="value">10 / 10</div>
+            <div class="detail">Every tested year finished positive</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card about-card">
+        <div class="section-kicker">Execution flow</div>
+        <h2 class="chart-title" style="margin-bottom:32px">How Atlas Works</h2>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-num">01</div>
+            <h3>Scan the Universe</h3>
+            <p>Every morning at 9:15 AM, Atlas downloads fresh data for all 50 Nifty stocks and rebuilds the day’s opportunity set.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">02</div>
+            <h3>Run Five Alpha Signals</h3>
+            <p>Each stock is scored by five uncorrelated quantitative factors so the ranking engine does not depend on one market regime.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">03</div>
+            <h3>AI Validation</h3>
+            <p>Top-ranked stocks go through an LLM for fundamental analysis before the final shortlist is approved for execution.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">04</div>
+            <h3>Execute &amp; Protect</h3>
+            <p>Orders fire automatically via broker API with trailing stops, portfolio constraints, and a daily loss cap guarding the book.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card about-card">
+        <div class="section-kicker">Alpha model</div>
+        <h2 class="chart-title" style="margin-bottom:32px">The Five Alpha Signals</h2>
+        <div class="signal-grid">
+          <div class="signal-card">
+            <div class="signal-head"><h3>α₁ Volume-Weighted Momentum</h3><div class="signal-metric">+21.2%/yr • Weight 3.0</div></div>
+            <p>Detects stocks where price rises are backed by increasing volume, favoring momentum with real participation behind it.</p>
+          </div>
+          <div class="signal-card">
+            <div class="signal-head"><h3>α₂ Keltner Channel Breakout</h3><div class="signal-metric">+19.5%/yr • Weight 3.0</div></div>
+            <p>Catches explosive moves when price breaks above the Keltner channel and expands out of compressed trading ranges.</p>
+          </div>
+          <div class="signal-card">
+            <div class="signal-head"><h3>α₃ MA Momentum</h3><div class="signal-metric">+16.1%/yr • Weight 2.5</div></div>
+            <p>Trend-following signal using 10-period moving-average crossover dynamics to stay aligned with persistent directional strength.</p>
+          </div>
+          <div class="signal-card">
+            <div class="signal-head"><h3>α₄ Range Position</h3><div class="signal-metric">+15.2%/yr • Weight 2.5</div></div>
+            <p>Measures where the close sits within the daily high-low range to identify names finishing strong inside the session.</p>
+          </div>
+          <div class="signal-card">
+            <div class="signal-head"><h3>α₅ Mean Reversion</h3><div class="signal-metric">+14.8%/yr • 11/11 yrs</div></div>
+            <p>The contrarian sleeve of the model, buying oversold bounces when price stretches too far below recent equilibrium.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card about-card">
+        <div class="section-kicker">Configuration</div>
+        <h2 class="chart-title" style="margin-bottom:24px">Operating Envelope</h2>
+        <div class="config-grid">
+          <div class="config-item"><div class="label">Position Size</div><div class="value">18%</div><div class="detail">Capital allocated per entry</div></div>
+          <div class="config-item"><div class="label">Trailing Stop</div><div class="value">+3% → 1.5%</div><div class="detail">Tightens as profit develops</div></div>
+          <div class="config-item"><div class="label">Max Hold</div><div class="value">15 days</div><div class="detail">Prevents stale capital usage</div></div>
+          <div class="config-item"><div class="label">Max Positions</div><div class="value">8</div><div class="detail">Portfolio breadth limit</div></div>
+          <div class="config-item"><div class="label">Buy Threshold</div><div class="value">0.60</div><div class="detail">Minimum composite score to enter</div></div>
+          <div class="config-item"><div class="label">Daily Loss Cap</div><div class="value">5%</div><div class="detail">Hard stop for portfolio drawdown</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<footer class="footer">
+  <div class="container">
+    <p><a href="index.html">Black School</a> • Quantitative trading systems • GitHub Pages deployment</p>
+  </div>
+</footer>
+<script>
+function setupTabs(){
+  const buttons = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-content');
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (button.classList.contains('active')) return;
+      const targetId = button.dataset.tabTarget;
+      buttons.forEach(btn => {
+        const isActive = btn === button;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', String(isActive));
+      });
+      panels.forEach(panel => {
+        const isActive = panel.id === targetId;
+        panel.hidden = !isActive;
+        panel.classList.toggle('active', isActive);
+      });
+    });
+  });
+}
+setupTabs();
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

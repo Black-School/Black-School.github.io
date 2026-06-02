@@ -316,7 +316,8 @@ body::before{
             <div class="dashboard-banner fade-up">
           <div class="dashboard-banner__title">📊 Live Paper Trading — Started May 29, 2026</div>
           <div class="dashboard-banner__meta">
-            <div class="dashboard-banner__chip">Current capital <strong id="dashboardCurrentCapital">—</strong></div>
+            <div class="dashboard-banner__chip">Combined capital <strong id="dashboardCurrentCapital">—</strong></div>
+            <div class="dashboard-banner__chip">Instrument capitals <strong id="dashboardInstrumentCapitals">—</strong></div>
             <div class="dashboard-banner__chip">Trade count <strong id="dashboardTradeCount">—</strong></div>
             <div class="dashboard-banner__chip">Last updated <strong id="dashboardUpdated">Awaiting feed...</strong></div>
           </div>
@@ -329,7 +330,7 @@ body::before{
           <div class="section-kicker">Performance</div>
           <h2 class="chart-title">Capital Growth</h2>
         </div>
-        <p class="chart-desc">Equity curve from ₹100,000 with daily tooltip P&amp;L.</p>
+        <p class="chart-desc">Four equity curves with synchronized daily tooltips across all instruments.</p>
       </div>
       <canvas id="capitalChart"></canvas>
     </div>
@@ -371,6 +372,7 @@ body::before{
             <tr>
               <th></th>
               <th>Date</th>
+              <th>Instrument</th>
               <th>Entry Time</th>
               <th>Exit Time</th>
               <th>Spot</th>
@@ -398,7 +400,7 @@ body::before{
           <div class="section-kicker">Daily attribution</div>
           <h2 class="chart-title">Daily P&amp;L</h2>
         </div>
-        <p class="chart-desc">Green days compound. Red days stay contained.</p>
+        <p class="chart-desc">Grouped daily net P&amp;L bars across SENSEX, BANKNIFTY, NIFTY, and FINNIFTY.</p>
       </div>
       <canvas id="dailyPnlChart"></canvas>
     </div>
@@ -617,31 +619,246 @@ body::before{
 </footer>
 
 <script>
-// Fallback data (used if fetch fails — e.g. local file:// access)
-const FALLBACK_DATA = {
-  initial_capital: 100000, current_capital: 103311.11, mode: "paper",
-  instrument: "SENSEX", lot_size: 10, last_updated: "2026-06-01 15:30 IST",
-  strategy: { entry_time: "09:59", exit_time: "15:06", ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: "12:30" },
-  trades: [
-    { id:1, date:"2026-05-29", time_entry:"09:59:07", time_exit:"15:06:01", instrument:"SENSEX", spot:75930.27, ce_strike:75900, pe_strike:75900, ce_sell:675.0, pe_sell:488.2, ce_exit:356.8, pe_exit:600.49, ce_sl_hit:false, pe_sl_hit:true, qty:10, gross_pnl:2059.10, brokerage:108.94, net_pnl:1950.16, capital_before:100000, capital_after:101950.16, notes:"SCHEDULED_EXIT" },
-    { id:2, date:"2026-06-01", time_entry:"09:59:05", time_exit:"15:06:02", instrument:"SENSEX", spot:74877.9, ce_strike:74900, pe_strike:74900, ce_sell:555.15, pe_sell:456.65, ce_exit:303.3, pe_exit:561.7, ce_sl_hit:false, pe_sl_hit:true, qty:10, gross_pnl:1468.0, brokerage:107.05, net_pnl:1360.95, capital_before:101950.16, capital_after:103311.11, notes:"SCHEDULED_EXIT" },
-  ]
+const INSTRUMENT_ORDER = ['SENSEX', 'BANKNIFTY', 'NIFTY', 'FINNIFTY'];
+const INSTRUMENT_META = {
+  SENSEX: { initial_capital: 100000, lot_size: 30, color: '#c9a84c' },
+  BANKNIFTY: { initial_capital: 80000, lot_size: 15, color: '#5fa878' },
+  NIFTY: { initial_capital: 120000, lot_size: 25, color: '#6b8cff' },
+  FINNIFTY: { initial_capital: 70000, lot_size: 25, color: '#c45c5c' },
+};
+const DEFAULT_STRATEGY = {
+  entry_time: '09:59',
+  exit_time: '15:06',
+  ce_sl_pct: 25,
+  pe_sl_pct: 23,
+  trail_to_be: true,
+  reentry_time: '12:30',
 };
 
-let THETA_GOD_DATA = FALLBACK_DATA;
+const FALLBACK_DATA = {
+  last_updated: '2026-06-01 15:30:10 IST',
+  instruments: {
+    SENSEX: {
+      initial_capital: 100000,
+      current_capital: 103311.11,
+      mode: 'paper',
+      instrument: 'SENSEX',
+      lot_size: 30,
+      color: '#c9a84c',
+      strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
+      stats: { total_trades: 2, wins: 2, losses: 0, win_rate: 100, total_pnl: 3311.11, avg_win: 1655.56, avg_loss: 0, best_day: 1950.16, worst_day: 1360.95, max_drawdown: 0 },
+      trades: [
+        { id: 1, date: '2026-05-29', time_entry: '09:59:07', time_exit: '15:06:01', instrument: 'SENSEX', spot: 75930.27, ce_strike: 75900, pe_strike: 75900, ce_sell: 675.0, pe_sell: 488.2, ce_exit: 356.8, pe_exit: 600.49, ce_sl_hit: false, pe_sl_hit: true, qty: 30, gross_pnl: 2059.10, brokerage: 108.94, net_pnl: 1950.16, capital_before: 100000, capital_after: 101950.16, notes: 'SCHEDULED_EXIT' },
+        { id: 6, date: '2026-06-01', time_entry: '09:59:05', time_exit: '15:06:02', instrument: 'SENSEX', spot: 74877.9, ce_strike: 74900, pe_strike: 74900, ce_sell: 555.15, pe_sell: 456.65, ce_exit: 303.3, pe_exit: 561.7, ce_sl_hit: false, pe_sl_hit: true, qty: 30, gross_pnl: 1468.0, brokerage: 107.05, net_pnl: 1360.95, capital_before: 101950.16, capital_after: 103311.11, notes: 'SCHEDULED_EXIT' },
+      ],
+    },
+    BANKNIFTY: {
+      initial_capital: 80000,
+      current_capital: 80000,
+      mode: 'paper',
+      instrument: 'BANKNIFTY',
+      lot_size: 15,
+      color: '#5fa878',
+      strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
+      stats: { total_trades: 0, wins: 0, losses: 0, win_rate: 0, total_pnl: 0, avg_win: 0, avg_loss: 0, best_day: 0, worst_day: 0, max_drawdown: 0 },
+      trades: [],
+    },
+    NIFTY: {
+      initial_capital: 120000,
+      current_capital: 120000,
+      mode: 'paper',
+      instrument: 'NIFTY',
+      lot_size: 25,
+      color: '#6b8cff',
+      strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
+      stats: { total_trades: 0, wins: 0, losses: 0, win_rate: 0, total_pnl: 0, avg_win: 0, avg_loss: 0, best_day: 0, worst_day: 0, max_drawdown: 0 },
+      trades: [],
+    },
+    FINNIFTY: {
+      initial_capital: 70000,
+      current_capital: 70000,
+      mode: 'paper',
+      instrument: 'FINNIFTY',
+      lot_size: 25,
+      color: '#c45c5c',
+      strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
+      stats: { total_trades: 0, wins: 0, losses: 0, win_rate: 0, total_pnl: 0, avg_win: 0, avg_loss: 0, best_day: 0, worst_day: 0, max_drawdown: 0 },
+      trades: [],
+    },
+  },
+};
+
+function num(value, fallback = 0) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function round2(value) {
+  return Math.round(num(value) * 100) / 100;
+}
+
+const fmtCurrency = value => `₹${num(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmtCompactCurrency = value => `₹${num(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+const fmtPct = value => Number.isFinite(Number(value)) ? `${Number(value) >= 0 ? '+' : ''}${Number(value).toFixed(2)}%` : '—';
+const fmtDate = value => new Date(`${value}T00:00:00`).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+const fmtNumber = (value, digits = 2) => num(value).toLocaleString('en-IN', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+
+function hexToRgba(hex, alpha) {
+  const normalized = (hex || '#c9a84c').replace('#', '');
+  const safe = normalized.length === 3 ? normalized.split('').map(ch => ch + ch).join('') : normalized;
+  const value = Number.parseInt(safe, 16);
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function sortTradesChronologically(list) {
+  return [...list].sort((a, b) => {
+    const left = new Date(`${a.date}T${a.time_entry || '00:00:00'}`);
+    const right = new Date(`${b.date}T${b.time_entry || '00:00:00'}`);
+    if (left.getTime() !== right.getTime()) return left - right;
+    return String(a.trade_key || a.id).localeCompare(String(b.trade_key || b.id));
+  });
+}
+
+function computeStats(initialCapital, currentCapital, trades) {
+  const pnls = trades.map(trade => num(trade.net_pnl));
+  const wins = pnls.filter(pnl => pnl > 0);
+  const losses = pnls.filter(pnl => pnl <= 0);
+  const capitalSeries = [num(initialCapital), ...trades.map(trade => num(trade.capital_after, initialCapital))];
+  let peak = capitalSeries[0] || 0;
+  let maxDrawdown = 0;
+  capitalSeries.forEach(value => {
+    peak = Math.max(peak, value);
+    const drawdown = peak ? ((value - peak) / peak) * 100 : 0;
+    maxDrawdown = Math.min(maxDrawdown, drawdown);
+  });
+  return {
+    total_trades: trades.length,
+    wins: wins.length,
+    losses: losses.length,
+    win_rate: trades.length ? round2((wins.length / trades.length) * 100) : 0,
+    total_pnl: round2(num(currentCapital) - num(initialCapital)),
+    avg_win: wins.length ? round2(wins.reduce((sum, pnl) => sum + pnl, 0) / wins.length) : 0,
+    avg_loss: losses.length ? round2(losses.reduce((sum, pnl) => sum + pnl, 0) / losses.length) : 0,
+    best_day: pnls.length ? round2(Math.max(...pnls)) : 0,
+    worst_day: pnls.length ? round2(Math.min(...pnls)) : 0,
+    max_drawdown: round2(maxDrawdown),
+  };
+}
+
+function defaultInstrument(name) {
+  const meta = INSTRUMENT_META[name];
+  return {
+    initial_capital: meta.initial_capital,
+    current_capital: meta.initial_capital,
+    mode: 'paper',
+    instrument: name,
+    lot_size: meta.lot_size,
+    color: meta.color,
+    strategy: { ...DEFAULT_STRATEGY },
+    stats: computeStats(meta.initial_capital, meta.initial_capital, []),
+    trades: [],
+  };
+}
+
+function normalizeTrade(trade, instrumentName, fallbackId) {
+  const id = trade?.id ?? fallbackId;
+  return {
+    ...trade,
+    id,
+    instrument: trade?.instrument || instrumentName,
+    date: trade?.date || '',
+    time_entry: trade?.time_entry || '—',
+    time_exit: trade?.time_exit || '—',
+    spot: num(trade?.spot),
+    ce_strike: num(trade?.ce_strike),
+    pe_strike: num(trade?.pe_strike),
+    ce_sell: num(trade?.ce_sell),
+    pe_sell: num(trade?.pe_sell),
+    ce_exit: num(trade?.ce_exit),
+    pe_exit: num(trade?.pe_exit),
+    ce_sl_hit: Boolean(trade?.ce_sl_hit),
+    pe_sl_hit: Boolean(trade?.pe_sl_hit),
+    qty: num(trade?.qty),
+    gross_pnl: round2(trade?.gross_pnl),
+    brokerage: round2(trade?.brokerage),
+    net_pnl: round2(trade?.net_pnl),
+    capital_before: round2(trade?.capital_before),
+    capital_after: round2(trade?.capital_after),
+    notes: trade?.notes || '—',
+    trade_key: `${trade?.instrument || instrumentName}-${id}-${trade?.date || fallbackId}-${trade?.time_entry || fallbackId}`,
+  };
+}
+
+function normalizeInstrument(name, rawInstrument) {
+  const base = defaultInstrument(name);
+  const trades = sortTradesChronologically((rawInstrument?.trades || []).map((trade, index) => normalizeTrade(trade, name, index + 1)));
+  const initialCapital = num(rawInstrument?.initial_capital, base.initial_capital);
+  const currentCapital = round2(rawInstrument?.current_capital ?? (trades.at(-1)?.capital_after ?? initialCapital));
+  const lotSize = Math.round(num(rawInstrument?.lot_size, base.lot_size));
+  return {
+    initial_capital: initialCapital,
+    current_capital: currentCapital,
+    mode: rawInstrument?.mode || base.mode,
+    instrument: rawInstrument?.instrument || name,
+    lot_size: lotSize,
+    color: rawInstrument?.color || base.color,
+    strategy: { ...DEFAULT_STRATEGY, ...(rawInstrument?.strategy || {}) },
+    stats: computeStats(initialCapital, currentCapital, trades),
+    trades,
+  };
+}
+
+function normalizeData(raw) {
+  const normalized = {
+    last_updated: raw?.last_updated || 'Awaiting feed...',
+    instruments: {},
+  };
+  if (raw?.instruments) {
+    INSTRUMENT_ORDER.forEach(name => {
+      normalized.instruments[name] = normalizeInstrument(name, raw.instruments[name]);
+    });
+  } else {
+    const legacyInstrument = raw?.instrument || 'SENSEX';
+    INSTRUMENT_ORDER.forEach(name => {
+      normalized.instruments[name] = normalizeInstrument(name, name === legacyInstrument ? raw : null);
+    });
+  }
+  return normalized;
+}
+
+let THETA_GOD_DATA = normalizeData(FALLBACK_DATA);
 let dashboardRendered = false;
 
-const fmtCurrency = value => `₹${Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const fmtCompactCurrency = value => `₹${Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
-const fmtPct = value => `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
-const fmtDate = value => new Date(`${value}T00:00:00`).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+function getInstrumentEntries(data = THETA_GOD_DATA) {
+  return INSTRUMENT_ORDER.map(name => [name, data.instruments[name]]);
+}
+
+function getAllTrades(data = THETA_GOD_DATA) {
+  return sortTradesChronologically(getInstrumentEntries(data).flatMap(([, instrument]) => instrument.trades));
+}
+
+function getTradeDates(data = THETA_GOD_DATA) {
+  const uniqueDates = [...new Set(getAllTrades(data).map(trade => trade.date).filter(Boolean))].sort();
+  return uniqueDates.length ? uniqueDates : [new Date().toISOString().slice(0, 10)];
+}
+
+function getTotalInitialCapital(data = THETA_GOD_DATA) {
+  return round2(getInstrumentEntries(data).reduce((sum, [, instrument]) => sum + num(instrument.initial_capital), 0));
+}
+
+function getTotalCurrentCapital(data = THETA_GOD_DATA) {
+  return round2(getInstrumentEntries(data).reduce((sum, [, instrument]) => sum + num(instrument.current_capital), 0));
+}
 
 async function loadData() {
   try {
     const resp = await fetch('data/theta-god-trades.json?t=' + Date.now());
     if (resp.ok) {
-      THETA_GOD_DATA = await resp.json();
-      console.log('Loaded live data:', THETA_GOD_DATA.trades.length, 'trades');
+      THETA_GOD_DATA = normalizeData(await resp.json());
+      console.log('Loaded live data:', getAllTrades().length, 'trades');
     }
   } catch (e) {
     console.warn('Using fallback data:', e);
@@ -654,13 +871,15 @@ async function loadData() {
 }
 
 function latestUpdateText() {
-  const latestTrade = THETA_GOD_DATA.trades.at(-1);
+  const latestTrade = getAllTrades().at(-1);
   return THETA_GOD_DATA.last_updated || (latestTrade ? `${fmtDate(latestTrade.date)} • ${latestTrade.time_exit}` : 'No trades yet');
 }
 
 function updateDashboardBanner() {
-  document.getElementById('dashboardCurrentCapital').textContent = fmtCurrency(THETA_GOD_DATA.current_capital);
-  document.getElementById('dashboardTradeCount').textContent = `${THETA_GOD_DATA.trades.length}`;
+  const entries = getInstrumentEntries();
+  document.getElementById('dashboardCurrentCapital').textContent = fmtCurrency(getTotalCurrentCapital());
+  document.getElementById('dashboardInstrumentCapitals').textContent = entries.map(([name, instrument]) => `${name} ${fmtCompactCurrency(instrument.current_capital)}`).join(' • ');
+  document.getElementById('dashboardTradeCount').textContent = `${getAllTrades().length}`;
   document.getElementById('dashboardUpdated').textContent = latestUpdateText();
 }
 
@@ -671,82 +890,116 @@ function ensureDashboardRendered() {
   observeFadeUps();
 }
 
-function renderDashboard() {
-  const trades = [...THETA_GOD_DATA.trades];
-  const totalPnl = THETA_GOD_DATA.current_capital - THETA_GOD_DATA.initial_capital;
-  const winTrades = trades.filter(t => t.net_pnl > 0);
-  const lossTrades = trades.filter(t => t.net_pnl < 0);
-  const winRate = trades.length ? (winTrades.length / trades.length) * 100 : 0;
-  const capitalSeries = [THETA_GOD_DATA.initial_capital, ...trades.map(t => t.capital_after)];
-  const drawdowns = capitalSeries.map((value, index) => {
-    const peak = Math.max(...capitalSeries.slice(0, index + 1));
-    return peak ? ((value - peak) / peak) * 100 : 0;
+function buildCapitalSeries(trades, initialCapital, dates) {
+  const sortedTrades = sortTradesChronologically(trades);
+  let cursor = 0;
+  let currentCapital = num(initialCapital);
+  return dates.map(date => {
+    while (cursor < sortedTrades.length && sortedTrades[cursor].date <= date) {
+      currentCapital = num(sortedTrades[cursor].capital_after, currentCapital);
+      cursor += 1;
+    }
+    return round2(currentCapital);
   });
-  const maxDrawdown = Math.min(...drawdowns);
-  const bestTrade = trades.length ? trades.reduce((best, trade) => trade.net_pnl > best.net_pnl ? trade : best, trades[0]) : null;
-  const worstTrade = trades.length ? trades.reduce((worst, trade) => trade.net_pnl < worst.net_pnl ? trade : worst, trades[0]) : null;
-  const avgWin = winTrades.length ? winTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / winTrades.length : null;
-  const avgLoss = lossTrades.length ? lossTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / lossTrades.length : null;
-  let streakWins = 0, streakLosses = 0, currentWins = 0, currentLosses = 0;
+}
+
+function buildDailyPnlSeries(trades, dates) {
+  const totals = new Map();
+  trades.forEach(trade => {
+    totals.set(trade.date, round2((totals.get(trade.date) || 0) + num(trade.net_pnl)));
+  });
+  return dates.map(date => round2(totals.get(date) || 0));
+}
+
+function instrumentBadge(name) {
+  const color = INSTRUMENT_META[name]?.color || '#c9a84c';
+  return `<span class="badge badge-gold" style="color:${color};background:${hexToRgba(color, 0.12)};border-color:${hexToRgba(color, 0.22)}">${name}</span>`;
+}
+
+function renderDashboard() {
+  const instrumentEntries = getInstrumentEntries();
+  const trades = getAllTrades();
+  const totalInitialCapital = getTotalInitialCapital();
+  const totalCurrentCapital = getTotalCurrentCapital();
+  const totalPnl = round2(totalCurrentCapital - totalInitialCapital);
+  const winTrades = trades.filter(trade => trade.net_pnl > 0);
+  const lossTrades = trades.filter(trade => trade.net_pnl <= 0);
+  const chartDates = getTradeDates();
+  const capitalSeriesByInstrument = Object.fromEntries(instrumentEntries.map(([name, instrument]) => [name, buildCapitalSeries(instrument.trades, instrument.initial_capital, chartDates)]));
+  const dailyPnlByInstrument = Object.fromEntries(instrumentEntries.map(([name, instrument]) => [name, buildDailyPnlSeries(instrument.trades, chartDates)]));
+  const combinedCapitalSeries = chartDates.map((_, index) => round2(instrumentEntries.reduce((sum, [name]) => sum + capitalSeriesByInstrument[name][index], 0)));
+  const combinedDailyPnl = chartDates.map((_, index) => round2(instrumentEntries.reduce((sum, [name]) => sum + dailyPnlByInstrument[name][index], 0)));
+  const bestDayIndex = combinedDailyPnl.length ? combinedDailyPnl.indexOf(Math.max(...combinedDailyPnl)) : -1;
+  const worstDayIndex = combinedDailyPnl.length ? combinedDailyPnl.indexOf(Math.min(...combinedDailyPnl)) : -1;
+  const bestDay = bestDayIndex >= 0 ? { date: chartDates[bestDayIndex], value: combinedDailyPnl[bestDayIndex] } : null;
+  const worstDay = worstDayIndex >= 0 ? { date: chartDates[worstDayIndex], value: combinedDailyPnl[worstDayIndex] } : null;
+  const avgWin = winTrades.length ? round2(winTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / winTrades.length) : null;
+  const avgLoss = lossTrades.length ? round2(lossTrades.reduce((sum, trade) => sum + trade.net_pnl, 0) / lossTrades.length) : null;
+  let streakWins = 0;
+  let streakLosses = 0;
+  let currentWins = 0;
+  let currentLosses = 0;
   trades.forEach(trade => {
     if (trade.net_pnl > 0) {
       currentWins += 1;
       currentLosses = 0;
-    } else if (trade.net_pnl < 0) {
+    } else {
       currentLosses += 1;
       currentWins = 0;
     }
     streakWins = Math.max(streakWins, currentWins);
     streakLosses = Math.max(streakLosses, currentLosses);
   });
-  const returns = trades.map(trade => trade.net_pnl / trade.capital_before);
-  const meanReturn = returns.length ? returns.reduce((sum, value) => sum + value, 0) / returns.length : 0;
-  const variance = returns.length > 1 ? returns.reduce((sum, value) => sum + Math.pow(value - meanReturn, 2), 0) / (returns.length - 1) : 0;
+  let rollingCapital = totalInitialCapital;
+  const dailyReturns = combinedDailyPnl.map(pnl => {
+    const previousCapital = rollingCapital || totalInitialCapital;
+    rollingCapital += pnl;
+    return previousCapital ? pnl / previousCapital : 0;
+  });
+  const meanReturn = dailyReturns.length ? dailyReturns.reduce((sum, value) => sum + value, 0) / dailyReturns.length : 0;
+  const variance = dailyReturns.length > 1 ? dailyReturns.reduce((sum, value) => sum + Math.pow(value - meanReturn, 2), 0) / (dailyReturns.length - 1) : 0;
   const stdDev = Math.sqrt(variance);
-  const sharpe = returns.length >= 3 && stdDev > 0 ? (meanReturn / stdDev) * Math.sqrt(252) : null;
+  const sharpe = dailyReturns.length >= 3 && stdDev > 0 ? (meanReturn / stdDev) * Math.sqrt(252) : null;
+  const combinedCapitalWithStart = [totalInitialCapital, ...combinedCapitalSeries];
+  let peakCapital = combinedCapitalWithStart[0] || 0;
+  let maxDrawdown = 0;
+  combinedCapitalWithStart.forEach(value => {
+    peakCapital = Math.max(peakCapital, value);
+    const drawdown = peakCapital ? ((value - peakCapital) / peakCapital) * 100 : 0;
+    maxDrawdown = Math.min(maxDrawdown, drawdown);
+  });
+  const totalBrokerage = round2(trades.reduce((sum, trade) => sum + num(trade.brokerage), 0));
 
-  const snapshotGrid = [
-    { label: 'Net return', value: fmtPct((totalPnl / THETA_GOD_DATA.initial_capital) * 100), detail: 'Since inception', className: totalPnl >= 0 ? 'positive' : 'negative' },
-    { label: 'Brokerage', value: fmtCurrency(trades.reduce((sum, trade) => sum + trade.brokerage, 0)), detail: 'All recorded costs' },
-    { label: 'Avg gross', value: fmtCurrency(trades.reduce((sum, trade) => sum + trade.gross_pnl, 0) / trades.length), detail: 'Before costs' },
-    { label: 'Best close', value: bestTrade ? fmtCurrency(bestTrade.capital_after) : '—', detail: bestTrade ? fmtDate(bestTrade.date) : 'No data' },
-  ].map(item => `
+  document.getElementById('snapshotGrid').innerHTML = instrumentEntries.map(([name, instrument]) => {
+    const pnl = round2(instrument.current_capital - instrument.initial_capital);
+    const returns = instrument.initial_capital ? (pnl / instrument.initial_capital) * 100 : 0;
+    return `
+      <div class="metric-tile">
+        <div class="label" style="color:${instrument.color}">${name}</div>
+        <div class="value ${pnl >= 0 ? 'positive' : 'negative'}">${fmtCurrency(instrument.current_capital)}</div>
+        <div class="detail">${fmtPct(returns)} • ${instrument.trades.length} trades • ${fmtCurrency(pnl)}</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('strategyGrid').innerHTML = instrumentEntries.map(([name, instrument]) => `
     <div class="metric-tile">
-      <div class="label">${item.label}</div>
-      <div class="value ${item.className || ''}">${item.value}</div>
-      <div class="detail">${item.detail}</div>
+      <div class="label" style="color:${instrument.color}">${name}</div>
+      <div class="detail">Lot ${instrument.lot_size} • ${String(instrument.mode || 'paper').toUpperCase()} • ${instrument.strategy.entry_time} → ${instrument.strategy.exit_time}</div>
+      <div class="detail">CE SL ${instrument.strategy.ce_sl_pct}% • PE SL ${instrument.strategy.pe_sl_pct}% • Trail ${instrument.strategy.trail_to_be ? 'Breakeven' : 'Off'}</div>
+      <div class="detail">Re-entry watch ${instrument.strategy.reentry_time}</div>
     </div>
   `).join('');
-  document.getElementById('snapshotGrid').innerHTML = snapshotGrid;
 
-  const strategyGrid = [
-    ['Index', THETA_GOD_DATA.instrument],
-    ['Lot', `${THETA_GOD_DATA.lot_size}`],
-    ['Mode', THETA_GOD_DATA.mode.toUpperCase()],
-    ['Entry', THETA_GOD_DATA.strategy.entry_time],
-    ['Exit', THETA_GOD_DATA.strategy.exit_time],
-    ['CE Stop', `${THETA_GOD_DATA.strategy.ce_sl_pct}%`],
-    ['PE Stop', `${THETA_GOD_DATA.strategy.pe_sl_pct}%`],
-    ['Trail', THETA_GOD_DATA.strategy.trail_to_be ? 'Breakeven' : 'Off'],
-    ['Re-entry watch', THETA_GOD_DATA.strategy.reentry_time],
-    ['Instrument type', 'Index options'],
-  ].map(([label, value]) => `
-    <div class="param">
-      <div class="label">${label}</div>
-      <div class="value">${value}</div>
-    </div>
-  `).join('');
-  document.getElementById('strategyGrid').innerHTML = strategyGrid;
-
-  const statsGrid = [
-    { label: 'Best day', value: bestTrade ? fmtCurrency(bestTrade.net_pnl) : '—', detail: bestTrade ? fmtDate(bestTrade.date) : 'No data', className: 'positive' },
-    { label: 'Worst day', value: worstTrade ? fmtCurrency(worstTrade.net_pnl) : '—', detail: worstTrade ? fmtDate(worstTrade.date) : 'No data', className: worstTrade && worstTrade.net_pnl < 0 ? 'negative' : '' },
-    { label: 'Avg win', value: avgWin !== null ? fmtCurrency(avgWin) : '—', detail: `${winTrades.length} winning days`, className: 'positive' },
-    { label: 'Avg loss', value: avgLoss !== null ? fmtCurrency(avgLoss) : '—', detail: `${lossTrades.length} losing days`, className: avgLoss !== null ? 'negative' : '' },
-    { label: 'Consecutive wins', value: `${streakWins}`, detail: 'Longest streak', className: 'positive' },
-    { label: 'Consecutive losses', value: `${streakLosses}`, detail: 'Longest streak', className: streakLosses ? 'negative' : '' },
-    { label: 'Sharpe ratio', value: sharpe !== null ? sharpe.toFixed(2) : 'N/A', detail: sharpe !== null ? 'Daily returns annualized' : 'Need more data' },
-    { label: 'Average hold', value: '5h 07m', detail: 'Entry 09:59 → exit 15:06' },
+  document.getElementById('statsGrid').innerHTML = [
+    { label: 'Combined return', value: fmtPct(totalInitialCapital ? (totalPnl / totalInitialCapital) * 100 : 0), detail: `${fmtCurrency(totalPnl)} across all instruments`, className: totalPnl >= 0 ? 'positive' : 'negative' },
+    { label: 'Total brokerage', value: fmtCurrency(totalBrokerage), detail: `${trades.length} total trades` },
+    { label: 'Best day', value: bestDay ? fmtCurrency(bestDay.value) : '—', detail: bestDay ? fmtDate(bestDay.date) : 'No data', className: bestDay && bestDay.value >= 0 ? 'positive' : '' },
+    { label: 'Worst day', value: worstDay ? fmtCurrency(worstDay.value) : '—', detail: worstDay ? fmtDate(worstDay.date) : 'No data', className: worstDay && worstDay.value < 0 ? 'negative' : '' },
+    { label: 'Avg win', value: avgWin !== null ? fmtCurrency(avgWin) : '—', detail: `${winTrades.length} winning trades`, className: 'positive' },
+    { label: 'Avg loss', value: avgLoss !== null ? fmtCurrency(avgLoss) : '—', detail: `${lossTrades.length} losing or flat trades`, className: avgLoss !== null ? 'negative' : '' },
+    { label: 'Max drawdown', value: fmtPct(maxDrawdown), detail: `Win streak ${streakWins} • Loss streak ${streakLosses}`, className: maxDrawdown < 0 ? 'negative' : '' },
+    { label: 'Sharpe ratio', value: sharpe !== null ? sharpe.toFixed(2) : 'N/A', detail: sharpe !== null ? 'Combined daily returns annualized' : 'Need more data' },
   ].map(item => `
     <div class="stat-card">
       <div class="label">${item.label}</div>
@@ -754,39 +1007,47 @@ function renderDashboard() {
       <div class="detail">${item.detail}</div>
     </div>
   `).join('');
-  document.getElementById('statsGrid').innerHTML = statsGrid;
 
-  document.getElementById('winRateNote').textContent = `${winTrades.length} wins • ${lossTrades.length} losses • ${trades.length} total sessions`;
+  document.getElementById('winRateNote').textContent = `${winTrades.length} wins • ${lossTrades.length} losses • ${trades.length} total trades`;
 
-  function rowBadge(trade){
+  function rowBadge(trade) {
     if (trade.ce_sl_hit || trade.pe_sl_hit) return '<span class="badge badge-red">SL Event</span>';
-    if (trade.net_pnl >= 0) return '<span class="badge badge-green">Profit</span>';
+    if (trade.net_pnl > 0) return '<span class="badge badge-green">Profit</span>';
     return '<span class="badge badge-red">Loss</span>';
   }
 
-  function tradeMatches(trade, search, pnlFilter){
-    const haystack = [trade.date, trade.notes, trade.ce_strike, trade.pe_strike, trade.time_entry, trade.time_exit].join(' ').toLowerCase();
+  function tradeMatches(trade, search, pnlFilter) {
+    const haystack = [trade.date, trade.instrument, trade.notes, trade.ce_strike, trade.pe_strike, trade.time_entry, trade.time_exit].join(' ').toLowerCase();
     const matchesSearch = haystack.includes(search);
     const matchesFilter = pnlFilter === 'all'
       || (pnlFilter === 'profit' && trade.net_pnl > 0)
-      || (pnlFilter === 'loss' && trade.net_pnl < 0)
+      || (pnlFilter === 'loss' && trade.net_pnl <= 0)
       || (pnlFilter === 'sl' && (trade.ce_sl_hit || trade.pe_sl_hit));
     return matchesSearch && matchesFilter;
   }
 
-  function sortTrades(list, sortBy){
+  function sortTrades(list, sortBy) {
     const sorted = [...list];
-    switch(sortBy){
-      case 'date-asc': sorted.sort((a,b) => new Date(a.date) - new Date(b.date)); break;
-      case 'pnl-desc': sorted.sort((a,b) => b.net_pnl - a.net_pnl); break;
-      case 'pnl-asc': sorted.sort((a,b) => a.net_pnl - b.net_pnl); break;
-      case 'capital-desc': sorted.sort((a,b) => b.capital_after - a.capital_after); break;
-      default: sorted.sort((a,b) => new Date(b.date) - new Date(a.date));
+    switch (sortBy) {
+      case 'date-asc':
+        sorted.sort((a, b) => new Date(`${a.date}T${a.time_entry || '00:00:00'}`) - new Date(`${b.date}T${b.time_entry || '00:00:00'}`));
+        break;
+      case 'pnl-desc':
+        sorted.sort((a, b) => b.net_pnl - a.net_pnl);
+        break;
+      case 'pnl-asc':
+        sorted.sort((a, b) => a.net_pnl - b.net_pnl);
+        break;
+      case 'capital-desc':
+        sorted.sort((a, b) => b.capital_after - a.capital_after);
+        break;
+      default:
+        sorted.sort((a, b) => new Date(`${b.date}T${b.time_entry || '00:00:00'}`) - new Date(`${a.date}T${a.time_entry || '00:00:00'}`));
     }
     return sorted;
   }
 
-  function renderTrades(){
+  function renderTrades() {
     const search = document.getElementById('searchInput').value.trim().toLowerCase();
     const pnlFilter = document.getElementById('pnlFilter').value;
     const sortBy = document.getElementById('sortBy').value;
@@ -794,23 +1055,24 @@ function renderDashboard() {
     const tbody = document.getElementById('tradeTableBody');
     const empty = document.getElementById('tradeEmpty');
     tbody.innerHTML = filtered.map(trade => `
-      <tr class="data-row" data-trade-id="${trade.id}">
-        <td><button class="expand-btn" type="button" aria-label="Expand trade ${trade.id}" data-expand="${trade.id}">+</button></td>
+      <tr class="data-row" data-trade-id="${trade.trade_key}">
+        <td><button class="expand-btn" type="button" aria-label="Expand trade ${trade.trade_key}" data-expand="${trade.trade_key}">+</button></td>
         <td>${fmtDate(trade.date)}</td>
+        <td>${instrumentBadge(trade.instrument)}</td>
         <td>${trade.time_entry}</td>
         <td>${trade.time_exit}</td>
-        <td>${trade.spot.toFixed(2)}</td>
-        <td>${trade.ce_strike}</td>
-        <td>${trade.pe_strike}</td>
-        <td>${trade.ce_sell.toFixed(2)} → ${trade.ce_exit.toFixed(2)}</td>
-        <td>${trade.pe_sell.toFixed(2)} → ${trade.pe_exit.toFixed(2)}</td>
+        <td>${fmtNumber(trade.spot)}</td>
+        <td>${fmtNumber(trade.ce_strike, 0)}</td>
+        <td>${fmtNumber(trade.pe_strike, 0)}</td>
+        <td>${fmtNumber(trade.ce_sell)} → ${fmtNumber(trade.ce_exit)}</td>
+        <td>${fmtNumber(trade.pe_sell)} → ${fmtNumber(trade.pe_exit)}</td>
         <td>${rowBadge(trade)}</td>
         <td class="${trade.gross_pnl >= 0 ? 'positive' : 'negative'}">${fmtCurrency(trade.gross_pnl)}</td>
         <td class="${trade.net_pnl >= 0 ? 'positive' : 'negative'}">${fmtCurrency(trade.net_pnl)}</td>
         <td>${fmtCurrency(trade.capital_after)}</td>
       </tr>
-      <tr class="detail-row" id="detail-${trade.id}">
-        <td colspan="13" class="detail-panel">
+      <tr class="detail-row" id="detail-${trade.trade_key}">
+        <td colspan="14" class="detail-panel">
           <div class="detail-inner">
             <div class="detail-item"><div class="label">Instrument</div><div class="value">${trade.instrument}</div></div>
             <div class="detail-item"><div class="label">Quantity</div><div class="value">${trade.qty}</div></div>
@@ -835,7 +1097,7 @@ function renderDashboard() {
     });
   }
 
-  ['searchInput','pnlFilter','sortBy'].forEach(id => document.getElementById(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderTrades));
+  ['searchInput', 'pnlFilter', 'sortBy'].forEach(id => document.getElementById(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderTrades));
   renderTrades();
 
   Chart.defaults.color = '#6b6356';
@@ -843,79 +1105,74 @@ function renderDashboard() {
   Chart.defaults.font.family = "'Inter', sans-serif";
   Chart.defaults.plugins.legend.labels.usePointStyle = true;
 
-  const labels = ['Start', ...trades.map(trade => fmtDate(trade.date))];
-  const capitalData = [THETA_GOD_DATA.initial_capital, ...trades.map(trade => trade.capital_after)];
   new Chart(document.getElementById('capitalChart'), {
     type: 'line',
     data: {
-      labels,
-      datasets: [{
-        label: 'Capital',
-        data: capitalData,
-        borderColor: '#c9a84c',
-        backgroundColor: 'rgba(201,168,76,0.12)',
-        fill: true,
+      labels: chartDates.map(fmtDate),
+      datasets: instrumentEntries.map(([name, instrument]) => ({
+        label: name,
+        data: capitalSeriesByInstrument[name],
+        borderColor: instrument.color,
+        backgroundColor: hexToRgba(instrument.color, 0.12),
+        fill: false,
         borderWidth: 2.5,
-        tension: 0.32,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        pointBackgroundColor: '#c9a84c',
+        tension: 0.28,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: instrument.color,
         pointBorderColor: '#050505',
         pointBorderWidth: 2,
-      }]
+      })),
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
+        legend: { display: true, position: 'bottom' },
         tooltip: {
           backgroundColor: '#0d0d0d',
           borderColor: 'rgba(201,168,76,0.18)',
           borderWidth: 1,
           callbacks: {
-            label: ctx => `Capital: ${fmtCurrency(ctx.raw)}`,
-            afterLabel: ctx => {
-              if (ctx.dataIndex === 0) return 'Initial capital';
-              const trade = trades[ctx.dataIndex - 1];
-              return `Day P&L: ${fmtCurrency(trade.net_pnl)}`;
-            }
-          }
-        }
+            label: ctx => `${ctx.dataset.label}: ${fmtCurrency(ctx.raw)}`,
+            afterLabel: ctx => `Day P&L: ${fmtCurrency(dailyPnlByInstrument[ctx.dataset.label][ctx.dataIndex])}`,
+          },
+        },
       },
       scales: {
         x: { grid: { display: false } },
-        y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } }
-      }
-    }
+        y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } },
+      },
+    },
   });
 
   new Chart(document.getElementById('dailyPnlChart'), {
     type: 'bar',
     data: {
-      labels: trades.map(trade => fmtDate(trade.date)),
-      datasets: [{
-        label: 'Daily net P&L',
-        data: trades.map(trade => trade.net_pnl),
-        backgroundColor: trades.map(trade => trade.net_pnl >= 0 ? '#5fa878' : '#c45c5c'),
-        borderRadius: 10,
+      labels: chartDates.map(fmtDate),
+      datasets: instrumentEntries.map(([name, instrument]) => ({
+        label: name,
+        data: dailyPnlByInstrument[name],
+        backgroundColor: hexToRgba(instrument.color, 0.85),
+        borderColor: instrument.color,
+        borderRadius: 8,
         borderSkipped: false,
-        maxBarThickness: 48,
-      }]
+        maxBarThickness: 24,
+      })),
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => `Net P&L: ${fmtCurrency(ctx.raw)}` } }
+        legend: { display: true, position: 'bottom' },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtCurrency(ctx.raw)}` } },
       },
       scales: {
-        x: { grid: { display: false } },
-        y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } }
-      }
-    }
+        x: { grid: { display: false }, stacked: false },
+        y: { ticks: { callback: value => `₹${Number(value).toLocaleString('en-IN')}` } },
+      },
+    },
   });
 
   new Chart(document.getElementById('winRateChart'), {
@@ -927,21 +1184,21 @@ function renderDashboard() {
         backgroundColor: ['#5fa878', 'rgba(255,255,255,0.08)'],
         borderColor: ['#5fa878', 'rgba(255,255,255,0.08)'],
         hoverOffset: 4,
-        cutout: '72%'
-      }]
+        cutout: '72%',
+      }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: { position: 'bottom' },
-        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}` } }
-      }
-    }
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}` } },
+      },
+    },
   });
 }
 
-function setupTabs(){
+function setupTabs() {
   const buttons = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.tab-content');
   buttons.forEach(button => {
@@ -969,7 +1226,7 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.12 });
 
-function observeFadeUps(){
+function observeFadeUps() {
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 }
 
@@ -977,5 +1234,6 @@ setupTabs();
 observeFadeUps();
 loadData();
 </script>
+
 </body>
 </html>

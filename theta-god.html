@@ -1494,7 +1494,7 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
 
     let trades = filtered;
     if(search){
-      trades = trades.filter(t=>[t.date,t.strike,t.spot,t.t1_ce_reason,t.t1_pe_reason].join(' ').toLowerCase().includes(search));
+      trades = trades.filter(t=>[t.date,t.strike,t.spot,t.t1_ce_reason,t.t1_pe_reason,t.t2_strike].join(' ').toLowerCase().includes(search));
     }
 
     const sorted = [...trades];
@@ -1502,46 +1502,102 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
     else if(sortBy==='pnl-desc') sorted.sort((a,b)=>b.total_pnl-a.total_pnl);
     else if(sortBy==='pnl-asc') sorted.sort((a,b)=>a.total_pnl-b.total_pnl);
 
-    document.getElementById('bt-trade-count').textContent = `Showing ${sorted.length} of ${totalDays} trades`;
+    // Flatten: each day becomes 1 row, re-entry days become 2 rows (T1 + T2)
+    const rows = [];
+    sorted.forEach(t=>{
+      // T1 row
+      rows.push({
+        id: t.date+'-t1',
+        date: t.date,
+        spot: t.spot,
+        strike: t.strike,
+        ce_entry: t.t1_ce_entry,
+        pe_entry: t.t1_pe_entry,
+        ce_sl: t.t1_ce_sl,
+        pe_sl: t.t1_pe_sl,
+        ce_exit: t.t1_ce_exit,
+        pe_exit: t.t1_pe_exit,
+        ce_exit_time: t.t1_ce_exit_time,
+        pe_exit_time: t.t1_pe_exit_time,
+        ce_reason: t.t1_ce_reason,
+        pe_reason: t.t1_pe_reason,
+        ce_sl_hit: t.t1_ce_sl_hit,
+        pe_sl_hit: t.t1_pe_sl_hit,
+        ce_trailed: t.t1_ce_trailed,
+        pe_trailed: t.t1_pe_trailed,
+        pnl: t.t1_pnl,
+        entry_time: '09:59',
+        exit_time: t.reentry ? '12:30' : '15:06',
+        tag: t.reentry ? 'T1' : '',
+        cov: t.ce_cov,
+        reentry: t.reentry,
+      });
+      // T2 row (re-entry)
+      if(t.reentry){
+        rows.push({
+          id: t.date+'-t2',
+          date: t.date,
+          spot: t.t2_spot,
+          strike: t.t2_strike,
+          ce_entry: t.t2_ce_entry,
+          pe_entry: t.t2_pe_entry,
+          ce_sl: t.t2_ce_sl,
+          pe_sl: t.t2_pe_sl,
+          ce_exit: t.t2_ce_exit,
+          pe_exit: t.t2_pe_exit,
+          ce_exit_time: t.t2_ce_exit_time,
+          pe_exit_time: t.t2_pe_exit_time,
+          ce_reason: t.t2_ce_reason,
+          pe_reason: t.t2_pe_reason,
+          ce_sl_hit: t.t2_ce_sl_hit,
+          pe_sl_hit: t.t2_pe_sl_hit,
+          ce_trailed: t.t2_ce_trailed,
+          pe_trailed: t.t2_pe_trailed,
+          pnl: t.t2_pnl,
+          entry_time: '12:30',
+          exit_time: '15:06',
+          tag: 'T2',
+          cov: t.ce_cov,
+          reentry: false,
+        });
+      }
+    });
+
+    const totalRows = rows.length;
+    document.getElementById('bt-trade-count').textContent = `Showing ${sorted.length} days (${totalRows} trades) of ${totalDays} days`;
 
     const tbody = document.getElementById('bt-trade-body');
-    tbody.innerHTML = sorted.map(t=>{
-      const ceTag = t.t1_ce_sl_hit ? '<span class="badge badge-red">SL</span>' : (t.t1_ce_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
-      const peTag = t.t1_pe_sl_hit ? '<span class="badge badge-red">SL</span>' : (t.t1_pe_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
-      const reTag = t.reentry ? '<span class="badge badge-gold">Yes</span>' : '<span style="color:var(--text-dim)">—</span>';
-      const pnlClass = t.total_pnl >= 0 ? 'positive' : 'negative';
-      const resultBadge = t.win ? '<span class="badge badge-green">Win</span>' : '<span class="badge badge-red">Loss</span>';
-      const id = t.date;
-      return `<tr class="data-row" data-trade-id="bt-${id}">
-        <td><button class="expand-btn" type="button" data-expand="bt-${id}">+</button></td>
-        <td>${fmtDateStr(t.date)}</td>
-        <td>${fmtNum(t.spot,1)}</td>
-        <td>${t.strike}</td>
-        <td>${fmtNum(t.t1_ce_entry)}</td>
-        <td>${fmtNum(t.t1_pe_entry)}</td>
-        <td>${fmtNum(t.t1_ce_sl)}</td>
-        <td>${fmtNum(t.t1_pe_sl)}</td>
-        <td>${fmtNum(t.t1_ce_exit)} <small>${t.t1_ce_exit_time||''}</small></td>
-        <td>${fmtNum(t.t1_pe_exit)} <small>${t.t1_pe_exit_time||''}</small></td>
+    tbody.innerHTML = rows.map(r=>{
+      const ceTag = r.ce_sl_hit ? '<span class="badge badge-red">SL</span>' : (r.ce_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
+      const peTag = r.pe_sl_hit ? '<span class="badge badge-red">SL</span>' : (r.pe_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
+      const tagBadge = r.tag === 'T1' ? '<span class="badge badge-gold" style="font-size:0.6rem;padding:4px 7px">T1</span> ' :
+                       r.tag === 'T2' ? '<span class="badge badge-gold" style="font-size:0.6rem;padding:4px 7px;background:rgba(201,168,76,0.25)">T2 ↻</span> ' : '';
+      const pnlClass = r.pnl >= 0 ? 'positive' : 'negative';
+      const resultBadge = r.pnl >= 0 ? '<span class="badge badge-green">Win</span>' : '<span class="badge badge-red">Loss</span>';
+      return `<tr class="data-row" data-trade-id="${r.id}">
+        <td><button class="expand-btn" type="button" data-expand="${r.id}">+</button></td>
+        <td>${tagBadge}${fmtDateStr(r.date)}</td>
+        <td>${fmtNum(r.spot,1)}</td>
+        <td>${r.strike}</td>
+        <td>${fmtNum(r.ce_entry)}</td>
+        <td>${fmtNum(r.pe_entry)}</td>
+        <td>${fmtNum(r.ce_sl)}</td>
+        <td>${fmtNum(r.pe_sl)}</td>
+        <td>${fmtNum(r.ce_exit)} <small>${r.ce_exit_time||''}</small></td>
+        <td>${fmtNum(r.pe_exit)} <small>${r.pe_exit_time||''}</small></td>
         <td>${ceTag}</td>
         <td>${peTag}</td>
-        <td>${reTag}</td>
-        <td class="${pnlClass}">${t.total_pnl>=0?'+':''}₹${Math.round(t.total_pnl).toLocaleString('en-IN')}</td>
+        <td>${r.tag==='T2'?'<span class="badge badge-gold">Re-entry</span>':'—'}</td>
+        <td class="${pnlClass}">${r.pnl>=0?'+':''}₹${Math.round(r.pnl).toLocaleString('en-IN')}</td>
         <td>${resultBadge}</td>
       </tr>
-      <tr class="detail-row" id="detail-bt-${id}">
+      <tr class="detail-row" id="detail-${r.id}">
         <td colspan="15" class="detail-panel">
           <div class="detail-inner">
-            <div class="detail-item"><div class="label">Trade 1 CE</div><div class="value">${fmtNum(t.t1_ce_entry)} → ${fmtNum(t.t1_ce_exit)} @ ${t.t1_ce_exit_time||'EOD'}<br>${t.t1_ce_reason}${t.t1_ce_trailed?' (trailed to BE)':''}</div></div>
-            <div class="detail-item"><div class="label">Trade 1 PE</div><div class="value">${fmtNum(t.t1_pe_entry)} → ${fmtNum(t.t1_pe_exit)} @ ${t.t1_pe_exit_time||'EOD'}<br>${t.t1_pe_reason}${t.t1_pe_trailed?' (trailed to BE)':''}</div></div>
-            <div class="detail-item"><div class="label">T1 P&L</div><div class="value ${t.t1_pnl>=0?'positive':'negative'}">${t.t1_pnl>=0?'+':''}₹${fmtNum(t.t1_pnl,0)}</div></div>
-            <div class="detail-item"><div class="label">Coverage</div><div class="value">${t.ce_cov}%</div></div>
-            ${t.reentry ? `
-            <div class="detail-item"><div class="label">Re-entry Strike</div><div class="value">${t.t2_strike} (Spot: ${fmtNum(t.t2_spot,1)})</div></div>
-            <div class="detail-item"><div class="label">T2 CE</div><div class="value">${fmtNum(t.t2_ce_entry)} → ${fmtNum(t.t2_ce_exit)} @ ${t.t2_ce_exit_time||'EOD'}<br>${t.t2_ce_reason}${t.t2_ce_trailed?' (trailed)':''}</div></div>
-            <div class="detail-item"><div class="label">T2 PE</div><div class="value">${fmtNum(t.t2_pe_entry)} → ${fmtNum(t.t2_pe_exit)} @ ${t.t2_pe_exit_time||'EOD'}<br>${t.t2_pe_reason}${t.t2_pe_trailed?' (trailed)':''}</div></div>
-            <div class="detail-item"><div class="label">T2 P&L</div><div class="value ${t.t2_pnl>=0?'positive':'negative'}">${t.t2_pnl>=0?'+':''}₹${fmtNum(t.t2_pnl,0)}</div></div>
-            ` : `<div class="detail-item"><div class="label">Re-entry</div><div class="value">No re-entry needed</div></div>`}
+            <div class="detail-item"><div class="label">Entry</div><div class="value">${r.entry_time} → ${r.exit_time}</div></div>
+            <div class="detail-item"><div class="label">CE</div><div class="value">${fmtNum(r.ce_entry)} → ${fmtNum(r.ce_exit)} @ ${r.ce_exit_time||'EOD'}<br>${r.ce_reason}${r.ce_trailed?' (trailed to BE)':''}</div></div>
+            <div class="detail-item"><div class="label">PE</div><div class="value">${fmtNum(r.pe_entry)} → ${fmtNum(r.pe_exit)} @ ${r.pe_exit_time||'EOD'}<br>${r.pe_reason}${r.pe_trailed?' (trailed to BE)':''}</div></div>
+            <div class="detail-item"><div class="label">Coverage</div><div class="value">${r.cov}%</div></div>
           </div>
         </td>
       </tr>`;

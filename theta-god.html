@@ -445,24 +445,24 @@ body::before{
         </p>
         <div class="about-stats-grid">
           <div class="about-stat">
-            <div class="label">CAGR</div>
-            <div class="value">+23.5%</div>
-            <div class="detail">Ten-year compounded return profile</div>
-          </div>
-          <div class="about-stat">
-            <div class="label">10yr Return</div>
-            <div class="value">8.2×</div>
-            <div class="detail">₹1 lakh becomes ₹8.2 lakh</div>
+            <div class="label">3yr P&L (100 lots)</div>
+            <div class="value">₹3.76Cr</div>
+            <div class="detail">₹1.09L → ₹3.76Cr, real Dhan data</div>
           </div>
           <div class="about-stat">
             <div class="label">Win Rate</div>
-            <div class="value">70.3%</div>
-            <div class="detail">Most sessions keep the daily premium</div>
+            <div class="value">69.4%</div>
+            <div class="detail">537 wins / 237 losses</div>
           </div>
           <div class="about-stat">
-            <div class="label">Months Profitable</div>
-            <div class="value">89%</div>
-            <div class="detail">Consistency across market regimes</div>
+            <div class="label">Avg Daily (1 lot)</div>
+            <div class="value">₹619</div>
+            <div class="detail">Consistent across all market regimes</div>
+          </div>
+          <div class="about-stat">
+            <div class="label">Months Green</div>
+            <div class="value">36/36</div>
+            <div class="detail">Every single month profitable</div>
           </div>
         </div>
         <div class="about-quote">
@@ -476,8 +476,47 @@ body::before{
     </section>
 
     <section class="section">
-      <div class="card about-card">
-        <div class="section-kicker">Execution loop</div>
+      <div class="card trade-card" style="padding:32px">
+        <div class="chart-header">
+          <div>
+            <div class="section-kicker">Real option data • Dhan API • 60/40 compounding</div>
+            <h2 class="chart-title">3-Year Equity Curve — SENSEX (3→100 lots)</h2>
+          </div>
+          <p class="chart-desc">Starting ₹1.09L, scaling lots with 60% margin / 40% reserve. Capped at 100 lots for realistic liquidity.</p>
+        </div>
+        <div style="height:380px;margin:24px 0">
+          <canvas id="backtestEquityChart"></canvas>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px">
+          <div style="text-align:center;padding:14px;border:1px solid var(--border);border-radius:14px">
+            <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Max Drawdown</div>
+            <div style="font-family:var(--serif);font-size:1.4rem;color:var(--gold);margin-top:6px" id="bt-max-dd">12.8%</div>
+          </div>
+          <div style="text-align:center;padding:14px;border:1px solid var(--border);border-radius:14px">
+            <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Lot Growth</div>
+            <div style="font-family:var(--serif);font-size:1.4rem;color:var(--gold);margin-top:6px">3 → 100</div>
+          </div>
+          <div style="text-align:center;padding:14px;border:1px solid var(--border);border-radius:14px">
+            <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Data Source</div>
+            <div style="font-family:var(--serif);font-size:1.4rem;color:var(--gold);margin-top:6px">774 Days</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card trade-card" style="padding:32px">
+        <div class="chart-header">
+          <div>
+            <div class="section-kicker">Month by month</div>
+            <h2 class="chart-title">Monthly P&L Breakdown</h2>
+          </div>
+        </div>
+        <div style="height:300px;margin:24px 0">
+          <canvas id="backtestMonthlyChart"></canvas>
+        </div>
+      </div>
+    </section>
         <h2 class="chart-title" style="margin-bottom:32px">Daily Execution</h2>
         <div class="steps-grid">
           <div class="step-card">
@@ -1233,6 +1272,144 @@ function observeFadeUps() {
 setupTabs();
 observeFadeUps();
 loadData();
+
+// ─── BACKTEST CHARTS ─────────────────────────────────────
+fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
+  const labels = bt.labels;
+  const capital = bt.capital;
+  const lots = bt.lots;
+
+  // Equity Curve
+  const eqCtx = document.getElementById('backtestEquityChart');
+  if(eqCtx){
+    new Chart(eqCtx, {
+      type:'line',
+      data:{
+        labels: labels,
+        datasets:[
+          {
+            label:'Capital (₹)',
+            data: capital,
+            borderColor:'#c9a84c',
+            backgroundColor:'rgba(201,168,76,0.08)',
+            fill:true,
+            tension:0.3,
+            pointRadius:0,
+            borderWidth:2,
+            yAxisID:'y',
+          },
+          {
+            label:'Lots',
+            data: lots,
+            borderColor:'rgba(95,168,120,0.6)',
+            backgroundColor:'transparent',
+            borderWidth:1.5,
+            borderDash:[4,4],
+            pointRadius:0,
+            tension:0.3,
+            yAxisID:'y1',
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{labels:{color:'#6b6356',font:{size:11}}},
+          tooltip:{
+            backgroundColor:'#0d0d0d',
+            borderColor:'rgba(201,168,76,0.3)',
+            borderWidth:1,
+            titleColor:'#f5f0e8',
+            bodyColor:'#b8b0a0',
+            callbacks:{
+              label:function(ctx){
+                if(ctx.datasetIndex===0) return '  Capital: ₹'+ctx.raw.toLocaleString('en-IN');
+                return '  Lots: '+ctx.raw;
+              }
+            }
+          }
+        },
+        scales:{
+          x:{
+            ticks:{color:'#6b6356',maxTicksLimit:12,font:{size:10}},
+            grid:{color:'rgba(255,255,255,0.04)'}
+          },
+          y:{
+            position:'left',
+            ticks:{
+              color:'#c9a84c',font:{size:10},
+              callback:v=>{
+                if(v>=10000000) return '₹'+(v/10000000).toFixed(1)+'Cr';
+                if(v>=100000) return '₹'+(v/100000).toFixed(0)+'L';
+                return '₹'+v.toLocaleString('en-IN');
+              }
+            },
+            grid:{color:'rgba(255,255,255,0.04)'}
+          },
+          y1:{
+            position:'right',
+            ticks:{color:'rgba(95,168,120,0.6)',font:{size:10}},
+            grid:{display:false}
+          }
+        }
+      }
+    });
+  }
+
+  // Monthly P&L Bar Chart
+  const moCtx = document.getElementById('backtestMonthlyChart');
+  if(moCtx && bt.monthly){
+    const mLabels = bt.monthly.map(m=>m.month);
+    const mPnl = bt.monthly.map(m=>m.pnl);
+    const mColors = mPnl.map(v=>v>=0?'rgba(95,168,120,0.7)':'rgba(196,92,92,0.7)');
+    new Chart(moCtx,{
+      type:'bar',
+      data:{
+        labels:mLabels,
+        datasets:[{
+          label:'Monthly P&L (₹)',
+          data:mPnl,
+          backgroundColor:mColors,
+          borderRadius:4,
+        }]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            backgroundColor:'#0d0d0d',
+            borderColor:'rgba(201,168,76,0.3)',
+            borderWidth:1,
+            titleColor:'#f5f0e8',
+            bodyColor:'#b8b0a0',
+            callbacks:{
+              label:function(ctx){
+                return '  P&L: ₹'+ctx.raw.toLocaleString('en-IN');
+              }
+            }
+          }
+        },
+        scales:{
+          x:{ticks:{color:'#6b6356',maxTicksLimit:18,font:{size:9}},grid:{display:false}},
+          y:{
+            ticks:{
+              color:'#6b6356',font:{size:10},
+              callback:v=>{
+                if(Math.abs(v)>=100000) return '₹'+(v/100000).toFixed(0)+'L';
+                return '₹'+(v/1000).toFixed(0)+'K';
+              }
+            },
+            grid:{color:'rgba(255,255,255,0.04)'}
+          }
+        }
+      }
+    });
+  }
+}).catch(e=>console.log('Backtest data not loaded:',e));
 </script>
 
 </body>

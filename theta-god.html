@@ -280,23 +280,23 @@ body::before{
       <div class="live-stats" id="liveStats">
         <div class="live-stat">
           <div class="label">3yr Compounded</div>
-          <div class="value positive">₹1.09L → ₹84.9L</div>
+          <div class="value positive">₹1.09L → ₹22.6L</div>
           <div class="sub">60/40 compounding, 100 lot cap</div>
         </div>
         <div class="live-stat">
           <div class="label">Per-Lot P&L</div>
-          <div class="value positive">+₹1.50L</div>
-          <div class="sub">737 days flat, ₹203 avg/day</div>
+          <div class="value positive">+₹1.57L</div>
+          <div class="sub">740 days flat, ₹212 avg/day</div>
         </div>
         <div class="live-stat">
           <div class="label">Win Rate</div>
-          <div class="value positive">60.2%</div>
-          <div class="sub">444 wins / 293 losses</div>
+          <div class="value positive">58.4%</div>
+          <div class="sub">432 wins / 308 losses</div>
         </div>
         <div class="live-stat">
           <div class="label">Months Profitable</div>
-          <div class="value positive">30/37</div>
-          <div class="sub">81% — validated with true INDEX spot</div>
+          <div class="value positive" id="heroMonthsGreen">—</div>
+          <div class="sub">Fresh Dhan API data, true INDEX spot</div>
         </div>
       </div>
     </div>
@@ -445,24 +445,24 @@ body::before{
         </p>
         <div class="about-stats-grid">
           <div class="about-stat">
-            <div class="label">3yr P&L (100 lots)</div>
-            <div class="value">₹84.9L</div>
-            <div class="detail">₹1.09L → ₹84.9L, real Dhan data</div>
+            <div class="label">3yr Compounded</div>
+            <div class="value">₹22.6L</div>
+            <div class="detail">₹1.09L → ₹22.6L, fresh Dhan API data</div>
           </div>
           <div class="about-stat">
             <div class="label">Win Rate</div>
-            <div class="value">60.2%</div>
-            <div class="detail">444 wins / 293 losses</div>
+            <div class="value">58.4%</div>
+            <div class="detail">432 wins / 308 losses</div>
           </div>
           <div class="about-stat">
             <div class="label">Avg Daily (1 lot)</div>
-            <div class="value">₹203</div>
+            <div class="value">₹212</div>
             <div class="detail">Validated with true INDEX spot data</div>
           </div>
           <div class="about-stat">
-            <div class="label">Months Green</div>
-            <div class="value">30/37</div>
-            <div class="detail">81% months profitable</div>
+            <div class="label">Re-entry Days</div>
+            <div class="value">219</div>
+            <div class="detail">29.6% of trading days</div>
           </div>
         </div>
         <div class="about-quote">
@@ -479,7 +479,7 @@ body::before{
       <div class="card trade-card" style="padding:32px">
         <div class="chart-header">
           <div>
-            <div class="section-kicker">Day-by-day replay • Real Dhan data • 60/40 compounding</div>
+            <div class="section-kicker">Day-by-day replay • Fresh Dhan API data • 60/40 compounding</div>
             <h2 class="chart-title">Live Backtest Replay — SENSEX</h2>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -487,6 +487,25 @@ body::before{
             <button id="bt-speed" class="cta-link" style="cursor:pointer;font-family:var(--mono)">1×</button>
             <button id="bt-skip" class="cta-link" style="cursor:pointer">⏭ Skip to end</button>
           </div>
+        </div>
+
+        <!-- Date range filters -->
+        <div id="bt-filters" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+          <select id="bt-range-preset" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:10px 14px;border-radius:12px;font-size:0.82rem">
+            <option value="all">All Days (740)</option>
+            <option value="month">By Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+          <select id="bt-month-picker" style="display:none;background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:10px 14px;border-radius:12px;font-size:0.82rem"></select>
+          <input type="date" id="bt-date-from" style="display:none;background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:10px 14px;border-radius:12px;font-size:0.82rem" />
+          <span id="bt-date-sep" style="display:none;color:var(--text-dim)">→</span>
+          <input type="date" id="bt-date-to" style="display:none;background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:10px 14px;border-radius:12px;font-size:0.82rem" />
+          <select id="bt-pnl-filter" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:10px 14px;border-radius:12px;font-size:0.82rem">
+            <option value="all">All Trades</option>
+            <option value="win">Winners</option>
+            <option value="loss">Losers</option>
+            <option value="reentry">Re-entry Days</option>
+          </select>
         </div>
 
         <!-- Live ticker bar -->
@@ -505,7 +524,7 @@ body::before{
           </div>
           <div style="padding:14px 12px;background:var(--bg-elevated)">
             <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Lots</div>
-            <div id="bt-lots" style="font-family:var(--mono);font-size:0.95rem;color:var(--white);margin-top:4px">3</div>
+            <div id="bt-lots" style="font-family:var(--mono);font-size:0.95rem;color:var(--white);margin-top:4px">2</div>
           </div>
           <div style="padding:14px 12px;background:var(--bg-elevated)">
             <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Win Rate</div>
@@ -513,11 +532,10 @@ body::before{
           </div>
           <div style="padding:14px 12px;background:var(--bg-elevated)">
             <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Day</div>
-            <div id="bt-daynum" style="font-family:var(--mono);font-size:0.95rem;color:var(--text-dim);margin-top:4px">0 / 737</div>
+            <div id="bt-daynum" style="font-family:var(--mono);font-size:0.95rem;color:var(--text-dim);margin-top:4px">0 / 740</div>
           </div>
         </div>
 
-        <!-- Progress bar -->
         <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;margin-bottom:20px;overflow:hidden">
           <div id="bt-progress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:99px;transition:width 0.1s linear"></div>
         </div>
@@ -535,17 +553,64 @@ body::before{
             <div id="bt-wl" style="font-family:var(--serif);font-size:1.3rem;color:var(--gold);margin-top:6px">0 / 0</div>
           </div>
           <div style="text-align:center;padding:14px;border:1px solid var(--border);border-radius:14px">
-            <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Total P&amp;L</div>
+            <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Total P&amp;L (compound)</div>
             <div id="bt-totalpnl" style="font-family:var(--serif);font-size:1.3rem;color:var(--green);margin-top:6px">₹0</div>
           </div>
           <div style="text-align:center;padding:14px;border:1px solid var(--border);border-radius:14px">
-            <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Lot Growth</div>
-            <div id="bt-lotgrowth" style="font-family:var(--serif);font-size:1.3rem;color:var(--gold);margin-top:6px">3</div>
+            <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Avg P&amp;L / Day (1 lot)</div>
+            <div id="bt-avgpnl" style="font-family:var(--serif);font-size:1.3rem;color:var(--gold);margin-top:6px">—</div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Backtest Trade Table -->
+    <section class="section">
+      <div class="card trade-card" style="padding:32px">
+        <div class="trade-toolbar">
+          <div>
+            <div class="section-kicker">Backtest execution ledger • fresh API data</div>
+            <h2 class="chart-title">Day-by-Day Trades</h2>
+          </div>
+          <div class="filters">
+            <input type="search" id="bt-search" placeholder="Search date, strike..." style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:11px 14px;border-radius:12px;min-height:44px">
+            <select id="bt-sort" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:11px 14px;border-radius:12px;min-height:44px">
+              <option value="date-asc">Oldest first</option>
+              <option value="date-desc">Newest first</option>
+              <option value="pnl-desc">Best P&amp;L</option>
+              <option value="pnl-asc">Worst P&amp;L</option>
+            </select>
+          </div>
+        </div>
+        <div id="bt-trade-count" style="font-size:0.82rem;color:var(--text-dim);margin-bottom:12px">Showing 0 trades</div>
+        <div class="table-wrap" style="max-height:600px">
+          <table class="table" style="min-width:1400px">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Date</th>
+                <th>Spot</th>
+                <th>ATM Strike</th>
+                <th>CE Entry</th>
+                <th>PE Entry</th>
+                <th>CE SL</th>
+                <th>PE SL</th>
+                <th>CE Exit</th>
+                <th>PE Exit</th>
+                <th>CE</th>
+                <th>PE</th>
+                <th>Re-entry</th>
+                <th>P&amp;L (1 lot)</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody id="bt-trade-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Monthly P&L -->
     <section class="section">
       <div class="card trade-card" style="padding:32px">
         <div class="chart-header">
@@ -612,50 +677,24 @@ body::before{
                 <th>Lots</th>
               </tr>
             </thead>
-            <tbody>
-              <tr><td>2023 <span class="year-flag">(Jun–Dec)</span></td><td>144</td><td>87</td><td>60.4%</td><td class="positive">+₹33,991</td><td>₹236</td><td class="positive">+₹2.32L</td><td>4 → 13</td></tr>
-              <tr><td>2024 <span class="year-flag">★ best year</span></td><td>245</td><td>156</td><td>63.7%</td><td class="positive">+₹66,671</td><td>₹272</td><td class="positive">+₹32.6L</td><td>13 → 100</td></tr>
-              <tr><td>2025</td><td>247</td><td>146</td><td>59.1%</td><td class="positive">+₹37,646</td><td>₹152</td><td class="positive">+₹37.6L</td><td>100</td></tr>
-              <tr><td>2026* <span class="year-flag">(Jan–Jun)</span></td><td>101</td><td>55</td><td>54.5%</td><td class="positive">+₹11,236</td><td>₹111</td><td class="positive">+₹11.2L</td><td>100</td></tr>
+            <tbody id="bt-year-table">
             </tbody>
           </table>
         </div>
-        <p class="section-note" style="margin-top:14px">* 2026 is a partial year (Jan–Jun 3). All P&amp;L from real 1-minute Dhan option candle data, validated with true SENSEX INDEX spot.</p>
+        <p class="section-note" style="margin-top:14px">* 2026 is a partial year (Jan–Jun 3). All P&amp;L from fresh 1-minute Dhan rolling option API calls, validated with true SENSEX INDEX spot.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="card trade-card">
         <div class="section-kicker">Compounding power</div>
-      <h2 class="chart-title">60/40 Compounding — Real Data</h2>
-      <p class="compound-intro">Starting with ₹1,09,000 (4 lots). 60% of capital for margin, 40% reserve. Lot cap: 100.</p>
-      <div class="compound-timeline">
-        <div class="compound-row">
-          <div class="compound-year">Year 1 (2023)<span>₹1.09L → ₹3.41L</span></div>
-          <div class="compound-bar-track"><div class="compound-bar" style="width:4%"><span>₹3.41L</span></div></div>
-          <div class="compound-gain"><strong>+₹2.32L</strong>213% return • 4→13 lots</div>
-        </div>
-        <div class="compound-row">
-          <div class="compound-year">Year 2 (2024)<span>₹3.41L → ₹36.0L</span></div>
-          <div class="compound-bar-track"><div class="compound-bar" style="width:42.4%"><span>₹36.0L</span></div></div>
-          <div class="compound-gain"><strong>+₹32.6L</strong>957% return • 13→100 lots</div>
-        </div>
-        <div class="compound-row">
-          <div class="compound-year">Year 3 (2025)<span>₹36.0L → ₹73.7L</span></div>
-          <div class="compound-bar-track"><div class="compound-bar" style="width:86.8%"><span>₹73.7L</span></div></div>
-          <div class="compound-gain"><strong>+₹37.6L</strong>105% return • 100 lots</div>
-        </div>
-        <div class="compound-row">
-          <div class="compound-year">Year 4 (2026*)<span>₹73.7L → ₹84.9L</span></div>
-          <div class="compound-bar-track"><div class="compound-bar" style="width:100%"><span>₹84.9L</span></div></div>
-          <div class="compound-gain"><strong>+₹11.2L</strong>15% return • 100 lots</div>
-        </div>
+      <h2 class="chart-title">60/40 Compounding — Fresh API Data</h2>
+      <p class="compound-intro">Starting with ₹1,09,000 (2 lots). 60% of capital for margin, 40% reserve. Lot cap: 100.</p>
+      <div class="compound-timeline" id="bt-compound-timeline">
       </div>
-      <div class="compound-summary">
-        <strong>Final: ₹1,09,000 → ₹84,89,056 (77.9×)</strong>
-        60% margin allocation with dynamic lot sizing — lots grew from 4 to 100 within 14 months. Max drawdown: 34.5%.
+      <div class="compound-summary" id="bt-compound-summary">
       </div>
-      <div class="compound-note">Data source: Real 1-minute Dhan option candle data validated with true SENSEX INDEX spot across 737 trading days. Lot cap of 100 applied for realistic SENSEX liquidity. Per-lot (flat) P&amp;L: ₹1.50L over the same period.</div>
+      <div class="compound-note">Data source: Fresh 1-minute Dhan rolling option API calls for every trading day. Validated with true SENSEX INDEX spot across 740 trading days. Lot cap of 100 applied for realistic SENSEX liquidity.</div>
     </div>
   </section>
   </div>
@@ -1283,13 +1322,14 @@ setupTabs();
 observeFadeUps();
 loadData();
 
-// ─── ANIMATED BACKTEST REPLAY ──────────────────────────────
-fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
-  const allLabels = bt.labels;
-  const allCapital = bt.capital;
-  const allLots = bt.lots;
-  const allPnl = bt.daily_pnl;
-  const totalDays = allLabels.length;
+// ─── ANIMATED BACKTEST REPLAY WITH DETAILED DATA ──────────────────────────────
+fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
+  const allTrades = btDetail.trades;
+  const compounding = btDetail.compounding;
+  const monthlyRaw = btDetail.monthly;
+  const summary = btDetail.summary;
+  const totalDays = allTrades.length;
+  const INITIAL = 109000;
 
   // Format helpers
   const fmtINR = v => '₹'+Math.round(v).toLocaleString('en-IN');
@@ -1298,21 +1338,246 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
     if(Math.abs(v)>=100000) return '₹'+(v/100000).toFixed(1)+'L';
     return '₹'+Math.round(v).toLocaleString('en-IN');
   };
-  const fmtDate = d => {
+  const fmtDateStr = d => {
     const [y,m,dd] = d.split('-');
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     return `${parseInt(dd)} ${months[parseInt(m)-1]} ${y}`;
   };
+  const fmtNum = (v,d=2) => v != null ? Number(v).toFixed(d) : '—';
 
-  // State
+  // Populate month picker
+  const monthPicker = document.getElementById('bt-month-picker');
+  const uniqueMonths = [...new Set(allTrades.map(t=>t.date.slice(0,7)))].sort();
+  uniqueMonths.forEach(m=>{
+    const opt = document.createElement('option');
+    opt.value = m;
+    const [y,mo] = m.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    opt.textContent = `${months[parseInt(mo)-1]} ${y}`;
+    monthPicker.appendChild(opt);
+  });
+
+  // Date range
+  const dateFrom = document.getElementById('bt-date-from');
+  const dateTo = document.getElementById('bt-date-to');
+  dateFrom.value = allTrades[0].date;
+  dateTo.value = allTrades[allTrades.length-1].date;
+
+  // Months green
+  const greenMonths = monthlyRaw.filter(m=>m.pnl>=0).length;
+  const heroMG = document.getElementById('heroMonthsGreen');
+  if(heroMG) heroMG.textContent = `${greenMonths}/${monthlyRaw.length}`;
+
+  // Filter logic
+  function getFilteredTrades(){
+    const preset = document.getElementById('bt-range-preset').value;
+    const pnlFilter = document.getElementById('bt-pnl-filter').value;
+    let filtered = allTrades;
+
+    if(preset === 'month'){
+      const m = monthPicker.value;
+      filtered = filtered.filter(t=>t.date.startsWith(m));
+    } else if(preset === 'custom'){
+      const from = dateFrom.value;
+      const to = dateTo.value;
+      filtered = filtered.filter(t=>t.date >= from && t.date <= to);
+    }
+
+    if(pnlFilter === 'win') filtered = filtered.filter(t=>t.win);
+    else if(pnlFilter === 'loss') filtered = filtered.filter(t=>!t.win);
+    else if(pnlFilter === 'reentry') filtered = filtered.filter(t=>t.reentry);
+
+    return filtered;
+  }
+
+  // Filter UI toggles
+  document.getElementById('bt-range-preset').addEventListener('change', e=>{
+    const v = e.target.value;
+    monthPicker.style.display = v==='month'?'':'none';
+    dateFrom.style.display = v==='custom'?'':'none';
+    document.getElementById('bt-date-sep').style.display = v==='custom'?'':'none';
+    dateTo.style.display = v==='custom'?'':'none';
+    onFilterChange();
+  });
+  monthPicker.addEventListener('change', onFilterChange);
+  dateFrom.addEventListener('change', onFilterChange);
+  dateTo.addEventListener('change', onFilterChange);
+  document.getElementById('bt-pnl-filter').addEventListener('change', onFilterChange);
+
+  function onFilterChange(){
+    renderTradeTable();
+  }
+
+  // ─── YEAR-BY-YEAR TABLE ───
+  function buildYearTable(){
+    const years = {};
+    let cap = INITIAL;
+    allTrades.forEach((t,i)=>{
+      const y = t.date.slice(0,4);
+      if(!years[y]) years[y] = {days:0,wins:0,pnl:0,startCap:cap,startLots:0,endCap:cap,endLots:0};
+      if(years[y].days===0){
+        const avail = cap * 0.6;
+        years[y].startLots = Math.max(1,Math.min(Math.floor(avail/27000),100));
+      }
+      years[y].days++;
+      if(t.win) years[y].wins++;
+      years[y].pnl += t.total_pnl;
+      const lots = Math.max(1,Math.min(Math.floor(cap*0.6/27000),100));
+      cap += t.total_pnl * lots;
+      years[y].endCap = cap;
+      years[y].endLots = lots;
+    });
+    const tbody = document.getElementById('bt-year-table');
+    const yKeys = Object.keys(years).sort();
+    const bestYear = yKeys.reduce((a,b)=>years[a].pnl>years[b].pnl?a:b);
+    tbody.innerHTML = yKeys.map(y=>{
+      const d = years[y];
+      const wr = (d.wins/d.days*100).toFixed(1);
+      const compGain = Math.round(d.endCap - d.startCap);
+      const flag = y==='2023'?' <span class="year-flag">(Jun–Dec)</span>':
+                   y==='2026'?' <span class="year-flag">(Jan–Jun)</span>':
+                   y===bestYear?' <span class="year-flag">★ best year</span>':'';
+      return `<tr>
+        <td>${y}${flag}</td>
+        <td>${d.days}</td>
+        <td>${d.wins}</td>
+        <td>${wr}%</td>
+        <td class="${d.pnl>=0?'positive':'negative'}">${d.pnl>=0?'+':''}₹${Math.round(d.pnl).toLocaleString('en-IN')}</td>
+        <td>₹${Math.round(d.pnl/d.days)}</td>
+        <td class="${compGain>=0?'positive':'negative'}">${compGain>=0?'+':''}${fmtCr(compGain)}</td>
+        <td>${d.startLots} → ${d.endLots}</td>
+      </tr>`;
+    }).join('');
+  }
+  buildYearTable();
+
+  // ─── COMPOUNDING TIMELINE ───
+  function buildCompoundTimeline(){
+    const years = {};
+    let cap = INITIAL;
+    allTrades.forEach(t=>{
+      const y = t.date.slice(0,4);
+      if(!years[y]) years[y]={startCap:cap,endCap:cap,startLots:0,endLots:0};
+      const lots = Math.max(1,Math.min(Math.floor(cap*0.6/27000),100));
+      if(!years[y].startLots) years[y].startLots = lots;
+      cap += t.total_pnl * lots;
+      years[y].endCap = cap;
+      years[y].endLots = lots;
+    });
+    const finalCap = cap;
+    const el = document.getElementById('bt-compound-timeline');
+    const yKeys = Object.keys(years).sort();
+    el.innerHTML = yKeys.map((y,i)=>{
+      const d = years[y];
+      const gain = Math.round(d.endCap - d.startCap);
+      const pct = Math.round(d.endCap/finalCap*100);
+      const retPct = d.startCap ? Math.round((d.endCap-d.startCap)/d.startCap*100) : 0;
+      const label = y==='2023'?`Year 1 (2023)`:y==='2024'?`Year 2 (2024)`:y==='2025'?`Year 3 (2025)`:`Year 4 (2026*)`;
+      return `<div class="compound-row">
+        <div class="compound-year">${label}<span>${fmtCr(d.startCap)} → ${fmtCr(d.endCap)}</span></div>
+        <div class="compound-bar-track"><div class="compound-bar" style="width:${Math.max(3,pct)}%"><span>${fmtCr(d.endCap)}</span></div></div>
+        <div class="compound-gain"><strong>+${fmtCr(gain)}</strong>${retPct}% return • ${d.startLots}→${d.endLots} lots</div>
+      </div>`;
+    }).join('');
+
+    const summaryEl = document.getElementById('bt-compound-summary');
+    summaryEl.innerHTML = `<strong>Final: ₹1,09,000 → ${fmtCr(finalCap)} (${(finalCap/INITIAL).toFixed(1)}×)</strong>
+    60% margin allocation with dynamic lot sizing — lots grew from 2 to ${years[yKeys[yKeys.length-1]].endLots} over ${totalDays} trading days.`;
+  }
+  buildCompoundTimeline();
+
+  // ─── TRADE TABLE ───
+  function renderTradeTable(){
+    const filtered = getFilteredTrades();
+    const search = (document.getElementById('bt-search').value||'').toLowerCase();
+    const sortBy = document.getElementById('bt-sort').value;
+
+    let trades = filtered;
+    if(search){
+      trades = trades.filter(t=>[t.date,t.strike,t.spot,t.t1_ce_reason,t.t1_pe_reason].join(' ').toLowerCase().includes(search));
+    }
+
+    const sorted = [...trades];
+    if(sortBy==='date-desc') sorted.sort((a,b)=>b.date.localeCompare(a.date));
+    else if(sortBy==='pnl-desc') sorted.sort((a,b)=>b.total_pnl-a.total_pnl);
+    else if(sortBy==='pnl-asc') sorted.sort((a,b)=>a.total_pnl-b.total_pnl);
+
+    document.getElementById('bt-trade-count').textContent = `Showing ${sorted.length} of ${totalDays} trades`;
+
+    const tbody = document.getElementById('bt-trade-body');
+    tbody.innerHTML = sorted.map(t=>{
+      const ceTag = t.t1_ce_sl_hit ? '<span class="badge badge-red">SL</span>' : (t.t1_ce_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
+      const peTag = t.t1_pe_sl_hit ? '<span class="badge badge-red">SL</span>' : (t.t1_pe_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
+      const reTag = t.reentry ? '<span class="badge badge-gold">Yes</span>' : '<span style="color:var(--text-dim)">—</span>';
+      const pnlClass = t.total_pnl >= 0 ? 'positive' : 'negative';
+      const resultBadge = t.win ? '<span class="badge badge-green">Win</span>' : '<span class="badge badge-red">Loss</span>';
+      const id = t.date;
+      return `<tr class="data-row" data-trade-id="bt-${id}">
+        <td><button class="expand-btn" type="button" data-expand="bt-${id}">+</button></td>
+        <td>${fmtDateStr(t.date)}</td>
+        <td>${fmtNum(t.spot,1)}</td>
+        <td>${t.strike}</td>
+        <td>${fmtNum(t.t1_ce_entry)}</td>
+        <td>${fmtNum(t.t1_pe_entry)}</td>
+        <td>${fmtNum(t.t1_ce_sl)}</td>
+        <td>${fmtNum(t.t1_pe_sl)}</td>
+        <td>${fmtNum(t.t1_ce_exit)} <small>${t.t1_ce_exit_time||''}</small></td>
+        <td>${fmtNum(t.t1_pe_exit)} <small>${t.t1_pe_exit_time||''}</small></td>
+        <td>${ceTag}</td>
+        <td>${peTag}</td>
+        <td>${reTag}</td>
+        <td class="${pnlClass}">${t.total_pnl>=0?'+':''}₹${Math.round(t.total_pnl).toLocaleString('en-IN')}</td>
+        <td>${resultBadge}</td>
+      </tr>
+      <tr class="detail-row" id="detail-bt-${id}">
+        <td colspan="15" class="detail-panel">
+          <div class="detail-inner">
+            <div class="detail-item"><div class="label">Trade 1 CE</div><div class="value">${fmtNum(t.t1_ce_entry)} → ${fmtNum(t.t1_ce_exit)} @ ${t.t1_ce_exit_time||'EOD'}<br>${t.t1_ce_reason}${t.t1_ce_trailed?' (trailed to BE)':''}</div></div>
+            <div class="detail-item"><div class="label">Trade 1 PE</div><div class="value">${fmtNum(t.t1_pe_entry)} → ${fmtNum(t.t1_pe_exit)} @ ${t.t1_pe_exit_time||'EOD'}<br>${t.t1_pe_reason}${t.t1_pe_trailed?' (trailed to BE)':''}</div></div>
+            <div class="detail-item"><div class="label">T1 P&L</div><div class="value ${t.t1_pnl>=0?'positive':'negative'}">${t.t1_pnl>=0?'+':''}₹${fmtNum(t.t1_pnl,0)}</div></div>
+            <div class="detail-item"><div class="label">Coverage</div><div class="value">${t.ce_cov}%</div></div>
+            ${t.reentry ? `
+            <div class="detail-item"><div class="label">Re-entry Strike</div><div class="value">${t.t2_strike} (Spot: ${fmtNum(t.t2_spot,1)})</div></div>
+            <div class="detail-item"><div class="label">T2 CE</div><div class="value">${fmtNum(t.t2_ce_entry)} → ${fmtNum(t.t2_ce_exit)} @ ${t.t2_ce_exit_time||'EOD'}<br>${t.t2_ce_reason}${t.t2_ce_trailed?' (trailed)':''}</div></div>
+            <div class="detail-item"><div class="label">T2 PE</div><div class="value">${fmtNum(t.t2_pe_entry)} → ${fmtNum(t.t2_pe_exit)} @ ${t.t2_pe_exit_time||'EOD'}<br>${t.t2_pe_reason}${t.t2_pe_trailed?' (trailed)':''}</div></div>
+            <div class="detail-item"><div class="label">T2 P&L</div><div class="value ${t.t2_pnl>=0?'positive':'negative'}">${t.t2_pnl>=0?'+':''}₹${fmtNum(t.t2_pnl,0)}</div></div>
+            ` : `<div class="detail-item"><div class="label">Re-entry</div><div class="value">No re-entry needed</div></div>`}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    // Wire expand buttons
+    document.querySelectorAll('#bt-trade-body [data-expand]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const id = btn.dataset.expand;
+        const detail = document.getElementById(`detail-${id}`);
+        if(detail){
+          detail.classList.toggle('open');
+          btn.textContent = detail.classList.contains('open') ? '−' : '+';
+        }
+      });
+    });
+  }
+
+  document.getElementById('bt-search').addEventListener('input', renderTradeTable);
+  document.getElementById('bt-sort').addEventListener('change', renderTradeTable);
+  renderTradeTable();
+
+  // ─── ANIMATED REPLAY ───
+  // Build compounding arrays from detailed data
+  const allLabels = compounding.map(c=>c.date);
+  const allCapital = compounding.map(c=>c.capital);
+  const allLots = compounding.map(c=>c.lots);
+  const allPnl = compounding.map(c=>c.day_pnl);
+
   let cursor = 0;
   let playing = false;
-  let speed = 1; // 1=normal(30ms), 2=fast(10ms), 5=turbo(2ms), 10=blitz
+  let speed = 1;
   let wins = 0, losses = 0;
-  let maxCap = 109000, maxDD = 0;
+  let maxCap = INITIAL, maxDD = 0;
   let animFrame = null;
 
-  // Chart setup
   const eqCtx = document.getElementById('backtestEquityChart');
   const eqChart = new Chart(eqCtx, {
     type:'line',
@@ -1388,7 +1653,6 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
     }
   });
 
-  // Monthly chart (builds progressively too)
   const moCtx = document.getElementById('backtestMonthlyChart');
   const monthlyData = {};
   const moChart = new Chart(moCtx, {
@@ -1419,7 +1683,6 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
     }
   });
 
-  // DOM refs
   const elDate = document.getElementById('bt-date');
   const elCapital = document.getElementById('bt-capital');
   const elDayPnl = document.getElementById('bt-daypnl');
@@ -1430,7 +1693,7 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
   const elMaxDD = document.getElementById('bt-max-dd');
   const elWL = document.getElementById('bt-wl');
   const elTotalPnl = document.getElementById('bt-totalpnl');
-  const elLotGrowth = document.getElementById('bt-lotgrowth');
+  const elAvgPnl = document.getElementById('bt-avgpnl');
   const btnPlay = document.getElementById('bt-play');
   const btnSpeed = document.getElementById('bt-speed');
   const btnSkip = document.getElementById('bt-skip');
@@ -1442,17 +1705,15 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
     const cap = allCapital[i];
     const lt = allLots[i];
 
-    if(pnl > 0) wins++; else losses++;
+    if(allTrades[i].win) wins++; else losses++;
     if(cap > maxCap) maxCap = cap;
     const dd = ((maxCap - cap) / maxCap * 100);
     if(dd > maxDD) maxDD = dd;
 
-    // Update equity chart
-    eqChart.data.labels.push(fmtDate(allLabels[i]));
+    eqChart.data.labels.push(fmtDateStr(allLabels[i]));
     eqChart.data.datasets[0].data.push(cap);
     eqChart.data.datasets[1].data.push(lt);
 
-    // Update monthly
     const month = allLabels[i].slice(0,7);
     if(!monthlyData[month]) monthlyData[month] = 0;
     monthlyData[month] += pnl;
@@ -1468,9 +1729,10 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
     const cap = allCapital[i];
     const lt = allLots[i];
     const total = wins + losses;
-    const totalPnl = cap - 109000;
+    const totalPnl = cap - INITIAL;
+    const flatPnl = allTrades.slice(0,cursor).reduce((s,t)=>s+t.total_pnl,0);
 
-    elDate.textContent = fmtDate(allLabels[i]);
+    elDate.textContent = fmtDateStr(allLabels[i]);
     elCapital.textContent = fmtCr(cap);
     elDayPnl.textContent = (pnl >= 0 ? '+' : '') + fmtINR(pnl);
     elDayPnl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
@@ -1482,12 +1744,11 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
     elWL.textContent = wins + ' / ' + losses;
     elTotalPnl.textContent = (totalPnl>=0?'+':'')+fmtCr(totalPnl);
     elTotalPnl.style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
-    elLotGrowth.textContent = '3 → ' + lt;
+    elAvgPnl.textContent = '₹'+Math.round(flatPnl/cursor);
   }
 
   function updateCharts(){
     eqChart.update('none');
-    // Rebuild monthly chart
     const mKeys = Object.keys(monthlyData).sort();
     moChart.data.labels = mKeys;
     moChart.data.datasets[0].data = mKeys.map(k=>Math.round(monthlyData[k]));
@@ -1520,7 +1781,6 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
       addDay();
     }
     updateUI();
-    // Only update chart every few ticks for performance
     if(cursor % Math.max(1, Math.floor(batch)) === 0 || cursor >= totalDays){
       updateCharts();
     }
@@ -1534,8 +1794,7 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
 
   function play(){
     if(cursor >= totalDays){
-      // Reset
-      cursor = 0; wins = 0; losses = 0; maxCap = 109000; maxDD = 0;
+      cursor = 0; wins = 0; losses = 0; maxCap = INITIAL; maxDD = 0;
       eqChart.data.labels = [];
       eqChart.data.datasets[0].data = [];
       eqChart.data.datasets[1].data = [];
@@ -1575,7 +1834,6 @@ fetch('data/backtest-sensex.json').then(r=>r.json()).then(bt=>{
 
   btnSkip.addEventListener('click', skipToEnd);
 
-  // Auto-play when scrolled into view
   const replaySection = eqCtx.closest('.section');
   const replayObserver = new IntersectionObserver(entries=>{
     if(entries[0].isIntersecting && cursor === 0 && !playing){

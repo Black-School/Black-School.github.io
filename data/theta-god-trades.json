@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-04 17:04:11 IST",
+  "last_updated": "2026-06-04 17:04:36 IST",
   "instruments": {
     "SENSEX": {
       "initial_capital": 100000.0,
@@ -368,7 +368,7 @@
       ]
     },
     "FINNIFTY": {
-      "initial_capital": 80000.0,
+      "initial_capital": 70000.0,
       "current_capital": 70923.87,
       "mode": "paper",
       "instrument": "FINNIFTY",
@@ -387,12 +387,12 @@
         "wins": 1,
         "losses": 0,
         "win_rate": 100.0,
-        "total_pnl": -9076.13,
+        "total_pnl": 923.87,
         "avg_win": 923.87,
         "avg_loss": 0,
         "best_day": 923.87,
         "worst_day": 923.87,
-        "max_drawdown": -11.35
+        "max_drawdown": 0.0
       },
       "trades": [
         {

@@ -175,6 +175,10 @@ body::before{
 .tab-nav{display:inline-flex;flex-wrap:wrap;gap:12px;padding:8px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.02);margin-bottom:8px}
 .tab-btn{padding:12px 20px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text-dim);font-size:0.82rem;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;transition:all 0.25s ease}
 .tab-btn:hover,.tab-btn.active{color:var(--gold);background:var(--gold-dim);border-color:rgba(201,168,76,0.28)}
+.instrument-selector{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.inst-btn{padding:12px 20px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text-dim);font-size:0.82rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.25s ease;font-family:var(--sans)}
+.inst-btn:hover{border-color:var(--inst-color,var(--gold));color:var(--inst-color,var(--gold))}
+.inst-btn.active{color:var(--inst-color,var(--gold));background:rgba(201,168,76,0.12);border-color:var(--inst-color,var(--gold))}
 .tab-content{opacity:0;transform:translateY(12px)}
 .tab-content.active{opacity:1;transform:translateY(0);animation:tabFade 0.35s ease}
 .tab-content[hidden]{display:none}
@@ -555,10 +559,16 @@ body::before{
 
     <section class="section">
       <div class="card trade-card fade-up" style="padding:32px">
+        <div class="instrument-selector" id="instrumentSelector">
+          <button class="inst-btn active" type="button" data-instrument="SENSEX" style="--inst-color:#c9a84c">SENSEX</button>
+          <button class="inst-btn" type="button" data-instrument="NIFTY" style="--inst-color:#6b8cff">NIFTY</button>
+          <button class="inst-btn" type="button" data-instrument="BANKNIFTY" style="--inst-color:#5fa878">BANKNIFTY</button>
+          <button class="inst-btn" type="button" data-instrument="FINNIFTY" style="--inst-color:#c45c5c">FINNIFTY</button>
+        </div>
         <div class="chart-header">
           <div>
-            <div class="section-kicker">SENSEX detailed replay • fresh Dhan API data • 60/40 compounding</div>
-            <h2 class="chart-title">SENSEX Detailed Replay</h2>
+            <div class="section-kicker" id="bt-replay-kicker">SENSEX detailed replay • fresh Dhan API data • 60/40 compounding</div>
+            <h2 class="chart-title" id="bt-replay-title">SENSEX Backtest Replay</h2>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <button id="bt-play" class="cta-link" style="cursor:pointer;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3)">▶ Play</button>
@@ -644,8 +654,8 @@ body::before{
       <div class="card trade-card fade-up" style="padding:32px">
         <div class="trade-toolbar">
           <div>
-            <div class="section-kicker">SENSEX execution ledger • fresh API data</div>
-            <h2 class="chart-title">SENSEX Detailed Trade Log</h2>
+            <div class="section-kicker" id="bt-log-kicker">SENSEX execution ledger • fresh API data</div>
+            <h2 class="chart-title" id="bt-log-title">SENSEX Trade Log</h2>
           </div>
           <div class="filters">
             <input type="search" id="bt-search" placeholder="Search date, strike..." style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:11px 14px;border-radius:12px;min-height:44px">
@@ -658,30 +668,7 @@ body::before{
           </div>
         </div>
         <div id="bt-trade-count" style="font-size:0.82rem;color:var(--text-dim);margin-bottom:12px">Showing 0 trades</div>
-        <div class="table-wrap" style="max-height:600px">
-          <table class="table" style="min-width:1400px">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Date</th>
-                <th>Spot</th>
-                <th>ATM Strike</th>
-                <th>CE Entry</th>
-                <th>PE Entry</th>
-                <th>CE SL</th>
-                <th>PE SL</th>
-                <th>CE Exit</th>
-                <th>PE Exit</th>
-                <th>CE</th>
-                <th>PE</th>
-                <th>Re-entry</th>
-                <th>P&amp;L (1 lot)</th>
-                <th>Result</th>
-              </tr>
-            </thead>
-            <tbody id="bt-trade-body"></tbody>
-          </table>
-        </div>
+        <div class="table-wrap" style="max-height:600px" id="bt-trade-table-wrap"></div>
       </div>
     </section>
 
@@ -689,8 +676,8 @@ body::before{
       <div class="card trade-card fade-up" style="padding:32px">
         <div class="chart-header">
           <div>
-            <div class="section-kicker">SENSEX month by month</div>
-            <h2 class="chart-title">SENSEX Monthly P&amp;L Replay</h2>
+            <div class="section-kicker" id="bt-monthly-kicker">SENSEX month by month</div>
+            <h2 class="chart-title" id="bt-monthly-title">SENSEX Monthly P&amp;L</h2>
           </div>
         </div>
         <div style="height:300px;margin:24px 0">
@@ -732,10 +719,10 @@ body::before{
       <div class="card trade-card fade-up">
         <div class="chart-header">
           <div>
-            <div class="section-kicker">SENSEX real data record</div>
-            <h2 class="chart-title">SENSEX Year-by-Year Performance</h2>
+            <div class="section-kicker" id="bt-year-kicker">SENSEX real data record</div>
+            <h2 class="chart-title" id="bt-year-title">SENSEX Year-by-Year Performance</h2>
           </div>
-          <p class="chart-desc">Jun 2023–Jun 2026 — real Dhan option data, per-lot (10 qty) P&amp;L.</p>
+          <p class="chart-desc" id="bt-year-desc">Jun 2023–Jun 2026 — real Dhan option data, per-lot (10 qty) P&amp;L.</p>
         </div>
         <div class="about-table-wrap">
           <table class="about-table">
@@ -754,18 +741,18 @@ body::before{
             <tbody id="bt-year-table"></tbody>
           </table>
         </div>
-        <p class="section-note" style="margin-top:14px">* 2026 is a partial year. All P&amp;L uses fresh 1-minute Dhan rolling option API calls validated with true SENSEX INDEX spot.</p>
+        <p class="section-note" id="bt-year-note" style="margin-top:14px">* 2026 is a partial year. All P&amp;L uses fresh 1-minute Dhan rolling option API calls validated with true SENSEX INDEX spot.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="card trade-card fade-up">
-        <div class="section-kicker">SENSEX compounding power</div>
-        <h2 class="chart-title">SENSEX 60/40 Compounding — Fresh API Data</h2>
-        <p class="compound-intro">Starting with ₹1,09,000 (4 lots). 60% of capital for margin, 40% reserve. Lot cap: 100.</p>
+        <div class="section-kicker" id="bt-compound-kicker">SENSEX compounding power</div>
+        <h2 class="chart-title" id="bt-compound-title">SENSEX 60/40 Compounding</h2>
+        <p class="compound-intro" id="bt-compound-intro">Starting with ₹1,09,000. 60% of capital for margin, 40% reserve. Lot cap: 100.</p>
         <div class="compound-timeline" id="bt-compound-timeline"></div>
         <div class="compound-summary" id="bt-compound-summary"></div>
-        <div class="compound-note">Data source: Fresh 1-minute Dhan rolling option API calls for every trading day. Validated with true SENSEX INDEX spot across 741 trading days. Lot cap of 100 applied for realistic SENSEX liquidity.</div>
+        <div class="compound-note" id="bt-compound-note">Data source: Fresh 1-minute Dhan rolling option API calls for every trading day. Validated with true SENSEX INDEX spot across 741 trading days. Lot cap of 100 applied for realistic SENSEX liquidity.</div>
       </div>
     </section>
   </div>
@@ -1893,545 +1880,851 @@ Promise.all([
 
   applyRangePreset('all');
 
-  // ─── SENSEX DETAILED REPLAY ───────────────────────────────────────────────────
-  const btDetail = sensexDetailed;
-  const allTrades = btDetail.trades;
-  const compounding = btDetail.compounding;
-  const monthlyRaw = btDetail.monthly;
-  const totalDays = allTrades.length;
-  const INITIAL = 109000;
-
-  const fmtINR = v => '₹'+Math.round(v).toLocaleString('en-IN');
-  const fmtCr = v => {
-    if(Math.abs(v)>=10000000) return '₹'+(v/10000000).toFixed(2)+'Cr';
-    if(Math.abs(v)>=100000) return '₹'+(v/100000).toFixed(1)+'L';
-    return '₹'+Math.round(v).toLocaleString('en-IN');
+  // ─── SWITCHABLE SINGLE-INSTRUMENT REPLAY ─────────────────────────────────────
+  const MARGINS = {
+    SENSEX: 27000,
+    NIFTY: 16000,
+    BANKNIFTY: 12000,
+    FINNIFTY: 15000,
   };
-  const fmtDateStr = d => {
-    const [y,m,dd] = d.split('-');
-    return `${parseInt(dd,10)} ${months[parseInt(m,10)-1]} ${y}`;
+  const INITIALS = {
+    SENSEX: 109000,
+    NIFTY: 100000,
+    BANKNIFTY: 100000,
+    FINNIFTY: 100000,
   };
-  const fmtNum = (v,d=2) => v != null ? Number(v).toFixed(d) : '—';
+  const MAX_LOTS = 100;
+  const DETAILED_TRADES = sensexDetailed.trades || [];
+  const replayEls = {
+    selector: document.getElementById('instrumentSelector'),
+    replayKicker: document.getElementById('bt-replay-kicker'),
+    replayTitle: document.getElementById('bt-replay-title'),
+    logKicker: document.getElementById('bt-log-kicker'),
+    logTitle: document.getElementById('bt-log-title'),
+    monthlyKicker: document.getElementById('bt-monthly-kicker'),
+    monthlyTitle: document.getElementById('bt-monthly-title'),
+    yearKicker: document.getElementById('bt-year-kicker'),
+    yearTitle: document.getElementById('bt-year-title'),
+    yearDesc: document.getElementById('bt-year-desc'),
+    yearNote: document.getElementById('bt-year-note'),
+    compoundKicker: document.getElementById('bt-compound-kicker'),
+    compoundTitle: document.getElementById('bt-compound-title'),
+    compoundIntro: document.getElementById('bt-compound-intro'),
+    compoundNote: document.getElementById('bt-compound-note'),
+    rangePreset: document.getElementById('bt-range-preset'),
+    monthPicker: document.getElementById('bt-month-picker'),
+    dateFrom: document.getElementById('bt-date-from'),
+    dateTo: document.getElementById('bt-date-to'),
+    dateSep: document.getElementById('bt-date-sep'),
+    pnlFilter: document.getElementById('bt-pnl-filter'),
+    search: document.getElementById('bt-search'),
+    sort: document.getElementById('bt-sort'),
+    tradeCount: document.getElementById('bt-trade-count'),
+    tradeWrap: document.getElementById('bt-trade-table-wrap'),
+    yearTable: document.getElementById('bt-year-table'),
+    compoundTimeline: document.getElementById('bt-compound-timeline'),
+    compoundSummary: document.getElementById('bt-compound-summary'),
+    date: document.getElementById('bt-date'),
+    capital: document.getElementById('bt-capital'),
+    dayPnl: document.getElementById('bt-daypnl'),
+    lots: document.getElementById('bt-lots'),
+    winRate: document.getElementById('bt-wr'),
+    dayNum: document.getElementById('bt-daynum'),
+    progress: document.getElementById('bt-progress'),
+    maxDd: document.getElementById('bt-max-dd'),
+    winsLosses: document.getElementById('bt-wl'),
+    totalPnl: document.getElementById('bt-totalpnl'),
+    avgPnl: document.getElementById('bt-avgpnl'),
+    play: document.getElementById('bt-play'),
+    speed: document.getElementById('bt-speed'),
+    skip: document.getElementById('bt-skip'),
+    equityCanvas: document.getElementById('backtestEquityChart'),
+    monthlyCanvas: document.getElementById('backtestMonthlyChart'),
+  };
 
-  const monthPicker = document.getElementById('bt-month-picker');
-  const uniqueMonths = [...new Set(allTrades.map(t=>t.date.slice(0,7)))].sort();
-  uniqueMonths.forEach(m=>{
-    const opt = document.createElement('option');
-    opt.value = m;
-    opt.textContent = formatMonthLabel(m);
-    monthPicker.appendChild(opt);
-  });
+  const fmtINR = value => '₹' + Math.round(pickNumber(value)).toLocaleString('en-IN');
+  const fmtCr = value => {
+    const safe = pickNumber(value);
+    const abs = Math.abs(safe);
+    const sign = safe < 0 ? '-' : '';
+    if (abs >= 10000000) return `${sign}₹${(abs / 10000000).toFixed(abs >= 100000000 ? 1 : 2)}Cr`;
+    if (abs >= 100000) return `${sign}₹${(abs / 100000).toFixed(abs >= 1000000 ? 1 : 2)}L`;
+    return `${sign}₹${Math.round(abs).toLocaleString('en-IN')}`;
+  };
+  const fmtDateStr = value => formatShortDate(value);
+  const fmtNum = (value, digits = 2) => value != null && value !== '' ? Number(value).toFixed(digits) : '—';
 
-  const dateFrom = document.getElementById('bt-date-from');
-  const dateTo = document.getElementById('bt-date-to');
-  dateFrom.value = allTrades[0].date;
-  dateTo.value = allTrades[allTrades.length-1].date;
+  function computeSimpleOneLotPnl(point) {
+    const lots = pickNumber(point.lots);
+    return lots > 0 ? pickNumber(point.dailyPnl) / lots : 0;
+  }
 
-  function getFilteredTrades(){
-    const preset = document.getElementById('bt-range-preset').value;
-    const pnlFilter = document.getElementById('bt-pnl-filter').value;
-    let filtered = allTrades;
+  function getBacktestDateRange(name) {
+    const labels = backtests[name].raw.labels || [];
+    return {
+      min: labels[0] || '',
+      max: labels[labels.length - 1] || '',
+      total: labels.length,
+    };
+  }
 
-    if(preset === 'month'){
-      const m = monthPicker.value;
-      filtered = filtered.filter(t=>t.date.startsWith(m));
-    } else if(preset === 'custom'){
-      const from = dateFrom.value;
-      const to = dateTo.value;
-      filtered = filtered.filter(t=>t.date >= from && t.date <= to);
+  function getCurrentPoints() {
+    return backtests[replayState.instrument].points;
+  }
+
+  function getCurrentRangeFilteredPoints() {
+    const points = getCurrentPoints();
+    const preset = replayEls.rangePreset.value;
+    if (preset === 'month') {
+      return points.filter(point => point.date.startsWith(replayEls.monthPicker.value));
     }
+    if (preset === 'custom') {
+      const from = replayEls.dateFrom.value;
+      const to = replayEls.dateTo.value;
+      return points.filter(point => point.date >= from && point.date <= to);
+    }
+    return points;
+  }
 
-    if(pnlFilter === 'win') filtered = filtered.filter(t=>t.win);
-    else if(pnlFilter === 'loss') filtered = filtered.filter(t=>!t.win);
-    else if(pnlFilter === 'reentry') filtered = filtered.filter(t=>t.reentry);
-
+  function getFilteredDetailedTrades() {
+    const preset = replayEls.rangePreset.value;
+    const pnlFilter = replayEls.pnlFilter.value;
+    let filtered = DETAILED_TRADES;
+    if (preset === 'month') {
+      filtered = filtered.filter(trade => trade.date.startsWith(replayEls.monthPicker.value));
+    } else if (preset === 'custom') {
+      const from = replayEls.dateFrom.value;
+      const to = replayEls.dateTo.value;
+      filtered = filtered.filter(trade => trade.date >= from && trade.date <= to);
+    }
+    if (pnlFilter === 'win') filtered = filtered.filter(trade => trade.win);
+    else if (pnlFilter === 'loss') filtered = filtered.filter(trade => !trade.win);
+    else if (pnlFilter === 'reentry') filtered = filtered.filter(trade => trade.reentry);
     return filtered;
   }
 
-  document.getElementById('bt-range-preset').addEventListener('change', e=>{
-    const v = e.target.value;
-    monthPicker.style.display = v==='month'?'':'none';
-    dateFrom.style.display = v==='custom'?'':'none';
-    document.getElementById('bt-date-sep').style.display = v==='custom'?'':'none';
-    dateTo.style.display = v==='custom'?'':'none';
-    renderTradeTable();
-  });
-  monthPicker.addEventListener('change', renderTradeTable);
-  dateFrom.addEventListener('change', renderTradeTable);
-  dateTo.addEventListener('change', renderTradeTable);
-  document.getElementById('bt-pnl-filter').addEventListener('change', renderTradeTable);
-
-  function buildYearTable(){
-    const years = {};
-    let cap = INITIAL;
-    allTrades.forEach(t=>{
-      const y = t.date.slice(0,4);
-      if(!years[y]) years[y] = {days:0,wins:0,pnl:0,startCap:cap,startLots:0,endCap:cap,endLots:0};
-      if(years[y].days===0){
-        const avail = cap * 0.6;
-        years[y].startLots = Math.max(1,Math.min(Math.floor(avail/27000),100));
-      }
-      years[y].days++;
-      if(t.win) years[y].wins++;
-      years[y].pnl += t.total_pnl;
-      const lots = Math.max(1,Math.min(Math.floor(cap*0.6/27000),100));
-      cap += t.total_pnl * lots;
-      years[y].endCap = cap;
-      years[y].endLots = lots;
-    });
-    const tbody = document.getElementById('bt-year-table');
-    const yKeys = Object.keys(years).sort();
-    const bestYear = yKeys.reduce((a,b)=>years[a].pnl>years[b].pnl?a:b);
-    tbody.innerHTML = yKeys.map(y=>{
-      const d = years[y];
-      const wr = (d.wins/d.days*100).toFixed(1);
-      const compGain = Math.round(d.endCap - d.startCap);
-      const flag = y==='2023'?' <span class="year-flag">(Jun–Dec)</span>':
-                   y==='2026'?' <span class="year-flag">(Jan–Jun)</span>':
-                   y===bestYear?' <span class="year-flag">★ best year</span>':'';
-      return `<tr>
-        <td>${y}${flag}</td>
-        <td>${d.days}</td>
-        <td>${d.wins}</td>
-        <td>${wr}%</td>
-        <td class="${d.pnl>=0?'positive':'negative'}">${d.pnl>=0?'+':''}₹${Math.round(d.pnl).toLocaleString('en-IN')}</td>
-        <td>₹${Math.round(d.pnl/d.days)}</td>
-        <td class="${compGain>=0?'positive':'negative'}">${compGain>=0?'+':''}${fmtCr(compGain)}</td>
-        <td>${d.startLots} → ${d.endLots}</td>
-      </tr>`;
-    }).join('');
+  function populateMonthPicker(name) {
+    const labels = backtests[name].raw.labels || [];
+    const monthsForInstrument = [...new Set(labels.map(label => label.slice(0, 7)))].sort();
+    replayEls.monthPicker.innerHTML = monthsForInstrument.map(month => `<option value="${month}">${formatMonthLabel(month)}</option>`).join('');
   }
-  buildYearTable();
 
-  function buildCompoundTimeline(){
-    const years = {};
-    let cap = INITIAL;
-    allTrades.forEach(t=>{
-      const y = t.date.slice(0,4);
-      if(!years[y]) years[y]={startCap:cap,endCap:cap,startLots:0,endLots:0};
-      const lots = Math.max(1,Math.min(Math.floor(cap*0.6/27000),100));
-      if(!years[y].startLots) years[y].startLots = lots;
-      cap += t.total_pnl * lots;
-      years[y].endCap = cap;
-      years[y].endLots = lots;
-    });
-    const finalCap = cap;
-    const el = document.getElementById('bt-compound-timeline');
-    const yKeys = Object.keys(years).sort();
-    el.innerHTML = yKeys.map(y=>{
-      const d = years[y];
-      const gain = Math.round(d.endCap - d.startCap);
-      const pct = Math.round(d.endCap/finalCap*100);
-      const retPct = d.startCap ? Math.round((d.endCap-d.startCap)/d.startCap*100) : 0;
-      const label = y==='2023'?`Year 1 (2023)`:y==='2024'?`Year 2 (2024)`:y==='2025'?`Year 3 (2025)`:`Year 4 (2026*)`;
-      return `<div class="compound-row">
-        <div class="compound-year">${label}<span>${fmtCr(d.startCap)} → ${fmtCr(d.endCap)}</span></div>
-        <div class="compound-bar-track"><div class="compound-bar" style="width:${Math.max(3,pct)}%"><span>${fmtCr(d.endCap)}</span></div></div>
-        <div class="compound-gain"><strong>+${fmtCr(gain)}</strong>${retPct}% return • ${d.startLots}→${d.endLots} lots</div>
-      </div>`;
-    }).join('');
-
-    const summaryEl = document.getElementById('bt-compound-summary');
-    summaryEl.innerHTML = `<strong>Final: ₹1,09,000 → ${fmtCr(finalCap)} (${(finalCap/INITIAL).toFixed(1)}×)</strong>
-    60% margin allocation with dynamic lot sizing — lots grew from 2 to ${years[yKeys[yKeys.length-1]].endLots} over ${totalDays} trading days.`;
+  function syncFilterVisibility() {
+    const preset = replayEls.rangePreset.value;
+    replayEls.monthPicker.style.display = preset === 'month' ? '' : 'none';
+    replayEls.dateFrom.style.display = preset === 'custom' ? '' : 'none';
+    replayEls.dateSep.style.display = preset === 'custom' ? '' : 'none';
+    replayEls.dateTo.style.display = preset === 'custom' ? '' : 'none';
   }
-  buildCompoundTimeline();
 
-  function renderTradeTable(){
-    const filtered = getFilteredTrades();
-    const search = (document.getElementById('bt-search').value||'').toLowerCase();
-    const sortBy = document.getElementById('bt-sort').value;
+  function syncPnlFilterOptions(name) {
+    const selected = replayEls.pnlFilter.value;
+    const options = name === 'SENSEX'
+      ? [
+          ['all', 'All Trades'],
+          ['win', 'Winners'],
+          ['loss', 'Losers'],
+          ['reentry', 'Re-entry Days'],
+        ]
+      : [
+          ['all', 'All Trades'],
+          ['win', 'Winners'],
+          ['loss', 'Losers'],
+        ];
+    replayEls.pnlFilter.innerHTML = options.map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
+    replayEls.pnlFilter.value = options.some(([value]) => value === selected) ? selected : 'all';
+  }
 
-    let trades = filtered;
-    if(search){
-      trades = trades.filter(t=>[t.date,t.strike,t.spot,t.t1_ce_reason,t.t1_pe_reason,t.t2_strike].join(' ').toLowerCase().includes(search));
+  function applyFilterBounds(name) {
+    const range = getBacktestDateRange(name);
+    replayEls.rangePreset.options[0].textContent = `All Days (${range.total.toLocaleString('en-IN')})`;
+    replayEls.dateFrom.min = range.min;
+    replayEls.dateFrom.max = range.max;
+    replayEls.dateTo.min = range.min;
+    replayEls.dateTo.max = range.max;
+    replayEls.dateFrom.value = range.min;
+    replayEls.dateTo.value = range.max;
+    populateMonthPicker(name);
+    syncFilterVisibility();
+  }
+
+  function destroyReplayCharts() {
+    if (replayChart) {
+      replayChart.destroy();
+      replayChart = null;
     }
+    if (replayMonthlyChart) {
+      replayMonthlyChart.destroy();
+      replayMonthlyChart = null;
+    }
+  }
 
+  let replayChart = null;
+  let replayMonthlyChart = null;
+  const replayState = {
+    instrument: 'SENSEX',
+    cursor: 0,
+    playing: false,
+    speed: 1,
+    wins: 0,
+    losses: 0,
+    maxCap: INITIALS.SENSEX,
+    maxDD: 0,
+    animFrame: null,
+    autoPlayed: false,
+  };
+
+  function buildReplayCharts(name) {
+    const color = backtests[name].color;
+    destroyReplayCharts();
+    replayChart = new Chart(replayEls.equityCanvas, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Capital (₹)',
+            data: [],
+            borderColor: color,
+            backgroundColor: hexToRgba(color, 0.08),
+            fill: true,
+            tension: 0.2,
+            pointRadius: 0,
+            borderWidth: 2,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Lots',
+            data: [],
+            borderColor: 'rgba(95,168,120,0.55)',
+            backgroundColor: 'transparent',
+            borderWidth: 1.5,
+            borderDash: [4, 4],
+            pointRadius: 0,
+            tension: 0.2,
+            yAxisID: 'y1',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 0 },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: '#6b6356', font: { size: 11 } } },
+          tooltip: {
+            backgroundColor: '#0d0d0d',
+            borderColor: hexToRgba(color, 0.3),
+            borderWidth: 1,
+            titleColor: '#f5f0e8',
+            bodyColor: '#b8b0a0',
+            callbacks: {
+              label(ctx) {
+                if (ctx.datasetIndex === 0) return `  Capital: ${fmtCr(ctx.raw)}`;
+                return `  Lots: ${ctx.raw}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            ticks: { color: '#6b6356', maxTicksLimit: 10, font: { size: 10 } },
+            grid: { color: 'rgba(255,255,255,0.04)' },
+          },
+          y: {
+            position: 'left',
+            ticks: { color, font: { size: 10 }, callback: value => fmtCr(value) },
+            grid: { color: 'rgba(255,255,255,0.04)' },
+          },
+          y1: {
+            position: 'right',
+            min: 0,
+            max: MAX_LOTS + 10,
+            ticks: { color: 'rgba(95,168,120,0.7)', font: { size: 10 } },
+            grid: { display: false },
+          },
+        },
+      },
+    });
+
+    const monthlyLabels = backtests[name].raw.monthly_labels || [];
+    const monthlyPnl = backtests[name].raw.monthly_pnl || [];
+    replayMonthlyChart = new Chart(replayEls.monthlyCanvas, {
+      type: 'bar',
+      data: {
+        labels: monthlyLabels,
+        datasets: [{
+          label: 'Monthly P&L',
+          data: monthlyPnl,
+          backgroundColor: monthlyPnl.map(value => value >= 0 ? 'rgba(95,168,120,0.7)' : 'rgba(196,92,92,0.7)'),
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 0 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0d0d0d',
+            borderColor: hexToRgba(color, 0.3),
+            borderWidth: 1,
+            titleColor: '#f5f0e8',
+            bodyColor: '#b8b0a0',
+            callbacks: { label(ctx) { return `  P&L: ${fmtCr(ctx.raw)}`; } },
+          },
+        },
+        scales: {
+          x: { ticks: { color: '#6b6356', maxTicksLimit: 18, font: { size: 9 } }, grid: { display: false } },
+          y: { ticks: { color: '#6b6356', font: { size: 10 }, callback: value => fmtCr(value) }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        },
+      },
+    });
+  }
+
+  function getReplaySpeedDelay() {
+    if (replayState.speed === 1) return 30;
+    if (replayState.speed === 2) return 10;
+    if (replayState.speed === 5) return 2;
+    return 0;
+  }
+
+  function getReplayBatch() {
+    if (replayState.speed === 1) return 1;
+    if (replayState.speed === 2) return 2;
+    if (replayState.speed === 5) return 5;
+    return 20;
+  }
+
+  function updateReplayCharts() {
+    if (replayChart) replayChart.update('none');
+  }
+
+  function resetReplayUI() {
+    const name = replayState.instrument;
+    const initial = INITIALS[name];
+    const totalDays = backtests[name].points.length;
+    replayEls.date.textContent = '—';
+    replayEls.capital.textContent = fmtCr(initial);
+    replayEls.dayPnl.textContent = '—';
+    replayEls.dayPnl.style.color = '';
+    replayEls.lots.textContent = '—';
+    replayEls.winRate.textContent = '—';
+    replayEls.dayNum.textContent = `0 / ${totalDays.toLocaleString('en-IN')}`;
+    replayEls.progress.style.width = '0%';
+    replayEls.maxDd.textContent = '0.0%';
+    replayEls.winsLosses.textContent = '0 / 0';
+    replayEls.totalPnl.textContent = fmtCr(0);
+    replayEls.totalPnl.style.color = 'var(--green)';
+    replayEls.avgPnl.textContent = '—';
+  }
+
+  function pauseReplay() {
+    replayState.playing = false;
+    if (replayState.animFrame) {
+      clearTimeout(replayState.animFrame);
+      cancelAnimationFrame(replayState.animFrame);
+      replayState.animFrame = null;
+    }
+    replayEls.play.innerHTML = replayState.cursor >= backtests[replayState.instrument].points.length ? '✓ Done' : '▶ Play';
+  }
+
+  function resetReplayData() {
+    pauseReplay();
+    replayState.cursor = 0;
+    replayState.wins = 0;
+    replayState.losses = 0;
+    replayState.maxCap = INITIALS[replayState.instrument];
+    replayState.maxDD = 0;
+    if (replayChart) {
+      replayChart.data.labels = [];
+      replayChart.data.datasets[0].data = [];
+      replayChart.data.datasets[1].data = [];
+    }
+    updateReplayCharts();
+    resetReplayUI();
+  }
+
+  function addReplayDay() {
+    const points = getCurrentPoints();
+    if (replayState.cursor >= points.length) return false;
+    const point = points[replayState.cursor];
+    if (point.dailyPnl > 0) replayState.wins += 1;
+    else replayState.losses += 1;
+    if (point.capital > replayState.maxCap) replayState.maxCap = point.capital;
+    const drawdown = replayState.maxCap ? ((replayState.maxCap - point.capital) / replayState.maxCap) * 100 : 0;
+    replayState.maxDD = Math.max(replayState.maxDD, drawdown);
+    replayChart.data.labels.push(fmtDateStr(point.date));
+    replayChart.data.datasets[0].data.push(point.capital);
+    replayChart.data.datasets[1].data.push(point.lots);
+    replayState.cursor += 1;
+    return true;
+  }
+
+  function updateReplayUI() {
+    const points = getCurrentPoints();
+    if (!replayState.cursor || !points.length) {
+      resetReplayUI();
+      return;
+    }
+    const current = points[replayState.cursor - 1];
+    const total = replayState.wins + replayState.losses;
+    const totalPnl = current.capital - INITIALS[replayState.instrument];
+    const oneLotPnls = points.slice(0, replayState.cursor).map(computeSimpleOneLotPnl);
+    const avgOneLotPnl = oneLotPnls.length ? oneLotPnls.reduce((sum, value) => sum + value, 0) / oneLotPnls.length : 0;
+    replayEls.date.textContent = fmtDateStr(current.date);
+    replayEls.capital.textContent = fmtCr(current.capital);
+    replayEls.dayPnl.textContent = `${current.dailyPnl >= 0 ? '+' : ''}${fmtINR(current.dailyPnl)}`;
+    replayEls.dayPnl.style.color = current.dailyPnl >= 0 ? 'var(--green)' : 'var(--red)';
+    replayEls.lots.textContent = current.lots;
+    replayEls.winRate.textContent = total ? `${((replayState.wins / total) * 100).toFixed(1)}%` : '—';
+    replayEls.dayNum.textContent = `${replayState.cursor.toLocaleString('en-IN')} / ${points.length.toLocaleString('en-IN')}`;
+    replayEls.progress.style.width = `${(replayState.cursor / points.length) * 100}%`;
+    replayEls.maxDd.textContent = `${replayState.maxDD.toFixed(1)}%`;
+    replayEls.winsLosses.textContent = `${replayState.wins} / ${replayState.losses}`;
+    replayEls.totalPnl.textContent = `${totalPnl >= 0 ? '+' : ''}${fmtCr(totalPnl)}`;
+    replayEls.totalPnl.style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
+    replayEls.avgPnl.textContent = fmtINR(avgOneLotPnl);
+  }
+
+  function replayTick() {
+    const points = getCurrentPoints();
+    if (!replayState.playing || replayState.cursor >= points.length) {
+      replayState.playing = false;
+      replayEls.play.innerHTML = replayState.cursor >= points.length ? '✓ Done' : '▶ Play';
+      return;
+    }
+    const batch = getReplayBatch();
+    for (let index = 0; index < batch && replayState.cursor < points.length; index += 1) addReplayDay();
+    updateReplayUI();
+    updateReplayCharts();
+    const delay = getReplaySpeedDelay();
+    replayState.animFrame = delay > 0 ? setTimeout(replayTick, delay) : requestAnimationFrame(replayTick);
+  }
+
+  function playReplay() {
+    if (replayState.cursor >= getCurrentPoints().length) resetReplayData();
+    replayState.playing = true;
+    replayEls.play.innerHTML = '⏸ Pause';
+    replayTick();
+  }
+
+  function skipReplayToEnd() {
+    pauseReplay();
+    while (replayState.cursor < getCurrentPoints().length) addReplayDay();
+    updateReplayUI();
+    updateReplayCharts();
+    replayEls.play.innerHTML = '✓ Done';
+  }
+
+  function renderDetailedTradeTable() {
+    const filtered = getFilteredDetailedTrades();
+    const search = (replayEls.search.value || '').trim().toLowerCase();
+    const sortBy = replayEls.sort.value;
+    const trades = search
+      ? filtered.filter(trade => [trade.date, trade.strike, trade.spot, trade.t1_ce_reason, trade.t1_pe_reason, trade.t2_strike].join(' ').toLowerCase().includes(search))
+      : filtered;
     const sorted = [...trades];
-    if(sortBy==='date-desc') sorted.sort((a,b)=>b.date.localeCompare(a.date));
-    else if(sortBy==='pnl-desc') sorted.sort((a,b)=>b.total_pnl-a.total_pnl);
-    else if(sortBy==='pnl-asc') sorted.sort((a,b)=>a.total_pnl-b.total_pnl);
+    if (sortBy === 'date-desc') sorted.sort((left, right) => right.date.localeCompare(left.date));
+    else if (sortBy === 'pnl-desc') sorted.sort((left, right) => right.total_pnl - left.total_pnl);
+    else if (sortBy === 'pnl-asc') sorted.sort((left, right) => left.total_pnl - right.total_pnl);
+    else sorted.sort((left, right) => left.date.localeCompare(right.date));
 
     const rows = [];
-    sorted.forEach(t=>{
+    sorted.forEach(trade => {
       rows.push({
-        id: t.date+'-t1',
-        date: t.date,
-        spot: t.spot,
-        strike: t.strike,
-        ce_entry: t.t1_ce_entry,
-        pe_entry: t.t1_pe_entry,
-        ce_sl: t.t1_ce_sl,
-        pe_sl: t.t1_pe_sl,
-        ce_exit: t.t1_ce_exit,
-        pe_exit: t.t1_pe_exit,
-        ce_exit_time: t.t1_ce_exit_time,
-        pe_exit_time: t.t1_pe_exit_time,
-        ce_reason: t.t1_ce_reason,
-        pe_reason: t.t1_pe_reason,
-        ce_sl_hit: t.t1_ce_sl_hit,
-        pe_sl_hit: t.t1_pe_sl_hit,
-        ce_trailed: t.t1_ce_trailed,
-        pe_trailed: t.t1_pe_trailed,
-        pnl: t.t1_pnl,
+        id: `${trade.date}-t1`,
+        date: trade.date,
+        spot: trade.spot,
+        strike: trade.strike,
+        ce_entry: trade.t1_ce_entry,
+        pe_entry: trade.t1_pe_entry,
+        ce_sl: trade.t1_ce_sl,
+        pe_sl: trade.t1_pe_sl,
+        ce_exit: trade.t1_ce_exit,
+        pe_exit: trade.t1_pe_exit,
+        ce_exit_time: trade.t1_ce_exit_time,
+        pe_exit_time: trade.t1_pe_exit_time,
+        ce_reason: trade.t1_ce_reason,
+        pe_reason: trade.t1_pe_reason,
+        ce_sl_hit: trade.t1_ce_sl_hit,
+        pe_sl_hit: trade.t1_pe_sl_hit,
+        ce_trailed: trade.t1_ce_trailed,
+        pe_trailed: trade.t1_pe_trailed,
+        pnl: trade.t1_pnl,
         entry_time: '09:59',
-        exit_time: t.reentry ? '12:30' : '15:06',
-        tag: t.reentry ? 'T1' : '',
-        cov: t.ce_cov,
-        reentry: t.reentry,
+        exit_time: trade.reentry ? '12:30' : '15:06',
+        tag: trade.reentry ? 'T1' : '',
+        cov: trade.ce_cov,
       });
-      if(t.reentry){
+      if (trade.reentry) {
         rows.push({
-          id: t.date+'-t2',
-          date: t.date,
-          spot: t.t2_spot,
-          strike: t.t2_strike,
-          ce_entry: t.t2_ce_entry,
-          pe_entry: t.t2_pe_entry,
-          ce_sl: t.t2_ce_sl,
-          pe_sl: t.t2_pe_sl,
-          ce_exit: t.t2_ce_exit,
-          pe_exit: t.t2_pe_exit,
-          ce_exit_time: t.t2_ce_exit_time,
-          pe_exit_time: t.t2_pe_exit_time,
-          ce_reason: t.t2_ce_reason,
-          pe_reason: t.t2_pe_reason,
-          ce_sl_hit: t.t2_ce_sl_hit,
-          pe_sl_hit: t.t2_pe_sl_hit,
-          ce_trailed: t.t2_ce_trailed,
-          pe_trailed: t.t2_pe_trailed,
-          pnl: t.t2_pnl,
+          id: `${trade.date}-t2`,
+          date: trade.date,
+          spot: trade.t2_spot,
+          strike: trade.t2_strike,
+          ce_entry: trade.t2_ce_entry,
+          pe_entry: trade.t2_pe_entry,
+          ce_sl: trade.t2_ce_sl,
+          pe_sl: trade.t2_pe_sl,
+          ce_exit: trade.t2_ce_exit,
+          pe_exit: trade.t2_pe_exit,
+          ce_exit_time: trade.t2_ce_exit_time,
+          pe_exit_time: trade.t2_pe_exit_time,
+          ce_reason: trade.t2_ce_reason,
+          pe_reason: trade.t2_pe_reason,
+          ce_sl_hit: trade.t2_ce_sl_hit,
+          pe_sl_hit: trade.t2_pe_sl_hit,
+          ce_trailed: trade.t2_ce_trailed,
+          pe_trailed: trade.t2_pe_trailed,
+          pnl: trade.t2_pnl,
           entry_time: '12:30',
           exit_time: '15:06',
           tag: 'T2',
-          cov: t.ce_cov,
-          reentry: false,
+          cov: trade.ce_cov,
         });
       }
     });
 
-    document.getElementById('bt-trade-count').textContent = `Showing ${sorted.length} days (${rows.length} trades) of ${totalDays} days`;
+    replayEls.tradeCount.textContent = `Showing ${sorted.length} days (${rows.length} trades) of ${DETAILED_TRADES.length} days`;
+    replayEls.tradeWrap.innerHTML = `
+      <table class="table" style="min-width:1400px">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Date</th>
+            <th>Spot</th>
+            <th>ATM Strike</th>
+            <th>CE Entry</th>
+            <th>PE Entry</th>
+            <th>CE SL</th>
+            <th>PE SL</th>
+            <th>CE Exit</th>
+            <th>PE Exit</th>
+            <th>CE</th>
+            <th>PE</th>
+            <th>Re-entry</th>
+            <th>P&amp;L (1 lot)</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody id="bt-trade-body">
+          ${rows.map(row => {
+            const ceTag = row.ce_sl_hit ? '<span class="badge badge-red">SL</span>' : (row.ce_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
+            const peTag = row.pe_sl_hit ? '<span class="badge badge-red">SL</span>' : (row.pe_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
+            const tagBadge = row.tag === 'T1' ? '<span class="badge badge-gold" style="font-size:0.6rem;padding:4px 7px">T1</span> ' : row.tag === 'T2' ? '<span class="badge badge-gold" style="font-size:0.6rem;padding:4px 7px;background:rgba(201,168,76,0.25)">T2 ↻</span> ' : '';
+            const pnlClass = row.pnl >= 0 ? 'positive' : 'negative';
+            const resultBadge = row.pnl >= 0 ? '<span class="badge badge-green">Win</span>' : '<span class="badge badge-red">Loss</span>';
+            return `
+              <tr class="data-row" data-trade-id="${row.id}">
+                <td><button class="expand-btn" type="button" data-expand="${row.id}">+</button></td>
+                <td>${tagBadge}${fmtDateStr(row.date)}</td>
+                <td>${fmtNum(row.spot, 1)}</td>
+                <td>${row.strike}</td>
+                <td>${fmtNum(row.ce_entry)}</td>
+                <td>${fmtNum(row.pe_entry)}</td>
+                <td>${fmtNum(row.ce_sl)}</td>
+                <td>${fmtNum(row.pe_sl)}</td>
+                <td>${fmtNum(row.ce_exit)} <small>${row.ce_exit_time || ''}</small></td>
+                <td>${fmtNum(row.pe_exit)} <small>${row.pe_exit_time || ''}</small></td>
+                <td>${ceTag}</td>
+                <td>${peTag}</td>
+                <td>${row.tag === 'T2' ? '<span class="badge badge-gold">Re-entry</span>' : '—'}</td>
+                <td class="${pnlClass}">${row.pnl >= 0 ? '+' : ''}₹${Math.round(row.pnl).toLocaleString('en-IN')}</td>
+                <td>${resultBadge}</td>
+              </tr>
+              <tr class="detail-row" id="detail-${row.id}">
+                <td colspan="15" class="detail-panel">
+                  <div class="detail-inner">
+                    <div class="detail-item"><div class="label">Entry</div><div class="value">${row.entry_time} → ${row.exit_time}</div></div>
+                    <div class="detail-item"><div class="label">CE</div><div class="value">${fmtNum(row.ce_entry)} → ${fmtNum(row.ce_exit)} @ ${row.ce_exit_time || 'EOD'}<br>${row.ce_reason}${row.ce_trailed ? ' (trailed to BE)' : ''}</div></div>
+                    <div class="detail-item"><div class="label">PE</div><div class="value">${fmtNum(row.pe_entry)} → ${fmtNum(row.pe_exit)} @ ${row.pe_exit_time || 'EOD'}<br>${row.pe_reason}${row.pe_trailed ? ' (trailed to BE)' : ''}</div></div>
+                    <div class="detail-item"><div class="label">Coverage</div><div class="value">${row.cov}%</div></div>
+                  </div>
+                </td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
 
-    const tbody = document.getElementById('bt-trade-body');
-    tbody.innerHTML = rows.map(r=>{
-      const ceTag = r.ce_sl_hit ? '<span class="badge badge-red">SL</span>' : (r.ce_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
-      const peTag = r.pe_sl_hit ? '<span class="badge badge-red">SL</span>' : (r.pe_trailed ? '<span class="badge badge-gold">BE</span>' : '<span class="badge badge-green">EOD</span>');
-      const tagBadge = r.tag === 'T1' ? '<span class="badge badge-gold" style="font-size:0.6rem;padding:4px 7px">T1</span> ' :
-                       r.tag === 'T2' ? '<span class="badge badge-gold" style="font-size:0.6rem;padding:4px 7px;background:rgba(201,168,76,0.25)">T2 ↻</span> ' : '';
-      const pnlClass = r.pnl >= 0 ? 'positive' : 'negative';
-      const resultBadge = r.pnl >= 0 ? '<span class="badge badge-green">Win</span>' : '<span class="badge badge-red">Loss</span>';
-      return `<tr class="data-row" data-trade-id="${r.id}">
-        <td><button class="expand-btn" type="button" data-expand="${r.id}">+</button></td>
-        <td>${tagBadge}${fmtDateStr(r.date)}</td>
-        <td>${fmtNum(r.spot,1)}</td>
-        <td>${r.strike}</td>
-        <td>${fmtNum(r.ce_entry)}</td>
-        <td>${fmtNum(r.pe_entry)}</td>
-        <td>${fmtNum(r.ce_sl)}</td>
-        <td>${fmtNum(r.pe_sl)}</td>
-        <td>${fmtNum(r.ce_exit)} <small>${r.ce_exit_time||''}</small></td>
-        <td>${fmtNum(r.pe_exit)} <small>${r.pe_exit_time||''}</small></td>
-        <td>${ceTag}</td>
-        <td>${peTag}</td>
-        <td>${r.tag==='T2'?'<span class="badge badge-gold">Re-entry</span>':'—'}</td>
-        <td class="${pnlClass}">${r.pnl>=0?'+':''}₹${Math.round(r.pnl).toLocaleString('en-IN')}</td>
-        <td>${resultBadge}</td>
-      </tr>
-      <tr class="detail-row" id="detail-${r.id}">
-        <td colspan="15" class="detail-panel">
-          <div class="detail-inner">
-            <div class="detail-item"><div class="label">Entry</div><div class="value">${r.entry_time} → ${r.exit_time}</div></div>
-            <div class="detail-item"><div class="label">CE</div><div class="value">${fmtNum(r.ce_entry)} → ${fmtNum(r.ce_exit)} @ ${r.ce_exit_time||'EOD'}<br>${r.ce_reason}${r.ce_trailed?' (trailed to BE)':''}</div></div>
-            <div class="detail-item"><div class="label">PE</div><div class="value">${fmtNum(r.pe_entry)} → ${fmtNum(r.pe_exit)} @ ${r.pe_exit_time||'EOD'}<br>${r.pe_reason}${r.pe_trailed?' (trailed to BE)':''}</div></div>
-            <div class="detail-item"><div class="label">Coverage</div><div class="value">${r.cov}%</div></div>
-          </div>
-        </td>
-      </tr>`;
-    }).join('');
-
-    document.querySelectorAll('#bt-trade-body [data-expand]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const id = btn.dataset.expand;
-        const detail = document.getElementById(`detail-${id}`);
-        if(detail){
-          detail.classList.toggle('open');
-          btn.textContent = detail.classList.contains('open') ? '−' : '+';
-        }
+    replayEls.tradeWrap.querySelectorAll('[data-expand]').forEach(button => {
+      button.addEventListener('click', () => {
+        const detail = replayEls.tradeWrap.querySelector(`#detail-${button.dataset.expand}`);
+        if (!detail) return;
+        detail.classList.toggle('open');
+        button.textContent = detail.classList.contains('open') ? '−' : '+';
       });
     });
   }
 
-  document.getElementById('bt-search').addEventListener('input', renderTradeTable);
-  document.getElementById('bt-sort').addEventListener('change', renderTradeTable);
-  renderTradeTable();
+  function renderSimpleTradeTable() {
+    const name = replayState.instrument;
+    const filtered = getCurrentRangeFilteredPoints();
+    const search = (replayEls.search.value || '').trim().toLowerCase();
+    const pnlFilter = replayEls.pnlFilter.value;
+    let rows = filtered.map(point => ({
+      date: point.date,
+      capital: point.capital,
+      dailyPnl: point.dailyPnl,
+      lots: point.lots,
+      result: point.dailyPnl > 0 ? 'Win' : 'Loss',
+    }));
+    if (pnlFilter === 'win') rows = rows.filter(row => row.dailyPnl > 0);
+    else if (pnlFilter === 'loss') rows = rows.filter(row => row.dailyPnl <= 0);
+    if (search) {
+      rows = rows.filter(row => [row.date, row.capital, row.dailyPnl, row.lots, row.result].join(' ').toLowerCase().includes(search));
+    }
+    const sorted = [...rows];
+    if (replayEls.sort.value === 'date-desc') sorted.sort((left, right) => right.date.localeCompare(left.date));
+    else if (replayEls.sort.value === 'pnl-desc') sorted.sort((left, right) => right.dailyPnl - left.dailyPnl);
+    else if (replayEls.sort.value === 'pnl-asc') sorted.sort((left, right) => left.dailyPnl - right.dailyPnl);
+    else sorted.sort((left, right) => left.date.localeCompare(right.date));
 
-  const allLabels = compounding.map(c=>c.date);
-  const allCapital = compounding.map(c=>c.capital);
-  const allLots = compounding.map(c=>c.lots);
-  const allPnl = compounding.map(c=>pickNumber(c.day_pnl, c.pnl));
+    replayEls.tradeCount.textContent = `Showing ${sorted.length} days of ${backtests[name].points.length} days`;
+    replayEls.tradeWrap.innerHTML = `
+      <table class="table" style="min-width:760px">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Capital</th>
+            <th>Daily P&amp;L</th>
+            <th>Lots</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map(row => `
+            <tr class="data-row">
+              <td>${fmtDateStr(row.date)}</td>
+              <td>${fmtCr(row.capital)}</td>
+              <td class="${row.dailyPnl > 0 ? 'positive' : 'negative'}">${row.dailyPnl >= 0 ? '+' : ''}${fmtINR(row.dailyPnl)}</td>
+              <td>${row.lots}</td>
+              <td>${row.dailyPnl > 0 ? '<span class="badge badge-green">Win</span>' : '<span class="badge badge-red">Loss</span>'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
 
-  let cursor = 0;
-  let playing = false;
-  let speed = 1;
-  let wins = 0, losses = 0;
-  let maxCap = INITIAL, maxDD = 0;
-  let animFrame = null;
+  function renderTradeTable() {
+    if (replayState.instrument === 'SENSEX') renderDetailedTradeTable();
+    else renderSimpleTradeTable();
+  }
 
-  const eqCtx = document.getElementById('backtestEquityChart');
-  const eqChart = new Chart(eqCtx, {
-    type:'line',
-    data:{
-      labels: [],
-      datasets:[
-        {
-          label:'Capital (₹)',
-          data:[],
-          borderColor:'#c9a84c',
-          backgroundColor:'rgba(201,168,76,0.06)',
-          fill:true,
-          tension:0.2,
-          pointRadius:0,
-          borderWidth:2,
-          yAxisID:'y',
-        },
-        {
-          label:'Lots',
-          data:[],
-          borderColor:'rgba(95,168,120,0.5)',
-          backgroundColor:'transparent',
-          borderWidth:1.5,
-          borderDash:[4,4],
-          pointRadius:0,
-          tension:0.2,
-          yAxisID:'y1',
-        }
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      animation:{duration:0},
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{labels:{color:'#6b6356',font:{size:11}}},
-        tooltip:{
-          backgroundColor:'#0d0d0d',
-          borderColor:'rgba(201,168,76,0.3)',
-          borderWidth:1,
-          titleColor:'#f5f0e8',
-          bodyColor:'#b8b0a0',
-          callbacks:{
-            label(ctx){
-              if(ctx.datasetIndex===0) return '  Capital: '+fmtCr(ctx.raw);
-              return '  Lots: '+ctx.raw;
-            }
-          }
-        }
-      },
-      scales:{
-        x:{
-          ticks:{color:'#6b6356',maxTicksLimit:10,font:{size:10}},
-          grid:{color:'rgba(255,255,255,0.04)'}
-        },
-        y:{
-          position:'left',
-          ticks:{
-            color:'#c9a84c',font:{size:10},
-            callback:v=>fmtCr(v)
-          },
-          grid:{color:'rgba(255,255,255,0.04)'}
-        },
-        y1:{
-          position:'right',
-          min:0,
-          max:110,
-          ticks:{color:'rgba(95,168,120,0.6)',font:{size:10}},
-          grid:{display:false}
-        }
+  function buildSensexYearRows() {
+    const years = {};
+    let capital = INITIALS.SENSEX;
+    DETAILED_TRADES.forEach(trade => {
+      const year = trade.date.slice(0, 4);
+      if (!years[year]) {
+        years[year] = {
+          days: 0,
+          wins: 0,
+          losses: 0,
+          pnl: 0,
+          startCap: capital,
+          endCap: capital,
+          startLots: Math.max(1, Math.min(Math.floor((capital * 0.6) / MARGINS.SENSEX), MAX_LOTS)),
+          endLots: 0,
+        };
       }
-    }
-  });
+      const lots = Math.max(1, Math.min(Math.floor((capital * 0.6) / MARGINS.SENSEX), MAX_LOTS));
+      years[year].days += 1;
+      if (trade.win) years[year].wins += 1;
+      else years[year].losses += 1;
+      years[year].pnl += trade.total_pnl;
+      capital += trade.total_pnl * lots;
+      years[year].endCap = capital;
+      years[year].endLots = lots;
+    });
+    return years;
+  }
 
-  const moCtx = document.getElementById('backtestMonthlyChart');
-  const monthlyData = {};
-  const moChart = new Chart(moCtx, {
-    type:'bar',
-    data:{labels:[], datasets:[{label:'Monthly P&L',data:[],backgroundColor:[],borderRadius:4}]},
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      animation:{duration:0},
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'#0d0d0d',
-          borderColor:'rgba(201,168,76,0.3)',
-          borderWidth:1,
-          titleColor:'#f5f0e8',
-          bodyColor:'#b8b0a0',
-          callbacks:{label(ctx){return '  P&L: '+fmtCr(ctx.raw)}}
-        }
-      },
-      scales:{
-        x:{ticks:{color:'#6b6356',maxTicksLimit:18,font:{size:9}},grid:{display:false}},
-        y:{
-          ticks:{color:'#6b6356',font:{size:10},callback:v=>fmtCr(v)},
-          grid:{color:'rgba(255,255,255,0.04)'}
-        }
+  function buildSimpleYearRows(name) {
+    const years = {};
+    getCurrentPoints().forEach(point => {
+      const year = point.date.slice(0, 4);
+      if (!years[year]) {
+        years[year] = {
+          days: 0,
+          wins: 0,
+          losses: 0,
+          pnl: 0,
+          startCap: point.capital - point.dailyPnl,
+          endCap: point.capital,
+          startLots: point.lots,
+          endLots: point.lots,
+        };
       }
+      years[year].days += 1;
+      if (point.dailyPnl > 0) years[year].wins += 1;
+      else years[year].losses += 1;
+      years[year].pnl += computeSimpleOneLotPnl(point);
+      years[year].endCap = point.capital;
+      years[year].endLots = point.lots;
+    });
+    return years;
+  }
+
+  function renderYearTable() {
+    const name = replayState.instrument;
+    const years = name === 'SENSEX' ? buildSensexYearRows() : buildSimpleYearRows(name);
+    const yearKeys = Object.keys(years).sort();
+    const bestYear = yearKeys.reduce((best, year) => !best || years[year].pnl > years[best].pnl ? year : best, '');
+    replayEls.yearTable.innerHTML = yearKeys.map(year => {
+      const row = years[year];
+      const winRate = row.days ? (row.wins / row.days) * 100 : 0;
+      const compoundGain = row.endCap - row.startCap;
+      const avgPnl = row.days ? row.pnl / row.days : 0;
+      const flag = year === bestYear ? ' <span class="year-flag">★ best year</span>' : '';
+      return `
+        <tr>
+          <td>${year}${flag}</td>
+          <td>${row.days}</td>
+          <td>${row.wins}</td>
+          <td>${winRate.toFixed(1)}%</td>
+          <td class="${row.pnl >= 0 ? 'positive' : 'negative'}">${row.pnl >= 0 ? '+' : ''}${fmtCr(row.pnl)}</td>
+          <td>${fmtINR(avgPnl)}</td>
+          <td class="${compoundGain >= 0 ? 'positive' : 'negative'}">${compoundGain >= 0 ? '+' : ''}${fmtCr(compoundGain)}</td>
+          <td>${row.startLots} → ${row.endLots}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  function buildCompoundYears(name) {
+    const points = backtests[name].points;
+    const years = {};
+    let previousCapital = INITIALS[name];
+    points.forEach(point => {
+      const year = point.date.slice(0, 4);
+      if (!years[year]) {
+        years[year] = {
+          startCap: previousCapital,
+          endCap: point.capital,
+          startLots: point.lots,
+          endLots: point.lots,
+          days: 0,
+        };
+      }
+      years[year].days += 1;
+      years[year].endCap = point.capital;
+      years[year].endLots = point.lots;
+      previousCapital = point.capital;
+    });
+    return years;
+  }
+
+  function renderCompoundTimeline() {
+    const name = replayState.instrument;
+    const points = backtests[name].points;
+    const years = buildCompoundYears(name);
+    const yearKeys = Object.keys(years).sort();
+    const maxEndCap = Math.max(...yearKeys.map(year => years[year].endCap), INITIALS[name]);
+    replayEls.compoundTimeline.innerHTML = yearKeys.map((year, index) => {
+      const row = years[year];
+      const gain = row.endCap - row.startCap;
+      const returnPct = row.startCap ? ((row.endCap - row.startCap) / row.startCap) * 100 : 0;
+      return `
+        <div class="compound-row">
+          <div class="compound-year">Year ${index + 1} (${year})<span>${fmtCr(row.startCap)} → ${fmtCr(row.endCap)}</span></div>
+          <div class="compound-bar-track"><div class="compound-bar" style="width:${Math.max(6, (row.endCap / maxEndCap) * 100)}%"><span>${fmtCr(row.endCap)}</span></div></div>
+          <div class="compound-gain"><strong>${gain >= 0 ? '+' : ''}${fmtCr(gain)}</strong>${returnPct.toFixed(0)}% return • ${row.startLots}→${row.endLots} lots</div>
+        </div>`;
+    }).join('');
+    const finalPoint = points[points.length - 1];
+    const finalCapital = finalPoint ? finalPoint.capital : INITIALS[name];
+    const firstLots = points[0]?.lots || 0;
+    const lastLots = finalPoint?.lots || 0;
+    replayEls.compoundSummary.innerHTML = `<strong>Final: ${fmtCr(INITIALS[name])} → ${fmtCr(finalCapital)} (${(finalCapital / INITIALS[name]).toFixed(1)}×)</strong> 60% reserve/margin framework with ${fmtINR(MARGINS[name])} per lot — lots scaled from ${firstLots} to ${lastLots} over ${points.length.toLocaleString('en-IN')} trading days.`;
+  }
+
+  function updateSectionHeaders(name) {
+    const summary = backtests[name].summary;
+    replayEls.replayKicker.textContent = name === 'SENSEX'
+      ? `${name} detailed replay • fresh Dhan API data • 60/40 compounding`
+      : `${name} replay • switchable single-instrument view • 60/40 compounding`;
+    replayEls.replayTitle.textContent = `${name} Backtest Replay`;
+    replayEls.logKicker.textContent = name === 'SENSEX'
+      ? `${name} execution ledger • fresh API data`
+      : `${name} execution ledger • simplified backtest daily log`;
+    replayEls.logTitle.textContent = `${name} Trade Log`;
+    replayEls.monthlyKicker.textContent = `${name} month by month`;
+    replayEls.monthlyTitle.textContent = `${name} Monthly P&L`;
+    replayEls.yearKicker.textContent = `${name} yearly breakdown`;
+    replayEls.yearTitle.textContent = `${name} Year-by-Year Performance`;
+    replayEls.yearDesc.textContent = `${formatShortDate(summary.start_date)}–${formatShortDate(summary.end_date)} • margin ${fmtINR(MARGINS[name])} per lot • ${summary.trading_days.toLocaleString('en-IN')} sessions.`;
+    replayEls.yearNote.textContent = name === 'SENSEX'
+      ? '* 2026 is a partial year. All P&L uses fresh 1-minute Dhan rolling option API calls validated with true SENSEX INDEX spot.'
+      : `* Derived from ${name} daily backtest series using capital, lot, and P&L arrays with ${fmtINR(MARGINS[name])} per-lot margin.`;
+    replayEls.compoundKicker.textContent = `${name} compounding power`;
+    replayEls.compoundTitle.textContent = `${name} 60/40 Compounding`;
+    replayEls.compoundIntro.textContent = `Starting with ${fmtCr(INITIALS[name])}. 60% of capital for margin, 40% reserve. Margin per lot ${fmtINR(MARGINS[name])}. Lot cap: ${MAX_LOTS}.`;
+    replayEls.compoundNote.textContent = name === 'SENSEX'
+      ? `Data source: Fresh 1-minute Dhan rolling option API calls across ${summary.trading_days.toLocaleString('en-IN')} SENSEX trading days. Lot cap of ${MAX_LOTS} applied for realistic sizing.`
+      : `Data source: ${name} compounded backtest series with daily capital, lot sizing, and monthly attribution across ${summary.trading_days.toLocaleString('en-IN')} sessions.`;
+  }
+
+  function switchInstrument(name) {
+    if (!backtests[name]) return;
+    replayState.instrument = name;
+    replayState.autoPlayed = false;
+    replayEls.selector.querySelectorAll('.inst-btn').forEach(button => button.classList.toggle('active', button.dataset.instrument === name));
+    updateSectionHeaders(name);
+    replayEls.rangePreset.value = 'all';
+    replayEls.search.value = '';
+    replayEls.sort.value = 'date-asc';
+    syncPnlFilterOptions(name);
+    applyFilterBounds(name);
+    buildReplayCharts(name);
+    resetReplayData();
+    renderTradeTable();
+    renderYearTable();
+    renderCompoundTimeline();
+  }
+
+  replayEls.rangePreset.addEventListener('change', () => {
+    syncFilterVisibility();
+    renderTradeTable();
+  });
+  replayEls.monthPicker.addEventListener('change', renderTradeTable);
+  [replayEls.dateFrom, replayEls.dateTo].forEach(input => input.addEventListener('change', () => {
+    if (replayEls.dateFrom.value > replayEls.dateTo.value) {
+      const swap = replayEls.dateFrom.value;
+      replayEls.dateFrom.value = replayEls.dateTo.value;
+      replayEls.dateTo.value = swap;
     }
+    renderTradeTable();
+  }));
+  replayEls.pnlFilter.addEventListener('change', renderTradeTable);
+  replayEls.search.addEventListener('input', renderTradeTable);
+  replayEls.sort.addEventListener('change', renderTradeTable);
+
+  replayEls.play.addEventListener('click', () => {
+    if (replayState.playing) pauseReplay();
+    else playReplay();
   });
 
-  const elDate = document.getElementById('bt-date');
-  const elCapital = document.getElementById('bt-capital');
-  const elDayPnl = document.getElementById('bt-daypnl');
-  const elLots = document.getElementById('bt-lots');
-  const elWR = document.getElementById('bt-wr');
-  const elDayNum = document.getElementById('bt-daynum');
-  const elProgress = document.getElementById('bt-progress');
-  const elMaxDD = document.getElementById('bt-max-dd');
-  const elWL = document.getElementById('bt-wl');
-  const elTotalPnl = document.getElementById('bt-totalpnl');
-  const elAvgPnl = document.getElementById('bt-avgpnl');
-  const btnPlay = document.getElementById('bt-play');
-  const btnSpeed = document.getElementById('bt-speed');
-  const btnSkip = document.getElementById('bt-skip');
-
-  function addDay(){
-    if(cursor >= totalDays) return false;
-    const i = cursor;
-    const pnl = allPnl[i];
-    const cap = allCapital[i];
-    const lt = allLots[i];
-
-    if(allTrades[i].win) wins++; else losses++;
-    if(cap > maxCap) maxCap = cap;
-    const dd = ((maxCap - cap) / maxCap * 100);
-    if(dd > maxDD) maxDD = dd;
-
-    eqChart.data.labels.push(fmtDateStr(allLabels[i]));
-    eqChart.data.datasets[0].data.push(cap);
-    eqChart.data.datasets[1].data.push(lt);
-
-    const month = allLabels[i].slice(0,7);
-    if(!monthlyData[month]) monthlyData[month] = 0;
-    monthlyData[month] += pnl;
-
-    cursor++;
-    return true;
-  }
-
-  function updateUI(){
-    const i = cursor - 1;
-    if(i < 0) return;
-    const pnl = allPnl[i];
-    const cap = allCapital[i];
-    const lt = allLots[i];
-    const total = wins + losses;
-    const totalPnl = cap - INITIAL;
-    const flatPnl = allTrades.slice(0,cursor).reduce((s,t)=>s+t.total_pnl,0);
-
-    elDate.textContent = fmtDateStr(allLabels[i]);
-    elCapital.textContent = fmtCr(cap);
-    elDayPnl.textContent = (pnl >= 0 ? '+' : '') + fmtINR(pnl);
-    elDayPnl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
-    elLots.textContent = lt;
-    elWR.textContent = total ? (wins/total*100).toFixed(1)+'%' : '—';
-    elDayNum.textContent = cursor + ' / ' + totalDays;
-    elProgress.style.width = (cursor/totalDays*100)+'%';
-    elMaxDD.textContent = maxDD.toFixed(1)+'%';
-    elWL.textContent = wins + ' / ' + losses;
-    elTotalPnl.textContent = (totalPnl>=0?'+':'')+fmtCr(totalPnl);
-    elTotalPnl.style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
-    elAvgPnl.textContent = '₹'+Math.round(flatPnl/cursor);
-  }
-
-  function updateCharts(){
-    eqChart.update('none');
-    const mKeys = Object.keys(monthlyData).sort();
-    moChart.data.labels = mKeys;
-    moChart.data.datasets[0].data = mKeys.map(k=>Math.round(monthlyData[k]));
-    moChart.data.datasets[0].backgroundColor = mKeys.map(k=>monthlyData[k]>=0?'rgba(95,168,120,0.7)':'rgba(196,92,92,0.7)');
-    moChart.update('none');
-  }
-
-  function getDelay(){
-    if(speed===1) return 30;
-    if(speed===2) return 10;
-    if(speed===5) return 2;
-    return 0;
-  }
-
-  function getBatch(){
-    if(speed===1) return 1;
-    if(speed===2) return 2;
-    if(speed===5) return 5;
-    return 20;
-  }
-
-  function tick(){
-    if(!playing || cursor >= totalDays){
-      playing = false;
-      btnPlay.innerHTML = cursor >= totalDays ? '✓ Done' : '▶ Play';
-      return;
-    }
-    const batch = getBatch();
-    for(let b=0; b<batch && cursor<totalDays; b++) addDay();
-    updateUI();
-    if(cursor % Math.max(1, Math.floor(batch)) === 0 || cursor >= totalDays) updateCharts();
-    const delay = getDelay();
-    if(delay > 0) animFrame = setTimeout(tick, delay);
-    else animFrame = requestAnimationFrame(tick);
-  }
-
-  function play(){
-    if(cursor >= totalDays){
-      cursor = 0; wins = 0; losses = 0; maxCap = INITIAL; maxDD = 0;
-      eqChart.data.labels = [];
-      eqChart.data.datasets[0].data = [];
-      eqChart.data.datasets[1].data = [];
-      Object.keys(monthlyData).forEach(k=>delete monthlyData[k]);
-      updateCharts();
-    }
-    playing = true;
-    btnPlay.innerHTML = '⏸ Pause';
-    tick();
-  }
-
-  function pause(){
-    playing = false;
-    if(animFrame) clearTimeout(animFrame);
-    btnPlay.innerHTML = '▶ Play';
-  }
-
-  function skipToEnd(){
-    pause();
-    while(cursor < totalDays) addDay();
-    updateUI();
-    updateCharts();
-    btnPlay.innerHTML = '✓ Done';
-  }
-
-  btnPlay.addEventListener('click', ()=>{ if(playing) pause(); else play(); });
-
-  const speeds = [1,2,5,10];
-  let speedIdx = 0;
-  btnSpeed.addEventListener('click', ()=>{
-    speedIdx = (speedIdx + 1) % speeds.length;
-    speed = speeds[speedIdx];
-    btnSpeed.textContent = speed + '×';
+  const replaySpeeds = [1, 2, 5, 10];
+  let replaySpeedIndex = 0;
+  replayEls.speed.addEventListener('click', () => {
+    replaySpeedIndex = (replaySpeedIndex + 1) % replaySpeeds.length;
+    replayState.speed = replaySpeeds[replaySpeedIndex];
+    replayEls.speed.textContent = `${replayState.speed}×`;
   });
+  replayEls.skip.addEventListener('click', skipReplayToEnd);
+  replayEls.selector.querySelectorAll('.inst-btn').forEach(button => button.addEventListener('click', () => switchInstrument(button.dataset.instrument)));
 
-  btnSkip.addEventListener('click', skipToEnd);
-
-  const replaySection = eqCtx.closest('.section');
-  const replayObserver = new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting && cursor === 0 && !playing){
-      play();
-      replayObserver.disconnect();
+  const replaySection = replayEls.equityCanvas.closest('.section');
+  const replayObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && replayState.cursor === 0 && !replayState.playing && !replayState.autoPlayed) {
+      replayState.autoPlayed = true;
+      playReplay();
     }
-  }, {threshold:0.3});
+  }, { threshold: 0.3 });
   replayObserver.observe(replaySection);
+
+  switchInstrument('SENSEX');
 }).catch(e=>console.log('Backtest data not loaded:',e));
 </script>
 

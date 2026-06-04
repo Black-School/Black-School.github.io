@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Theta God — Live Paper Trading Dashboard | Black School</title>
-<meta name="description" content="Live paper trading dashboard for Theta God — SENSEX short straddle strategy by Black School.">
+<title>Theta God — Multi-Instrument Backtest & Live Paper Dashboard | Black School</title>
+<meta name="description" content="Multi-instrument backtest and live paper trading dashboard for Theta God — short straddle across SENSEX, NIFTY, BANKNIFTY and FINNIFTY by Black School.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -202,6 +202,31 @@ body::before{
 .about-table tbody tr:hover{background:rgba(201,168,76,0.04)}
 .year-flag{color:var(--gold);font-size:0.75rem;margin-left:6px}
 .cta-link{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border:1px solid rgba(201,168,76,0.28);border-radius:999px;background:var(--gold-dim);color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;font-size:0.76rem}
+
+.comparison-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:26px}
+.instrument-card{padding:24px;border:1px solid var(--border);border-radius:20px;background:rgba(255,255,255,0.02)}
+.instrument-card__head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.instrument-card__title{font-family:var(--serif);font-size:1.55rem;color:var(--white);line-height:1}
+.instrument-card__growth{margin-top:14px;font-family:var(--serif);font-size:1.9rem;font-weight:300;color:var(--white);line-height:1.05}
+.instrument-card__meta{margin-top:10px;font-size:0.82rem;color:var(--text-dim)}
+.instrument-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.mini-metric{padding:12px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.02)}
+.mini-metric .label{font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.mini-metric .value{font-family:var(--mono);font-size:0.9rem;color:var(--white)}
+.filter-toolbar{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.range-controls,.toggle-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.range-controls select,.range-controls input{background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:11px 14px;border-radius:12px;min-height:44px}
+.toggle-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--text-dim);cursor:pointer;transition:all 0.25s ease}
+.toggle-btn.active{color:var(--white);transform:translateY(-1px)}
+.legend-dot{width:9px;height:9px;border-radius:50%}
+.range-sep{color:var(--text-dim);font-size:0.86rem}
+.selected-range-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+.selected-range-card{padding:18px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,0.02)}
+.selected-range-card .label{font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px}
+.selected-range-card .value{font-family:var(--serif);font-size:1.55rem;color:var(--white);line-height:1}
+.selected-range-card .detail{font-size:0.8rem;color:var(--text-dim);margin-top:8px}
+.chart-footnote{margin-top:14px;font-size:0.85rem;color:var(--text-dim);line-height:1.7}
+
 @keyframes tabFade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .footer{padding:28px 0 44px;text-align:center;color:var(--text-dim)}
 .footer a{color:var(--gold)}
@@ -215,14 +240,15 @@ body::before{
   .dashboard-banner{flex-direction:column;align-items:flex-start}
   .compound-row{grid-template-columns:1fr}
   .compound-gain{text-align:left}
-  .live-stats,.stats-grid,.about-stats-grid,.steps-grid{grid-template-columns:repeat(2,1fr)}
+  .live-stats,.stats-grid,.about-stats-grid,.steps-grid,.instrument-metrics,.selected-range-grid{grid-template-columns:repeat(2,1fr)}
+  .comparison-grid{grid-template-columns:1fr}
 }
 @media(max-width:760px){
   .top-nav .container{align-items:flex-start;flex-direction:column}
   .container{width:min(100% - 24px,1200px)}
   .hero-shell,.chart-card,.snapshot,.trade-card,.strategy-card,.stats-card,.donut-card,.about-card{padding:22px}
-  .live-stats,.stats-grid,.snapshot-grid,.param-grid,.detail-inner,.about-stats-grid,.steps-grid{grid-template-columns:1fr}
-  .section-heading,.chart-header,.trade-toolbar{align-items:flex-start;flex-direction:column}
+  .live-stats,.stats-grid,.snapshot-grid,.param-grid,.detail-inner,.about-stats-grid,.steps-grid,.instrument-metrics,.selected-range-grid,.comparison-grid{grid-template-columns:1fr}
+  .section-heading,.chart-header,.trade-toolbar,.filter-toolbar{align-items:flex-start;flex-direction:column}
   .hero{padding-top:26px}
   .hero h1{font-size:3rem}
   .nav-links{width:100%}
@@ -257,19 +283,19 @@ body::before{
     <div class="card hero-shell fade-up">
       <div class="hero-grid">
         <div>
-          <div class="hero-kicker">3-Year real data backtest</div>
+          <div class="hero-kicker">Multi-Instrument Backtest — Up to 5.4 Years</div>
           <h1>🔱 Theta God</h1>
-          <p class="hero-subtitle">SENSEX Short Straddle • Jun 2023–Jun 2026 • Real Dhan option data with live paper trading in the dashboard tab</p>
+          <p class="hero-subtitle">Short Straddle across SENSEX, NIFTY, BANKNIFTY &amp; FINNIFTY</p>
           <div class="hero-meta">
-            <div class="meta-pill">Index <strong>SENSEX</strong></div>
+            <div class="meta-pill">Instruments <strong>4 index sleeves</strong></div>
             <div class="meta-pill">Structure <strong>ATM Short Straddle</strong></div>
-            <div class="meta-pill">Data <strong>Real Options</strong></div>
+            <div class="meta-pill">Data <strong>Backtest + Live Paper</strong></div>
           </div>
         </div>
         <div class="last-updated">
           <div>
             <div class="label">Status</div>
-            <div class="value positive">Backtest validated</div>
+            <div class="value positive">Cross-index validated</div>
           </div>
           <div class="stamp">
             <div class="label">Live paper</div>
@@ -279,24 +305,24 @@ body::before{
       </div>
       <div class="live-stats" id="liveStats">
         <div class="live-stat">
-          <div class="label">3yr Compounded</div>
-          <div class="value positive">₹1.09L → ₹89.7L</div>
-          <div class="sub">60/40 compounding, 100 lot cap</div>
+          <div class="label">Standalone sleeves</div>
+          <div class="value positive" id="heroCombinedGrowth">₹4.09L → ₹7.86Cr</div>
+          <div class="sub" id="heroCombinedDetail">4 independent backtests compounded side by side</div>
         </div>
         <div class="live-stat">
-          <div class="label">Per-Lot P&L</div>
-          <div class="value positive">+₹1.57L</div>
-          <div class="sub">741 days flat, ₹213 avg/day</div>
+          <div class="label">Longest track</div>
+          <div class="value positive" id="heroLongestTrack">5.4y</div>
+          <div class="sub" id="heroLongestTrackDetail">NIFTY • Jan 2021 → Jun 2026</div>
         </div>
         <div class="live-stat">
-          <div class="label">Win Rate</div>
-          <div class="value positive">58.4%</div>
-          <div class="sub">432 wins / 308 losses</div>
+          <div class="label">Best CAGR</div>
+          <div class="value positive" id="heroBestCagr">235.8%</div>
+          <div class="sub" id="heroBestCagrDetail">FINNIFTY • fastest compounding sleeve</div>
         </div>
         <div class="live-stat">
-          <div class="label">Months Profitable</div>
-          <div class="value positive" id="heroMonthsGreen">—</div>
-          <div class="sub">Fresh Dhan API data, true INDEX spot</div>
+          <div class="label">Best hit rate</div>
+          <div class="value positive" id="heroBestWinRate">63.2%</div>
+          <div class="sub" id="heroBestWinRateDetail">FINNIFTY • strongest win consistency</div>
         </div>
       </div>
     </div>
@@ -435,36 +461,15 @@ body::before{
 
   <div class="tab-content active" id="about-tab" role="tabpanel" aria-labelledby="about-btn">
     <section class="section">
-      <div class="card about-card">
+      <div class="card about-card fade-up">
         <div class="section-label">System II</div>
         <h2 class="about-title">Theta God</h2>
         <p class="about-copy">
-          A SENSEX short straddle bot that sells at-the-money options every trading day,
-          collects premium from theta decay, and manages risk with intelligent stop-losses.
-          It sells time for money.
+          A multi-instrument short straddle stack that sells at-the-money premium every trading day,
+          harvests intraday theta across four index complexes, and compounds each sleeve only when the
+          edge earns the right to scale. Same process. Four markets. One risk discipline.
         </p>
-        <div class="about-stats-grid">
-          <div class="about-stat">
-            <div class="label">3yr Compounded</div>
-            <div class="value">₹89.7L</div>
-            <div class="detail">₹1.09L → ₹89.7L, fresh Dhan API data</div>
-          </div>
-          <div class="about-stat">
-            <div class="label">Win Rate</div>
-            <div class="value">58.4%</div>
-            <div class="detail">432 wins / 308 losses</div>
-          </div>
-          <div class="about-stat">
-            <div class="label">Avg Daily (1 lot)</div>
-            <div class="value">₹212</div>
-            <div class="detail">Validated with true INDEX spot data</div>
-          </div>
-          <div class="about-stat">
-            <div class="label">Re-entry Days</div>
-            <div class="value">219</div>
-            <div class="detail">29.6% of trading days</div>
-          </div>
-        </div>
+        <div class="comparison-grid" id="instrumentComparisonGrid"></div>
         <div class="about-quote">
           <blockquote>
             Options are insurance contracts. Buyers pay premiums for protection.
@@ -476,11 +481,84 @@ body::before{
     </section>
 
     <section class="section">
-      <div class="card trade-card" style="padding:32px">
+      <div class="card trade-card fade-up" style="padding:32px">
         <div class="chart-header">
           <div>
-            <div class="section-kicker">Day-by-day replay • Fresh Dhan API data • 60/40 compounding</div>
-            <h2 class="chart-title">Live Backtest Replay — SENSEX</h2>
+            <div class="section-kicker">Cross-instrument capital curves</div>
+            <h2 class="chart-title">Multi-Instrument Equity Curves</h2>
+          </div>
+          <p class="chart-desc">Four synchronized equity curves on a log scale with shared date filtering and per-instrument visibility toggles.</p>
+        </div>
+        <div class="filter-toolbar">
+          <div class="range-controls">
+            <select id="mi-range-preset" aria-label="Backtest date range">
+              <option value="all">All Time</option>
+              <option value="1y">Last 1 Year</option>
+              <option value="2y">Last 2 Years</option>
+              <option value="3y">Last 3 Years</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input type="date" id="mi-date-from" aria-label="From date" style="display:none">
+            <span class="range-sep" id="mi-date-sep" style="display:none">→</span>
+            <input type="date" id="mi-date-to" aria-label="To date" style="display:none">
+          </div>
+          <div class="toggle-row" id="mi-toggle-row" aria-label="Instrument visibility"></div>
+        </div>
+        <div style="height:420px;margin:24px 0 16px">
+          <canvas id="multiEquityChart"></canvas>
+        </div>
+        <div class="selected-range-grid" id="filteredSummaryGrid"></div>
+        <p class="chart-footnote">BANKNIFTY briefly went below zero during its deepest drawdown, so sub-zero capital points are visually floored on the log chart while the tooltip still shows the true capital.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card trade-card fade-up" style="padding:32px">
+        <div class="chart-header">
+          <div>
+            <div class="section-kicker">Month by month attribution</div>
+            <h2 class="chart-title">Monthly P&amp;L Comparison</h2>
+          </div>
+          <p class="chart-desc">Grouped monthly P&amp;L lets you compare how each sleeve contributed through the selected date window.</p>
+        </div>
+        <div style="height:340px;margin:24px 0 8px">
+          <canvas id="multiMonthlyChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card trade-card fade-up">
+        <div class="chart-header">
+          <div>
+            <div class="section-kicker">Snapshot comparison</div>
+            <h2 class="chart-title">Summary Comparison Table</h2>
+          </div>
+          <p class="chart-desc">Full-run statistics for each backtest sleeve.</p>
+        </div>
+        <div class="about-table-wrap">
+          <table class="about-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>SENSEX</th>
+                <th>NIFTY</th>
+                <th>BANKNIFTY</th>
+                <th>FINNIFTY</th>
+              </tr>
+            </thead>
+            <tbody id="comparisonTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card trade-card fade-up" style="padding:32px">
+        <div class="chart-header">
+          <div>
+            <div class="section-kicker">SENSEX detailed replay • fresh Dhan API data • 60/40 compounding</div>
+            <h2 class="chart-title">SENSEX Detailed Replay</h2>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <button id="bt-play" class="cta-link" style="cursor:pointer;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3)">▶ Play</button>
@@ -489,7 +567,6 @@ body::before{
           </div>
         </div>
 
-        <!-- Date range filters -->
         <div id="bt-filters" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
           <select id="bt-range-preset" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:10px 14px;border-radius:12px;font-size:0.82rem">
             <option value="all">All Days (741)</option>
@@ -508,7 +585,6 @@ body::before{
           </select>
         </div>
 
-        <!-- Live ticker bar -->
         <div id="bt-ticker" style="display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px">
           <div style="padding:14px 12px;background:var(--bg-elevated)">
             <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Date</div>
@@ -564,13 +640,12 @@ body::before{
       </div>
     </section>
 
-    <!-- Backtest Trade Table -->
     <section class="section">
-      <div class="card trade-card" style="padding:32px">
+      <div class="card trade-card fade-up" style="padding:32px">
         <div class="trade-toolbar">
           <div>
-            <div class="section-kicker">Backtest execution ledger • fresh API data</div>
-            <h2 class="chart-title">Day-by-Day Trades</h2>
+            <div class="section-kicker">SENSEX execution ledger • fresh API data</div>
+            <h2 class="chart-title">SENSEX Detailed Trade Log</h2>
           </div>
           <div class="filters">
             <input type="search" id="bt-search" placeholder="Search date, strike..." style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--white);padding:11px 14px;border-radius:12px;min-height:44px">
@@ -610,13 +685,12 @@ body::before{
       </div>
     </section>
 
-    <!-- Monthly P&L -->
     <section class="section">
-      <div class="card trade-card" style="padding:32px">
+      <div class="card trade-card fade-up" style="padding:32px">
         <div class="chart-header">
           <div>
-            <div class="section-kicker">Month by month</div>
-            <h2 class="chart-title">Monthly P&amp;L Breakdown</h2>
+            <div class="section-kicker">SENSEX month by month</div>
+            <h2 class="chart-title">SENSEX Monthly P&amp;L Replay</h2>
           </div>
         </div>
         <div style="height:300px;margin:24px 0">
@@ -626,7 +700,7 @@ body::before{
     </section>
 
     <section class="section">
-      <div class="card about-card">
+      <div class="card about-card fade-up">
         <div class="section-kicker">Execution loop</div>
         <h2 class="chart-title" style="margin-bottom:32px">Daily Execution</h2>
         <div class="steps-grid">
@@ -655,11 +729,11 @@ body::before{
     </section>
 
     <section class="section">
-      <div class="card trade-card">
+      <div class="card trade-card fade-up">
         <div class="chart-header">
           <div>
-            <div class="section-kicker">Real data record</div>
-            <h2 class="chart-title">Year-by-Year Performance</h2>
+            <div class="section-kicker">SENSEX real data record</div>
+            <h2 class="chart-title">SENSEX Year-by-Year Performance</h2>
           </div>
           <p class="chart-desc">Jun 2023–Jun 2026 — real Dhan option data, per-lot (10 qty) P&amp;L.</p>
         </div>
@@ -677,26 +751,23 @@ body::before{
                 <th>Lots</th>
               </tr>
             </thead>
-            <tbody id="bt-year-table">
-            </tbody>
+            <tbody id="bt-year-table"></tbody>
           </table>
         </div>
-        <p class="section-note" style="margin-top:14px">* 2026 is a partial year (Jan–Jun 3). All P&amp;L from fresh 1-minute Dhan rolling option API calls, validated with true SENSEX INDEX spot.</p>
+        <p class="section-note" style="margin-top:14px">* 2026 is a partial year. All P&amp;L uses fresh 1-minute Dhan rolling option API calls validated with true SENSEX INDEX spot.</p>
       </div>
     </section>
 
     <section class="section">
-      <div class="card trade-card">
-        <div class="section-kicker">Compounding power</div>
-      <h2 class="chart-title">60/40 Compounding — Fresh API Data</h2>
-      <p class="compound-intro">Starting with ₹1,09,000 (4 lots). 60% of capital for margin, 40% reserve. Lot cap: 100.</p>
-      <div class="compound-timeline" id="bt-compound-timeline">
+      <div class="card trade-card fade-up">
+        <div class="section-kicker">SENSEX compounding power</div>
+        <h2 class="chart-title">SENSEX 60/40 Compounding — Fresh API Data</h2>
+        <p class="compound-intro">Starting with ₹1,09,000 (4 lots). 60% of capital for margin, 40% reserve. Lot cap: 100.</p>
+        <div class="compound-timeline" id="bt-compound-timeline"></div>
+        <div class="compound-summary" id="bt-compound-summary"></div>
+        <div class="compound-note">Data source: Fresh 1-minute Dhan rolling option API calls for every trading day. Validated with true SENSEX INDEX spot across 741 trading days. Lot cap of 100 applied for realistic SENSEX liquidity.</div>
       </div>
-      <div class="compound-summary" id="bt-compound-summary">
-      </div>
-      <div class="compound-note">Data source: Fresh 1-minute Dhan rolling option API calls for every trading day. Validated with true SENSEX INDEX spot across 741 trading days. Lot cap of 100 applied for realistic SENSEX liquidity.</div>
-    </div>
-  </section>
+    </section>
   </div>
 </main>
 
@@ -1329,16 +1400,507 @@ setupTabs();
 observeFadeUps();
 loadData();
 
-// ─── ANIMATED BACKTEST REPLAY WITH DETAILED DATA ──────────────────────────────
-fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
+// ─── MULTI-INSTRUMENT BACKTEST + SENSEX DETAILED REPLAY ───────────────────────
+Promise.all([
+  fetch('data/backtest-sensex.json').then(r=>r.json()),
+  fetch('data/backtest-nifty.json').then(r=>r.json()),
+  fetch('data/backtest-banknifty.json').then(r=>r.json()),
+  fetch('data/backtest-finnifty.json').then(r=>r.json()),
+  fetch('data/backtest-detailed.json').then(r=>r.json()),
+]).then(([sensex, nifty, banknifty, finnifty, sensexDetailed]) => {
+  const BACKTEST_ORDER = ['SENSEX', 'NIFTY', 'BANKNIFTY', 'FINNIFTY'];
+  const BACKTEST_META = {
+    SENSEX: { color: '#c9a84c' },
+    NIFTY: { color: '#6b8cff' },
+    BANKNIFTY: { color: '#5fa878' },
+    FINNIFTY: { color: '#c45c5c' },
+  };
+  const SIMPLE_DATA = { SENSEX: sensex, NIFTY: nifty, BANKNIFTY: banknifty, FINNIFTY: finnifty };
+
+  Chart.defaults.color = '#6b6356';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.04)';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+  const pickNumber = (...values) => {
+    for (const value of values) {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+    return 0;
+  };
+  const avg = values => values.length ? values.reduce((sum, value) => sum + pickNumber(value), 0) / values.length : 0;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const pad = value => String(value).padStart(2, '0');
+  const isoDate = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const formatShortDate = value => {
+    const [year, month, day] = String(value).split('-');
+    return `${parseInt(day, 10)} ${months[parseInt(month, 10) - 1]} ${year}`;
+  };
+  const formatMonthLabel = value => {
+    const [year, month] = String(value).split('-');
+    return `${months[parseInt(month, 10) - 1]} ${year}`;
+  };
+  const formatCompactINR = value => {
+    const safe = pickNumber(value);
+    const abs = Math.abs(safe);
+    const sign = safe < 0 ? '-' : '';
+    if (abs >= 10000000) return `${sign}₹${(abs / 10000000).toFixed(abs >= 100000000 ? 1 : 2)}Cr`;
+    if (abs >= 100000) return `${sign}₹${(abs / 100000).toFixed(abs >= 1000000 ? 1 : 2)}L`;
+    if (abs >= 1000) return `${sign}₹${(abs / 1000).toFixed(1)}K`;
+    return `${sign}₹${Math.round(abs).toLocaleString('en-IN')}`;
+  };
+  const formatFullINR = value => `₹${Math.round(pickNumber(value)).toLocaleString('en-IN')}`;
+  const formatSignedINR = value => `${pickNumber(value) >= 0 ? '+' : '-'}${formatCompactINR(Math.abs(pickNumber(value))).replace('-', '')}`;
+  const formatPct = (value, digits = 1, withPlus = false) => {
+    const safe = pickNumber(value);
+    return `${withPlus && safe > 0 ? '+' : ''}${safe.toFixed(digits)}%`;
+  };
+  const calcMaxDrawdown = capitalSeries => {
+    if (!capitalSeries.length) return 0;
+    let peak = pickNumber(capitalSeries[0]);
+    let maxDrawdown = 0;
+    capitalSeries.forEach(value => {
+      const capital = pickNumber(value);
+      peak = Math.max(peak, capital);
+      const drawdown = peak ? ((peak - capital) / peak) * 100 : 0;
+      maxDrawdown = Math.max(maxDrawdown, drawdown);
+    });
+    return maxDrawdown;
+  };
+  const buildSummary = (name, raw, detailedSummary = null) => {
+    const labels = raw.labels || [];
+    const initialCapital = name === 'SENSEX'
+      ? pickNumber(detailedSummary?.initial_capital, raw.capital?.[0], 100000)
+      : pickNumber(raw.summary?.initial_capital, raw.capital?.[0], 100000);
+    const finalCapital = pickNumber(raw.summary?.final_capital, raw.capital?.[raw.capital.length - 1], initialCapital);
+    const startDate = raw.summary?.start_date || labels[0];
+    const endDate = raw.summary?.end_date || labels[labels.length - 1];
+    const years = pickNumber(raw.summary?.years, (new Date(`${endDate}T00:00:00`) - new Date(`${startDate}T00:00:00`)) / (365.25 * 24 * 60 * 60 * 1000));
+    const wins = Math.round(pickNumber(raw.summary?.wins, detailedSummary?.wins));
+    const losses = Math.round(pickNumber(raw.summary?.losses, detailedSummary?.losses, Math.max(labels.length - wins, 0)));
+    return {
+      instrument: name,
+      start_date: startDate,
+      end_date: endDate,
+      trading_days: labels.length,
+      initial_capital: initialCapital,
+      final_capital: finalCapital,
+      total_pnl: pickNumber(raw.summary?.total_pnl, finalCapital - initialCapital),
+      return_pct: pickNumber(raw.summary?.return_pct, initialCapital ? ((finalCapital - initialCapital) / initialCapital) * 100 : 0),
+      cagr: pickNumber(raw.summary?.cagr, years > 0 && initialCapital > 0 ? (Math.pow(finalCapital / initialCapital, 1 / years) - 1) * 100 : 0),
+      win_rate: pickNumber(raw.summary?.win_rate, detailedSummary?.win_rate, labels.length ? (wins / labels.length) * 100 : 0),
+      wins,
+      losses,
+      max_drawdown: pickNumber(raw.summary?.max_drawdown, calcMaxDrawdown([initialCapital, ...(raw.capital || [])])),
+      reentry_days: Math.round(pickNumber(raw.summary?.reentry_days, detailedSummary?.reentry_days)),
+      avg_daily_pnl: pickNumber(raw.summary?.avg_daily_pnl, detailedSummary?.avg_daily_pnl, avg(raw.daily_pnl || [])),
+      years,
+    };
+  };
+
+  const summaries = {
+    SENSEX: buildSummary('SENSEX', sensex, sensexDetailed.summary),
+    NIFTY: buildSummary('NIFTY', nifty),
+    BANKNIFTY: buildSummary('BANKNIFTY', banknifty),
+    FINNIFTY: buildSummary('FINNIFTY', finnifty),
+  };
+
+  const backtests = Object.fromEntries(BACKTEST_ORDER.map(name => {
+    const raw = SIMPLE_DATA[name];
+    const summary = summaries[name];
+    const points = (raw.labels || []).map((date, index) => ({
+      date,
+      capital: pickNumber(raw.capital?.[index]),
+      lots: pickNumber(raw.lots?.[index]),
+      dailyPnl: pickNumber(raw.daily_pnl?.[index]),
+      returnPct: summary.initial_capital ? ((pickNumber(raw.capital?.[index]) / summary.initial_capital) - 1) * 100 : 0,
+    }));
+    return [name, {
+      name,
+      color: BACKTEST_META[name].color,
+      raw,
+      summary,
+      points,
+      byDate: new Map(points.map(point => [point.date, point])),
+    }];
+  }));
+
+  const combinedInitial = BACKTEST_ORDER.reduce((sum, name) => sum + backtests[name].summary.initial_capital, 0);
+  const combinedFinal = BACKTEST_ORDER.reduce((sum, name) => sum + backtests[name].summary.final_capital, 0);
+  const longestTrack = BACKTEST_ORDER.reduce((best, name) => backtests[name].summary.years > backtests[best].summary.years ? name : best, BACKTEST_ORDER[0]);
+  const bestCagr = BACKTEST_ORDER.reduce((best, name) => backtests[name].summary.cagr > backtests[best].summary.cagr ? name : best, BACKTEST_ORDER[0]);
+  const bestWinRate = BACKTEST_ORDER.reduce((best, name) => backtests[name].summary.win_rate > backtests[best].summary.win_rate ? name : best, BACKTEST_ORDER[0]);
+
+  document.getElementById('heroCombinedGrowth').textContent = `${formatCompactINR(combinedInitial)} → ${formatCompactINR(combinedFinal)}`;
+  document.getElementById('heroCombinedDetail').textContent = '4 independent sleeves compounded side by side';
+  document.getElementById('heroLongestTrack').textContent = `${backtests[longestTrack].summary.years.toFixed(1)}y`;
+  document.getElementById('heroLongestTrackDetail').textContent = `${longestTrack} • ${formatShortDate(backtests[longestTrack].summary.start_date)} → ${formatShortDate(backtests[longestTrack].summary.end_date)}`;
+  document.getElementById('heroBestCagr').textContent = formatPct(backtests[bestCagr].summary.cagr, 1);
+  document.getElementById('heroBestCagrDetail').textContent = `${bestCagr} • ${formatCompactINR(backtests[bestCagr].summary.final_capital)} final capital`;
+  document.getElementById('heroBestWinRate').textContent = formatPct(backtests[bestWinRate].summary.win_rate, 1);
+  document.getElementById('heroBestWinRateDetail').textContent = `${bestWinRate} • ${backtests[bestWinRate].summary.wins} wins in ${backtests[bestWinRate].summary.trading_days} sessions`;
+
+  document.getElementById('instrumentComparisonGrid').innerHTML = BACKTEST_ORDER.map(name => {
+    const instrument = backtests[name];
+    const summary = instrument.summary;
+    return `
+      <div class="instrument-card">
+        <div class="instrument-card__head">
+          <div>
+            <div class="section-kicker" style="margin-bottom:6px;color:${instrument.color};letter-spacing:0.16em">${name}</div>
+            <div class="instrument-card__title">${summary.trading_days} trading days</div>
+          </div>
+          <span class="badge badge-gold" style="color:${instrument.color};background:${hexToRgba(instrument.color, 0.12)};border-color:${hexToRgba(instrument.color, 0.22)}">${summary.years.toFixed(1)}y</span>
+        </div>
+        <div class="instrument-card__growth ${summary.total_pnl >= 0 ? 'positive' : 'negative'}">${formatCompactINR(summary.initial_capital)} → ${formatCompactINR(summary.final_capital)}</div>
+        <div class="instrument-card__meta">${formatShortDate(summary.start_date)} → ${formatShortDate(summary.end_date)}</div>
+        <div class="instrument-metrics">
+          <div class="mini-metric"><div class="label">Win Rate</div><div class="value">${formatPct(summary.win_rate, 1)}</div></div>
+          <div class="mini-metric"><div class="label">CAGR</div><div class="value">${formatPct(summary.cagr, 1)}</div></div>
+          <div class="mini-metric"><div class="label">Max DD</div><div class="value ${summary.max_drawdown >= 50 ? 'negative' : ''}">${formatPct(summary.max_drawdown, 1)}</div></div>
+          <div class="mini-metric"><div class="label">Capital Growth</div><div class="value">${formatPct(summary.return_pct, 1)}</div></div>
+          <div class="mini-metric"><div class="label">Avg Daily</div><div class="value">${formatCompactINR(summary.avg_daily_pnl)}</div></div>
+          <div class="mini-metric"><div class="label">Re-entry Days</div><div class="value">${summary.reentry_days}</div></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const comparisonRows = [
+    ['Start Date', name => formatShortDate(backtests[name].summary.start_date)],
+    ['End Date', name => formatShortDate(backtests[name].summary.end_date)],
+    ['Days', name => backtests[name].summary.trading_days.toLocaleString('en-IN')],
+    ['Win Rate', name => formatPct(backtests[name].summary.win_rate, 1)],
+    ['CAGR', name => formatPct(backtests[name].summary.cagr, 1)],
+    ['Max DD', name => formatPct(backtests[name].summary.max_drawdown, 1)],
+    ['Final Capital', name => formatFullINR(backtests[name].summary.final_capital)],
+    ['Avg Daily P&L', name => formatSignedINR(backtests[name].summary.avg_daily_pnl)],
+  ];
+  document.getElementById('comparisonTableBody').innerHTML = comparisonRows.map(([label, formatter]) => `
+    <tr>
+      <td>${label}</td>
+      ${BACKTEST_ORDER.map(name => `<td>${formatter(name)}</td>`).join('')}
+    </tr>
+  `).join('');
+
+  const globalMin = BACKTEST_ORDER.map(name => backtests[name].summary.start_date).sort()[0];
+  const globalMax = BACKTEST_ORDER.map(name => backtests[name].summary.end_date).sort().at(-1);
+  const multiState = {
+    preset: 'all',
+    from: globalMin,
+    to: globalMax,
+    visible: Object.fromEntries(BACKTEST_ORDER.map(name => [name, true])),
+  };
+
+  const multiRangePreset = document.getElementById('mi-range-preset');
+  const multiDateFrom = document.getElementById('mi-date-from');
+  const multiDateTo = document.getElementById('mi-date-to');
+  const multiDateSep = document.getElementById('mi-date-sep');
+  multiDateFrom.min = globalMin;
+  multiDateFrom.max = globalMax;
+  multiDateTo.min = globalMin;
+  multiDateTo.max = globalMax;
+  multiDateFrom.value = globalMin;
+  multiDateTo.value = globalMax;
+
+  const shiftYearsFromMax = yearsBack => {
+    const date = new Date(`${globalMax}T00:00:00`);
+    date.setFullYear(date.getFullYear() - yearsBack);
+    const shifted = isoDate(date);
+    return shifted < globalMin ? globalMin : shifted;
+  };
+  const showCustomInputs = show => {
+    multiDateFrom.style.display = show ? '' : 'none';
+    multiDateSep.style.display = show ? '' : 'none';
+    multiDateTo.style.display = show ? '' : 'none';
+  };
+  const applyRangePreset = preset => {
+    multiState.preset = preset;
+    if (preset === 'all') {
+      multiState.from = globalMin;
+      multiState.to = globalMax;
+    } else if (preset === '1y') {
+      multiState.from = shiftYearsFromMax(1);
+      multiState.to = globalMax;
+    } else if (preset === '2y') {
+      multiState.from = shiftYearsFromMax(2);
+      multiState.to = globalMax;
+    } else if (preset === '3y') {
+      multiState.from = shiftYearsFromMax(3);
+      multiState.to = globalMax;
+    }
+    multiDateFrom.value = multiState.from;
+    multiDateTo.value = multiState.to;
+    showCustomInputs(preset === 'custom');
+    renderMultiInstrumentView();
+  };
+  multiRangePreset.addEventListener('change', event => applyRangePreset(event.target.value));
+  [multiDateFrom, multiDateTo].forEach(input => input.addEventListener('change', () => {
+    multiState.preset = 'custom';
+    multiRangePreset.value = 'custom';
+    showCustomInputs(true);
+    multiState.from = multiDateFrom.value || globalMin;
+    multiState.to = multiDateTo.value || globalMax;
+    if (multiState.from > multiState.to) {
+      [multiState.from, multiState.to] = [multiState.to, multiState.from];
+      multiDateFrom.value = multiState.from;
+      multiDateTo.value = multiState.to;
+    }
+    renderMultiInstrumentView();
+  }));
+
+  const toggleRow = document.getElementById('mi-toggle-row');
+  toggleRow.innerHTML = BACKTEST_ORDER.map(name => `
+    <button class="toggle-btn active" type="button" data-instrument="${name}">
+      <span class="legend-dot" style="background:${backtests[name].color}"></span>${name}
+    </button>
+  `).join('');
+  const updateToggleStyles = () => {
+    toggleRow.querySelectorAll('[data-instrument]').forEach(button => {
+      const name = button.dataset.instrument;
+      const active = multiState.visible[name];
+      button.classList.toggle('active', active);
+      button.style.borderColor = active ? hexToRgba(backtests[name].color, 0.32) : 'rgba(255,255,255,0.06)';
+      button.style.background = active ? hexToRgba(backtests[name].color, 0.14) : 'rgba(255,255,255,0.02)';
+      button.style.color = active ? '#f5f0e8' : '#6b6356';
+    });
+  };
+  toggleRow.querySelectorAll('[data-instrument]').forEach(button => button.addEventListener('click', () => {
+    const name = button.dataset.instrument;
+    multiState.visible[name] = !multiState.visible[name];
+    updateToggleStyles();
+    renderMultiInstrumentView();
+  }));
+  updateToggleStyles();
+
+  const multiEquityChart = new Chart(document.getElementById('multiEquityChart'), {
+    type: 'line',
+    data: { labels: [], datasets: [] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0d0d0d',
+          borderColor: 'rgba(201,168,76,0.3)',
+          borderWidth: 1,
+          titleColor: '#f5f0e8',
+          bodyColor: '#b8b0a0',
+          callbacks: {
+            title: items => items.length ? formatShortDate(items[0].label) : '',
+            label: context => {
+              const meta = context.dataset.metaByIndex?.[context.dataIndex];
+              if (!meta) return null;
+              return `${context.dataset.label}: ${formatCompactINR(meta.capital)} • ${meta.lots} lots`;
+            },
+            afterLabel: context => {
+              const meta = context.dataset.metaByIndex?.[context.dataIndex];
+              if (!meta) return null;
+              const lines = [
+                `Day P&L: ${formatSignedINR(meta.dailyPnl)}`,
+                `Cum return: ${formatPct(meta.returnPct, 1, true)}`,
+              ];
+              if (meta.clamped) lines.push('Capital < 0, floored visually for log scale');
+              return lines;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#6b6356',
+            maxTicksLimit: 10,
+            callback(value) {
+              return formatMonthLabel(this.getLabelForValue(value).slice(0, 7));
+            },
+          },
+          grid: { display: false },
+        },
+        y: {
+          type: 'logarithmic',
+          ticks: {
+            color: '#6b6356',
+            callback: value => formatCompactINR(value),
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+        },
+      },
+    },
+  });
+
+  const multiMonthlyChart = new Chart(document.getElementById('multiMonthlyChart'), {
+    type: 'bar',
+    data: { labels: [], datasets: [] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'bottom' },
+        tooltip: {
+          backgroundColor: '#0d0d0d',
+          borderColor: 'rgba(201,168,76,0.3)',
+          borderWidth: 1,
+          titleColor: '#f5f0e8',
+          bodyColor: '#b8b0a0',
+          callbacks: {
+            title: items => items.length ? formatMonthLabel(items[0].label) : '',
+            label: context => `${context.dataset.label}: ${formatSignedINR(context.raw)}`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#6b6356',
+            maxTicksLimit: 14,
+            callback(value) {
+              return formatMonthLabel(this.getLabelForValue(value));
+            },
+          },
+          grid: { display: false },
+        },
+        y: {
+          ticks: { color: '#6b6356', callback: value => formatCompactINR(value) },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+        },
+      },
+    },
+  });
+
+  const rangeSummaryEl = document.getElementById('filteredSummaryGrid');
+  const getFilteredPoints = name => backtests[name].points.filter(point => point.date >= multiState.from && point.date <= multiState.to);
+  const getRangeStats = name => {
+    const points = getFilteredPoints(name);
+    if (!points.length) return null;
+    const instrument = backtests[name];
+    const firstIndex = instrument.points.findIndex(point => point.date === points[0].date);
+    const previousCapital = firstIndex > 0 ? instrument.points[firstIndex - 1].capital : instrument.summary.initial_capital;
+    const finalCapital = points[points.length - 1].capital;
+    const pnl = finalCapital - previousCapital;
+    return {
+      name,
+      points,
+      pnl,
+      returnPct: previousCapital ? (pnl / previousCapital) * 100 : 0,
+      avgDaily: points.length ? pnl / points.length : 0,
+    };
+  };
+
+  function renderMultiInstrumentView() {
+    const visibleNames = BACKTEST_ORDER.filter(name => multiState.visible[name]);
+    const filteredDates = [...new Set(BACKTEST_ORDER.flatMap(name => getFilteredPoints(name).map(point => point.date)))].sort();
+    const positiveValues = visibleNames.flatMap(name => getFilteredPoints(name).filter(point => point.capital > 0).map(point => point.capital));
+    const logFloor = positiveValues.length ? Math.max(1000, Math.min(...positiveValues) * 0.5) : 1000;
+
+    multiEquityChart.data.labels = filteredDates;
+    multiEquityChart.data.datasets = visibleNames.map(name => {
+      const instrument = backtests[name];
+      const metaByIndex = filteredDates.map(date => {
+        const point = instrument.byDate.get(date);
+        return point && point.date >= multiState.from && point.date <= multiState.to ? {
+          ...point,
+          clamped: point.capital <= 0,
+        } : null;
+      });
+      return {
+        label: name,
+        data: metaByIndex.map(point => point ? Math.max(point.capital, logFloor) : null),
+        metaByIndex,
+        borderColor: instrument.color,
+        backgroundColor: hexToRgba(instrument.color, 0.12),
+        borderWidth: 2.4,
+        tension: 0.22,
+        pointRadius: filteredDates.length > 220 ? 0 : 2.4,
+        pointHoverRadius: 5,
+        pointBackgroundColor: instrument.color,
+        pointBorderColor: '#050505',
+        pointBorderWidth: 2,
+        spanGaps: true,
+      };
+    });
+    multiEquityChart.update('none');
+
+    const monthlyKeys = [...new Set(visibleNames.flatMap(name => getFilteredPoints(name).map(point => point.date.slice(0, 7))))].sort();
+    multiMonthlyChart.data.labels = monthlyKeys;
+    multiMonthlyChart.data.datasets = visibleNames.map(name => {
+      const monthTotals = new Map();
+      getFilteredPoints(name).forEach(point => {
+        const month = point.date.slice(0, 7);
+        monthTotals.set(month, pickNumber(monthTotals.get(month)) + point.dailyPnl);
+      });
+      return {
+        label: name,
+        data: monthlyKeys.map(month => Math.round(pickNumber(monthTotals.get(month)))),
+        backgroundColor: hexToRgba(backtests[name].color, 0.82),
+        borderColor: backtests[name].color,
+        borderRadius: 8,
+        borderSkipped: false,
+        maxBarThickness: 26,
+      };
+    });
+    multiMonthlyChart.update('none');
+
+    if (!visibleNames.length) {
+      rangeSummaryEl.innerHTML = `
+        <div class="selected-range-card"><div class="label">Selection</div><div class="value">No curves</div><div class="detail">Turn at least one instrument back on to inspect the filtered window.</div></div>
+      `;
+      return;
+    }
+
+    const rangeStats = visibleNames.map(getRangeStats).filter(Boolean);
+    const combinedPnl = rangeStats.reduce((sum, item) => sum + item.pnl, 0);
+    const bestSleeve = rangeStats.reduce((best, item) => item.returnPct > best.returnPct ? item : best, rangeStats[0]);
+    const biggestDay = visibleNames.flatMap(name => getFilteredPoints(name).map(point => ({
+      instrument: name,
+      date: point.date,
+      dailyPnl: point.dailyPnl,
+    }))).sort((left, right) => Math.abs(right.dailyPnl) - Math.abs(left.dailyPnl))[0];
+    rangeSummaryEl.innerHTML = [
+      {
+        label: 'Window',
+        value: filteredDates.length ? `${filteredDates.length} days` : '0 days',
+        detail: `${formatShortDate(multiState.from)} → ${formatShortDate(multiState.to)}`,
+      },
+      {
+        label: 'Combined P&L',
+        value: formatSignedINR(combinedPnl),
+        detail: `${visibleNames.length} visible sleeves • standalone totals`,
+        className: combinedPnl >= 0 ? 'positive' : 'negative',
+      },
+      {
+        label: 'Best Sleeve',
+        value: `${bestSleeve.name} ${formatPct(bestSleeve.returnPct, 1, true)}`,
+        detail: `${formatSignedINR(bestSleeve.pnl)} in selected range`,
+      },
+      {
+        label: 'Largest Daily Move',
+        value: biggestDay ? `${biggestDay.instrument} ${formatSignedINR(biggestDay.dailyPnl)}` : '—',
+        detail: biggestDay ? formatShortDate(biggestDay.date) : 'No data in range',
+        className: biggestDay && biggestDay.dailyPnl >= 0 ? 'positive' : 'negative',
+      },
+    ].map(item => `
+      <div class="selected-range-card">
+        <div class="label">${item.label}</div>
+        <div class="value ${item.className || ''}">${item.value}</div>
+        <div class="detail">${item.detail}</div>
+      </div>
+    `).join('');
+  }
+
+  applyRangePreset('all');
+
+  // ─── SENSEX DETAILED REPLAY ───────────────────────────────────────────────────
+  const btDetail = sensexDetailed;
   const allTrades = btDetail.trades;
   const compounding = btDetail.compounding;
   const monthlyRaw = btDetail.monthly;
-  const summary = btDetail.summary;
   const totalDays = allTrades.length;
   const INITIAL = 109000;
 
-  // Format helpers
   const fmtINR = v => '₹'+Math.round(v).toLocaleString('en-IN');
   const fmtCr = v => {
     if(Math.abs(v)>=10000000) return '₹'+(v/10000000).toFixed(2)+'Cr';
@@ -1347,35 +1909,24 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
   };
   const fmtDateStr = d => {
     const [y,m,dd] = d.split('-');
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${parseInt(dd)} ${months[parseInt(m)-1]} ${y}`;
+    return `${parseInt(dd,10)} ${months[parseInt(m,10)-1]} ${y}`;
   };
   const fmtNum = (v,d=2) => v != null ? Number(v).toFixed(d) : '—';
 
-  // Populate month picker
   const monthPicker = document.getElementById('bt-month-picker');
   const uniqueMonths = [...new Set(allTrades.map(t=>t.date.slice(0,7)))].sort();
   uniqueMonths.forEach(m=>{
     const opt = document.createElement('option');
     opt.value = m;
-    const [y,mo] = m.split('-');
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    opt.textContent = `${months[parseInt(mo)-1]} ${y}`;
+    opt.textContent = formatMonthLabel(m);
     monthPicker.appendChild(opt);
   });
 
-  // Date range
   const dateFrom = document.getElementById('bt-date-from');
   const dateTo = document.getElementById('bt-date-to');
   dateFrom.value = allTrades[0].date;
   dateTo.value = allTrades[allTrades.length-1].date;
 
-  // Months green
-  const greenMonths = monthlyRaw.filter(m=>m.pnl>=0).length;
-  const heroMG = document.getElementById('heroMonthsGreen');
-  if(heroMG) heroMG.textContent = `${greenMonths}/${monthlyRaw.length}`;
-
-  // Filter logic
   function getFilteredTrades(){
     const preset = document.getElementById('bt-range-preset').value;
     const pnlFilter = document.getElementById('bt-pnl-filter').value;
@@ -1397,29 +1948,23 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
     return filtered;
   }
 
-  // Filter UI toggles
   document.getElementById('bt-range-preset').addEventListener('change', e=>{
     const v = e.target.value;
     monthPicker.style.display = v==='month'?'':'none';
     dateFrom.style.display = v==='custom'?'':'none';
     document.getElementById('bt-date-sep').style.display = v==='custom'?'':'none';
     dateTo.style.display = v==='custom'?'':'none';
-    onFilterChange();
-  });
-  monthPicker.addEventListener('change', onFilterChange);
-  dateFrom.addEventListener('change', onFilterChange);
-  dateTo.addEventListener('change', onFilterChange);
-  document.getElementById('bt-pnl-filter').addEventListener('change', onFilterChange);
-
-  function onFilterChange(){
     renderTradeTable();
-  }
+  });
+  monthPicker.addEventListener('change', renderTradeTable);
+  dateFrom.addEventListener('change', renderTradeTable);
+  dateTo.addEventListener('change', renderTradeTable);
+  document.getElementById('bt-pnl-filter').addEventListener('change', renderTradeTable);
 
-  // ─── YEAR-BY-YEAR TABLE ───
   function buildYearTable(){
     const years = {};
     let cap = INITIAL;
-    allTrades.forEach((t,i)=>{
+    allTrades.forEach(t=>{
       const y = t.date.slice(0,4);
       if(!years[y]) years[y] = {days:0,wins:0,pnl:0,startCap:cap,startLots:0,endCap:cap,endLots:0};
       if(years[y].days===0){
@@ -1458,7 +2003,6 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
   }
   buildYearTable();
 
-  // ─── COMPOUNDING TIMELINE ───
   function buildCompoundTimeline(){
     const years = {};
     let cap = INITIAL;
@@ -1474,7 +2018,7 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
     const finalCap = cap;
     const el = document.getElementById('bt-compound-timeline');
     const yKeys = Object.keys(years).sort();
-    el.innerHTML = yKeys.map((y,i)=>{
+    el.innerHTML = yKeys.map(y=>{
       const d = years[y];
       const gain = Math.round(d.endCap - d.startCap);
       const pct = Math.round(d.endCap/finalCap*100);
@@ -1493,7 +2037,6 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
   }
   buildCompoundTimeline();
 
-  // ─── TRADE TABLE ───
   function renderTradeTable(){
     const filtered = getFilteredTrades();
     const search = (document.getElementById('bt-search').value||'').toLowerCase();
@@ -1509,10 +2052,8 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
     else if(sortBy==='pnl-desc') sorted.sort((a,b)=>b.total_pnl-a.total_pnl);
     else if(sortBy==='pnl-asc') sorted.sort((a,b)=>a.total_pnl-b.total_pnl);
 
-    // Flatten: each day becomes 1 row, re-entry days become 2 rows (T1 + T2)
     const rows = [];
     sorted.forEach(t=>{
-      // T1 row
       rows.push({
         id: t.date+'-t1',
         date: t.date,
@@ -1539,7 +2080,6 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
         cov: t.ce_cov,
         reentry: t.reentry,
       });
-      // T2 row (re-entry)
       if(t.reentry){
         rows.push({
           id: t.date+'-t2',
@@ -1570,8 +2110,7 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
       }
     });
 
-    const totalRows = rows.length;
-    document.getElementById('bt-trade-count').textContent = `Showing ${sorted.length} days (${totalRows} trades) of ${totalDays} days`;
+    document.getElementById('bt-trade-count').textContent = `Showing ${sorted.length} days (${rows.length} trades) of ${totalDays} days`;
 
     const tbody = document.getElementById('bt-trade-body');
     tbody.innerHTML = rows.map(r=>{
@@ -1610,7 +2149,6 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
       </tr>`;
     }).join('');
 
-    // Wire expand buttons
     document.querySelectorAll('#bt-trade-body [data-expand]').forEach(btn=>{
       btn.addEventListener('click',()=>{
         const id = btn.dataset.expand;
@@ -1627,12 +2165,10 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
   document.getElementById('bt-sort').addEventListener('change', renderTradeTable);
   renderTradeTable();
 
-  // ─── ANIMATED REPLAY ───
-  // Build compounding arrays from detailed data
   const allLabels = compounding.map(c=>c.date);
   const allCapital = compounding.map(c=>c.capital);
   const allLots = compounding.map(c=>c.lots);
-  const allPnl = compounding.map(c=>c.day_pnl);
+  const allPnl = compounding.map(c=>pickNumber(c.day_pnl, c.pnl));
 
   let cursor = 0;
   let playing = false;
@@ -1840,19 +2376,12 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
       return;
     }
     const batch = getBatch();
-    for(let b=0; b<batch && cursor<totalDays; b++){
-      addDay();
-    }
+    for(let b=0; b<batch && cursor<totalDays; b++) addDay();
     updateUI();
-    if(cursor % Math.max(1, Math.floor(batch)) === 0 || cursor >= totalDays){
-      updateCharts();
-    }
+    if(cursor % Math.max(1, Math.floor(batch)) === 0 || cursor >= totalDays) updateCharts();
     const delay = getDelay();
-    if(delay > 0){
-      animFrame = setTimeout(tick, delay);
-    } else {
-      animFrame = requestAnimationFrame(tick);
-    }
+    if(delay > 0) animFrame = setTimeout(tick, delay);
+    else animFrame = requestAnimationFrame(tick);
   }
 
   function play(){
@@ -1883,9 +2412,7 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
     btnPlay.innerHTML = '✓ Done';
   }
 
-  btnPlay.addEventListener('click', ()=>{
-    if(playing) pause(); else play();
-  });
+  btnPlay.addEventListener('click', ()=>{ if(playing) pause(); else play(); });
 
   const speeds = [1,2,5,10];
   let speedIdx = 0;
@@ -1905,7 +2432,6 @@ fetch('data/backtest-detailed.json').then(r=>r.json()).then(btDetail=>{
     }
   }, {threshold:0.3});
   replayObserver.observe(replaySection);
-
 }).catch(e=>console.log('Backtest data not loaded:',e));
 </script>
 

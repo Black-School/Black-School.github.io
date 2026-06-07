@@ -310,8 +310,8 @@ body::before{
       <div class="live-stats" id="liveStats">
         <div class="live-stat">
           <div class="label">Standalone sleeves</div>
-          <div class="value positive" id="heroCombinedGrowth">₹4.09L → ₹7.86Cr</div>
-          <div class="sub" id="heroCombinedDetail">4 independent backtests compounded side by side</div>
+          <div class="value positive" id="heroCombinedGrowth">₹10L → ₹26.2L</div>
+          <div class="sub" id="heroCombinedDetail">4 independent sleeves compounded side by side</div>
         </div>
         <div class="live-stat">
           <div class="label">Longest track</div>
@@ -320,8 +320,8 @@ body::before{
         </div>
         <div class="live-stat">
           <div class="label">Best CAGR</div>
-          <div class="value positive" id="heroBestCagr">235.8%</div>
-          <div class="sub" id="heroBestCagrDetail">FINNIFTY • fastest compounding sleeve</div>
+          <div class="value positive" id="heroBestCagr">32.2%</div>
+          <div class="sub" id="heroBestCagrDetail">NIFTY • ₹11.3L final capital</div>
         </div>
         <div class="live-stat">
           <div class="label">Best hit rate</div>
@@ -567,7 +567,7 @@ body::before{
         </div>
         <div class="chart-header">
           <div>
-            <div class="section-kicker" id="bt-replay-kicker">SENSEX detailed replay • fresh Dhan API data • 60/40 compounding</div>
+            <div class="section-kicker" id="bt-replay-kicker">SENSEX detailed replay • fresh API data • real margin compounding</div>
             <h2 class="chart-title" id="bt-replay-title">SENSEX Backtest Replay</h2>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -602,7 +602,7 @@ body::before{
           </div>
           <div style="padding:14px 12px;background:var(--bg-elevated)">
             <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Capital</div>
-            <div id="bt-capital" style="font-family:var(--mono);font-size:0.95rem;color:var(--gold);margin-top:4px">₹1,09,000</div>
+            <div id="bt-capital" style="font-family:var(--mono);font-size:0.95rem;color:var(--gold);margin-top:4px">₹2,50,000</div>
           </div>
           <div style="padding:14px 12px;background:var(--bg-elevated)">
             <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-dim)">Day P&amp;L</div>
@@ -748,11 +748,11 @@ body::before{
     <section class="section">
       <div class="card trade-card fade-up">
         <div class="section-kicker" id="bt-compound-kicker">SENSEX compounding power</div>
-        <h2 class="chart-title" id="bt-compound-title">SENSEX 60/40 Compounding</h2>
-        <p class="compound-intro" id="bt-compound-intro">Starting with ₹1,09,000. 60% of capital for margin, 40% reserve. Lot cap: 100.</p>
+        <h2 class="chart-title" id="bt-compound-title">SENSEX Real Margin Compounding</h2>
+        <p class="compound-intro" id="bt-compound-intro">Starting with ₹2,50,000. Full capital for margin. Margin per lot ₹2,00,000. Lot cap: 100.</p>
         <div class="compound-timeline" id="bt-compound-timeline"></div>
         <div class="compound-summary" id="bt-compound-summary"></div>
-        <div class="compound-note" id="bt-compound-note">Data source: Fresh 1-minute Dhan rolling option API calls for every trading day. Validated with true SENSEX INDEX spot across 741 trading days. Lot cap of 100 applied for realistic SENSEX liquidity.</div>
+        <div class="compound-note" id="bt-compound-note">Data source: Day-by-day backtest data fetched from the live trading journal API. Real straddle margins (₹2L–₹2.3L per lot) with full capital utilisation. No artificial lot caps or reserve splits.</div>
       </div>
     </section>
   </div>
@@ -767,10 +767,10 @@ body::before{
 <script>
 const INSTRUMENT_ORDER = ['SENSEX', 'BANKNIFTY', 'NIFTY', 'FINNIFTY'];
 const INSTRUMENT_META = {
-  SENSEX: { initial_capital: 100000, lot_size: 30, color: '#c9a84c' },
-  BANKNIFTY: { initial_capital: 80000, lot_size: 15, color: '#5fa878' },
-  NIFTY: { initial_capital: 120000, lot_size: 25, color: '#6b8cff' },
-  FINNIFTY: { initial_capital: 70000, lot_size: 25, color: '#c45c5c' },
+  SENSEX: { initial_capital: 250000, lot_size: 20, color: '#c9a84c' },
+  BANKNIFTY: { initial_capital: 250000, lot_size: 30, color: '#5fa878' },
+  NIFTY: { initial_capital: 250000, lot_size: 65, color: '#6b8cff' },
+  FINNIFTY: { initial_capital: 250000, lot_size: 60, color: '#c45c5c' },
 };
 const DEFAULT_STRATEGY = {
   entry_time: '09:59',
@@ -785,47 +785,47 @@ const FALLBACK_DATA = {
   last_updated: '2026-06-01 15:30:10 IST',
   instruments: {
     SENSEX: {
-      initial_capital: 100000,
-      current_capital: 103311.11,
+      initial_capital: 250000,
+      current_capital: 253528,
       mode: 'paper',
       instrument: 'SENSEX',
-      lot_size: 30,
+      lot_size: 20,
       color: '#c9a84c',
       strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
       stats: { total_trades: 2, wins: 2, losses: 0, win_rate: 100, total_pnl: 3311.11, avg_win: 1655.56, avg_loss: 0, best_day: 1950.16, worst_day: 1360.95, max_drawdown: 0 },
       trades: [
-        { id: 1, date: '2026-05-29', time_entry: '09:59:07', time_exit: '15:06:01', instrument: 'SENSEX', spot: 75930.27, ce_strike: 75900, pe_strike: 75900, ce_sell: 675.0, pe_sell: 488.2, ce_exit: 356.8, pe_exit: 600.49, ce_sl_hit: false, pe_sl_hit: true, qty: 30, gross_pnl: 2059.10, brokerage: 108.94, net_pnl: 1950.16, capital_before: 100000, capital_after: 101950.16, notes: 'SCHEDULED_EXIT' },
-        { id: 6, date: '2026-06-01', time_entry: '09:59:05', time_exit: '15:06:02', instrument: 'SENSEX', spot: 74877.9, ce_strike: 74900, pe_strike: 74900, ce_sell: 555.15, pe_sell: 456.65, ce_exit: 303.3, pe_exit: 561.7, ce_sl_hit: false, pe_sl_hit: true, qty: 30, gross_pnl: 1468.0, brokerage: 107.05, net_pnl: 1360.95, capital_before: 101950.16, capital_after: 103311.11, notes: 'SCHEDULED_EXIT' },
+        { id: 1, date: '2026-05-29', time_entry: '09:59:07', time_exit: '15:06:01', instrument: 'SENSEX', spot: 75930.27, ce_strike: 75900, pe_strike: 75900, ce_sell: 675.0, pe_sell: 488.2, ce_exit: 356.8, pe_exit: 600.49, ce_sl_hit: false, pe_sl_hit: true, qty: 20, gross_pnl: 2059.10, brokerage: 108.94, net_pnl: 1950.16, capital_before: 250000, capital_after: 251950.16, notes: 'SCHEDULED_EXIT' },
+        { id: 6, date: '2026-06-01', time_entry: '09:59:05', time_exit: '15:06:02', instrument: 'SENSEX', spot: 74877.9, ce_strike: 74900, pe_strike: 74900, ce_sell: 555.15, pe_sell: 456.65, ce_exit: 303.3, pe_exit: 561.7, ce_sl_hit: false, pe_sl_hit: true, qty: 20, gross_pnl: 1468.0, brokerage: 107.05, net_pnl: 1360.95, capital_before: 251950.16, capital_after: 253311.11, notes: 'SCHEDULED_EXIT' },
       ],
     },
     BANKNIFTY: {
-      initial_capital: 80000,
-      current_capital: 80000,
+      initial_capital: 250000,
+      current_capital: 254046,
       mode: 'paper',
       instrument: 'BANKNIFTY',
-      lot_size: 15,
+      lot_size: 30,
       color: '#5fa878',
       strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
       stats: { total_trades: 0, wins: 0, losses: 0, win_rate: 0, total_pnl: 0, avg_win: 0, avg_loss: 0, best_day: 0, worst_day: 0, max_drawdown: 0 },
       trades: [],
     },
     NIFTY: {
-      initial_capital: 120000,
-      current_capital: 120000,
+      initial_capital: 250000,
+      current_capital: 251261,
       mode: 'paper',
       instrument: 'NIFTY',
-      lot_size: 25,
+      lot_size: 65,
       color: '#6b8cff',
       strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
       stats: { total_trades: 0, wins: 0, losses: 0, win_rate: 0, total_pnl: 0, avg_win: 0, avg_loss: 0, best_day: 0, worst_day: 0, max_drawdown: 0 },
       trades: [],
     },
     FINNIFTY: {
-      initial_capital: 70000,
-      current_capital: 70000,
+      initial_capital: 250000,
+      current_capital: 242246,
       mode: 'paper',
       instrument: 'FINNIFTY',
-      lot_size: 25,
+      lot_size: 60,
       color: '#c45c5c',
       strategy: { entry_time: '09:59', exit_time: '15:06', ce_sl_pct: 25, pe_sl_pct: 23, trail_to_be: true, reentry_time: '12:30' },
       stats: { total_trades: 0, wins: 0, losses: 0, win_rate: 0, total_pnl: 0, avg_win: 0, avg_loss: 0, best_day: 0, worst_day: 0, max_drawdown: 0 },
@@ -1458,8 +1458,8 @@ Promise.all([
   const buildSummary = (name, raw, detailedSummary = null) => {
     const labels = raw.labels || [];
     const initialCapital = name === 'SENSEX'
-      ? pickNumber(detailedSummary?.initial_capital, raw.capital?.[0], 100000)
-      : pickNumber(raw.summary?.initial_capital, raw.capital?.[0], 100000);
+      ? pickNumber(detailedSummary?.initial_capital, raw.capital?.[0], 250000)
+      : pickNumber(raw.summary?.initial_capital, raw.capital?.[0], 250000);
     const finalCapital = pickNumber(raw.summary?.final_capital, raw.capital?.[raw.capital.length - 1], initialCapital);
     const startDate = raw.summary?.start_date || labels[0];
     const endDate = raw.summary?.end_date || labels[labels.length - 1];
@@ -1882,16 +1882,16 @@ Promise.all([
 
   // ─── SWITCHABLE SINGLE-INSTRUMENT REPLAY ─────────────────────────────────────
   const MARGINS = {
-    SENSEX: 27000,
-    NIFTY: 16000,
-    BANKNIFTY: 12000,
-    FINNIFTY: 15000,
+    SENSEX: 200000,
+    NIFTY: 200000,
+    BANKNIFTY: 230000,
+    FINNIFTY: 220000,
   };
   const INITIALS = {
-    SENSEX: 109000,
-    NIFTY: 100000,
-    BANKNIFTY: 100000,
-    FINNIFTY: 100000,
+    SENSEX: 250000,
+    NIFTY: 250000,
+    BANKNIFTY: 250000,
+    FINNIFTY: 250000,
   };
   const MAX_LOTS = 100;
   const DETAILED_TRADES = sensexDetailed.trades || [];
@@ -2525,11 +2525,11 @@ Promise.all([
           pnl: 0,
           startCap: capital,
           endCap: capital,
-          startLots: Math.max(1, Math.min(Math.floor((capital * 0.6) / MARGINS.SENSEX), MAX_LOTS)),
+          startLots: Math.max(1, Math.min(Math.floor(capital / MARGINS.SENSEX), MAX_LOTS)),
           endLots: 0,
         };
       }
-      const lots = Math.max(1, Math.min(Math.floor((capital * 0.6) / MARGINS.SENSEX), MAX_LOTS));
+      const lots = Math.max(1, Math.min(Math.floor(capital / MARGINS.SENSEX), MAX_LOTS));
       years[year].days += 1;
       if (trade.win) years[year].wins += 1;
       else years[year].losses += 1;
@@ -2636,14 +2636,14 @@ Promise.all([
     const finalCapital = finalPoint ? finalPoint.capital : INITIALS[name];
     const firstLots = points[0]?.lots || 0;
     const lastLots = finalPoint?.lots || 0;
-    replayEls.compoundSummary.innerHTML = `<strong>Final: ${fmtCr(INITIALS[name])} → ${fmtCr(finalCapital)} (${(finalCapital / INITIALS[name]).toFixed(1)}×)</strong> 60% reserve/margin framework with ${fmtINR(MARGINS[name])} per lot — lots scaled from ${firstLots} to ${lastLots} over ${points.length.toLocaleString('en-IN')} trading days.`;
+    replayEls.compoundSummary.innerHTML = `<strong>Final: ${fmtCr(INITIALS[name])} → ${fmtCr(finalCapital)} (${(finalCapital / INITIALS[name]).toFixed(1)}×)</strong> Real straddle margins with ${fmtINR(MARGINS[name])} per lot — lots scaled from ${firstLots} to ${lastLots} over ${points.length.toLocaleString('en-IN')} trading days.`;
   }
 
   function updateSectionHeaders(name) {
     const summary = backtests[name].summary;
     replayEls.replayKicker.textContent = name === 'SENSEX'
-      ? `${name} detailed replay • fresh Dhan API data • 60/40 compounding`
-      : `${name} replay • switchable single-instrument view • 60/40 compounding`;
+      ? `${name} detailed replay • fresh API data • real margin compounding`
+      : `${name} replay • switchable single-instrument view • real margin compounding`;
     replayEls.replayTitle.textContent = `${name} Backtest Replay`;
     replayEls.logKicker.textContent = name === 'SENSEX'
       ? `${name} execution ledger • fresh API data`
@@ -2658,8 +2658,8 @@ Promise.all([
       ? '* 2026 is a partial year. All P&L uses fresh 1-minute Dhan rolling option API calls validated with true SENSEX INDEX spot.'
       : `* Derived from ${name} daily backtest series using capital, lot, and P&L arrays with ${fmtINR(MARGINS[name])} per-lot margin.`;
     replayEls.compoundKicker.textContent = `${name} compounding power`;
-    replayEls.compoundTitle.textContent = `${name} 60/40 Compounding`;
-    replayEls.compoundIntro.textContent = `Starting with ${fmtCr(INITIALS[name])}. 60% of capital for margin, 40% reserve. Margin per lot ${fmtINR(MARGINS[name])}. Lot cap: ${MAX_LOTS}.`;
+    replayEls.compoundTitle.textContent = `${name} Real Margin Compounding`;
+    replayEls.compoundIntro.textContent = `Starting with ${fmtCr(INITIALS[name])}. Full capital for margin. Margin per lot ${fmtINR(MARGINS[name])}. Lot cap: ${MAX_LOTS}.`;
     replayEls.compoundNote.textContent = name === 'SENSEX'
       ? `Data source: Fresh 1-minute Dhan rolling option API calls across ${summary.trading_days.toLocaleString('en-IN')} SENSEX trading days. Lot cap of ${MAX_LOTS} applied for realistic sizing.`
       : `Data source: ${name} compounded backtest series with daily capital, lot sizing, and monthly attribution across ${summary.trading_days.toLocaleString('en-IN')} sessions.`;

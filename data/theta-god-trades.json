@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-25 15:20:21 IST",
+  "last_updated": "2026-06-25 15:38:32 IST",
   "instruments": {
     "SENSEX": {
       "initial_capital": 253528.0,
@@ -1542,7 +1542,7 @@
     },
     "FINNIFTY": {
       "initial_capital": 242246.0,
-      "current_capital": 332032.21,
+      "current_capital": 271780.65,
       "mode": "paper",
       "instrument": "FINNIFTY",
       "lot_size": 60,
@@ -1560,10 +1560,10 @@
         "wins": 13,
         "losses": 5,
         "win_rate": 72.22,
-        "total_pnl": 89786.21,
-        "avg_win": 7395.66,
+        "total_pnl": 29534.65,
+        "avg_win": 2760.92,
         "avg_loss": -2822.26,
-        "best_day": 65213.7,
+        "best_day": 4962.14,
         "worst_day": -7920.6,
         "max_drawdown": -3.95
       },
@@ -1969,17 +1969,17 @@
           "ce_strike": 26950.0,
           "pe_strike": 26950.0,
           "ce_sell": 163.4,
-          "pe_sell": 1221.45,
+          "pe_sell": 216.0,
           "ce_exit": 80.0,
           "pe_exit": 214.65,
           "ce_sl_hit": false,
           "pe_sl_hit": false,
           "qty": 60,
-          "gross_pnl": 65412.0,
-          "brokerage": 198.3,
-          "net_pnl": 65213.7,
+          "gross_pnl": 5085.0,
+          "brokerage": 122.86,
+          "net_pnl": 4962.14,
           "capital_before": 266818.51,
-          "capital_after": 332032.21,
+          "capital_after": 271780.65,
           "notes": "SCHEDULED_EXIT"
         }
       ]

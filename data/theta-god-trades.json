@@ -1,9 +1,9 @@
 {
-  "last_updated": "2026-08-03 15:20:30 IST",
+  "last_updated": "2026-08-04 15:20:07 IST",
   "instruments": {
     "SENSEX": {
       "initial_capital": 253528.0,
-      "current_capital": 272004.62,
+      "current_capital": 274186.72,
       "mode": "paper",
       "instrument": "SENSEX",
       "lot_size": 20,
@@ -17,12 +17,12 @@
         "reentry_time": "12:30"
       },
       "stats": {
-        "total_trades": 60,
-        "wins": 36,
+        "total_trades": 61,
+        "wins": 37,
         "losses": 24,
-        "win_rate": 60.0,
-        "total_pnl": 18476.62,
-        "avg_win": 1632.27,
+        "win_rate": 60.66,
+        "total_pnl": 20658.72,
+        "avg_win": 1647.13,
         "avg_loss": -1531.54,
         "best_day": 3900.32,
         "worst_day": -2776.6,
@@ -1408,12 +1408,35 @@
           "capital_before": 271456.8,
           "capital_after": 272004.62,
           "notes": "SCHEDULED_EXIT"
+        },
+        {
+          "id": 67,
+          "date": "2026-08-04",
+          "time_entry": "09:59:05",
+          "time_exit": "15:06:07",
+          "instrument": "SENSEX",
+          "spot": 78844.41,
+          "ce_strike": 78800.0,
+          "pe_strike": 78800.0,
+          "ce_sell": 337.1,
+          "pe_sell": 282.55,
+          "ce_exit": 157.5,
+          "pe_exit": 347.55,
+          "ce_sl_hit": false,
+          "pe_sl_hit": true,
+          "qty": 20,
+          "gross_pnl": 2292.0,
+          "brokerage": 109.9,
+          "net_pnl": 2182.1,
+          "capital_before": 272004.62,
+          "capital_after": 274186.72,
+          "notes": "SCHEDULED_EXIT"
         }
       ]
     },
     "BANKNIFTY": {
       "initial_capital": 254046.0,
-      "current_capital": 291282.44,
+      "current_capital": 290465.26,
       "mode": "paper",
       "instrument": "BANKNIFTY",
       "lot_size": 30,
@@ -1427,13 +1450,13 @@
         "reentry_time": "12:30"
       },
       "stats": {
-        "total_trades": 45,
+        "total_trades": 46,
         "wins": 33,
-        "losses": 12,
-        "win_rate": 73.33,
-        "total_pnl": 37236.44,
+        "losses": 13,
+        "win_rate": 71.74,
+        "total_pnl": 36419.26,
         "avg_win": 1885.44,
-        "avg_loss": -1744.77,
+        "avg_loss": -1673.41,
         "best_day": 4809.63,
         "worst_day": -6096.63,
         "max_drawdown": -3.23
@@ -2473,12 +2496,35 @@
           "capital_before": 290773.49,
           "capital_after": 291282.44,
           "notes": "SCHEDULED_EXIT"
+        },
+        {
+          "id": 47,
+          "date": "2026-08-04",
+          "time_entry": "09:59:04",
+          "time_exit": "15:06:01",
+          "instrument": "BANKNIFTY",
+          "spot": 57862.4,
+          "ce_strike": 57900.0,
+          "pe_strike": 57900.0,
+          "ce_sell": 723.2,
+          "pe_sell": 630.5,
+          "ce_exit": 600.6,
+          "pe_exit": 775.5,
+          "ce_sl_hit": false,
+          "pe_sl_hit": true,
+          "qty": 30,
+          "gross_pnl": -672.0,
+          "brokerage": 145.18,
+          "net_pnl": -817.18,
+          "capital_before": 291282.44,
+          "capital_after": 290465.26,
+          "notes": "SCHEDULED_EXIT"
         }
       ]
     },
     "NIFTY": {
       "initial_capital": 251261.0,
-      "current_capital": 246301.39,
+      "current_capital": 247071.21,
       "mode": "paper",
       "instrument": "NIFTY",
       "lot_size": 65,
@@ -2492,12 +2538,12 @@
         "reentry_time": "12:30"
       },
       "stats": {
-        "total_trades": 54,
-        "wins": 25,
+        "total_trades": 55,
+        "wins": 26,
         "losses": 29,
-        "win_rate": 46.3,
-        "total_pnl": -4959.61,
-        "avg_win": 1459.89,
+        "win_rate": 47.27,
+        "total_pnl": -4189.79,
+        "avg_win": 1433.35,
         "avg_loss": -1386.06,
         "best_day": 3220.54,
         "worst_day": -2765.65,
@@ -3745,12 +3791,35 @@
           "capital_before": 245782.27,
           "capital_after": 246301.39,
           "notes": "SCHEDULED_EXIT"
+        },
+        {
+          "id": 58,
+          "date": "2026-08-04",
+          "time_entry": "09:59:05",
+          "time_exit": "15:06:08",
+          "instrument": "NIFTY",
+          "spot": 24633.75,
+          "ce_strike": 24650.0,
+          "pe_strike": 24650.0,
+          "ce_sell": 30.8,
+          "pe_sell": 52.6,
+          "ce_exit": 5.3,
+          "pe_exit": 64.7,
+          "ce_sl_hit": false,
+          "pe_sl_hit": true,
+          "qty": 65,
+          "gross_pnl": 871.0,
+          "brokerage": 101.18,
+          "net_pnl": 769.82,
+          "capital_before": 246301.39,
+          "capital_after": 247071.21,
+          "notes": "SCHEDULED_EXIT"
         }
       ]
     },
     "FINNIFTY": {
       "initial_capital": 242246.0,
-      "current_capital": 274863.73,
+      "current_capital": 274748.64,
       "mode": "paper",
       "instrument": "FINNIFTY",
       "lot_size": 60,
@@ -3764,13 +3833,13 @@
         "reentry_time": "12:30"
       },
       "stats": {
-        "total_trades": 49,
+        "total_trades": 50,
         "wins": 30,
-        "losses": 19,
-        "win_rate": 61.22,
-        "total_pnl": 32617.73,
+        "losses": 20,
+        "win_rate": 60.0,
+        "total_pnl": 32502.64,
         "avg_win": 2144.55,
-        "avg_loss": -2077.51,
+        "avg_loss": -1979.39,
         "best_day": 4962.14,
         "worst_day": -7920.6,
         "max_drawdown": -3.95
@@ -4901,6 +4970,29 @@
           "net_pnl": -848.47,
           "capital_before": 275712.2,
           "capital_after": 274863.73,
+          "notes": "SCHEDULED_EXIT"
+        },
+        {
+          "id": 53,
+          "date": "2026-08-04",
+          "time_entry": "09:59:05",
+          "time_exit": "15:06:04",
+          "instrument": "FINNIFTY",
+          "spot": 26863.25,
+          "ce_strike": 26850.0,
+          "pe_strike": 26850.0,
+          "ce_sell": 383.65,
+          "pe_sell": 291.95,
+          "ce_exit": 316.0,
+          "pe_exit": 359.1,
+          "ce_sl_hit": false,
+          "pe_sl_hit": true,
+          "qty": 60,
+          "gross_pnl": 30.0,
+          "brokerage": 145.09,
+          "net_pnl": -115.09,
+          "capital_before": 274863.73,
+          "capital_after": 274748.64,
           "notes": "SCHEDULED_EXIT"
         }
       ]
